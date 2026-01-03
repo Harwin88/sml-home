@@ -1,0 +1,13 @@
+{
+    "name": "bulk-import",
+    "version": "1.0.0",
+    "description": "Carga masiva para DAM",
+    "strapi": {
+        "name": "bulk-import",
+        "description": "Importación masiva de activos al DAM",
+        "kind": "plugin",
+        "displayName": "Carga Masiva DAM"
+    },
+    "dependencies": {},
+    "devDependencies": {}
+}
