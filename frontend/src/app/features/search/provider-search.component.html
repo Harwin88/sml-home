@@ -138,7 +138,7 @@
             <!-- Imagen -->
             <div class="provider-image">
               <img [src]="provider.photoUrl || 'assets/default-avatar.png'" [alt]="provider.name"
-                onerror="this.src='assets/default-avatar.png'" />
+                (error)="onImageError($event)" />
               <span *ngIf="provider.isVerified" class="verified-badge">
                 ✓ Verificado
               </span>

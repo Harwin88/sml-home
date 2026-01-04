@@ -548,4 +548,23 @@ export class ProviderSearchComponent implements OnInit {
         const filter = this.subcategoryFilters.find(f => f.name === categoryName);
         return filter ? this.selectedSubcategory === filter.slug : false;
     }
+
+    /**
+     * Manejar error al cargar imagen - evita loops infinitos
+     */
+    onImageError(event: Event): void {
+        const img = event.target as HTMLImageElement;
+        const defaultAvatar = 'assets/default-avatar.png';
+        
+        // Solo cambiar si no es ya el default-avatar para evitar loops
+        if (img.src && !img.src.includes(defaultAvatar)) {
+            img.src = defaultAvatar;
+            // Deshabilitar el handler de error después del primer fallo para evitar loops
+            img.onerror = null;
+        } else {
+            // Si ya es el default-avatar y falla, usar un data URI transparente para evitar parpadeo
+            img.onerror = null;
+            img.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'1\' height=\'1\'%3E%3C/svg%3E';
+        }
+    }
 }

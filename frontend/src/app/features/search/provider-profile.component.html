@@ -26,7 +26,7 @@
     <div class="profile-header">
       <div class="profile-image-section">
         <img [src]="getPhotoUrl()" [alt]="provider.name" class="profile-image"
-          onerror="this.src='assets/default-avatar.png'" />
+          (error)="onImageError($event)" />
         <span *ngIf="provider.isVerified" class="verified-badge-large">
           ✓ Verificado
         </span>
