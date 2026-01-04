@@ -24,6 +24,35 @@
     },
     "description": {
       "type": "text"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "parent": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "children"
+    },
+    "children": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::category.category",
+      "mappedBy": "parent"
+    },
+    "service_providers": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::service-provider.service-provider",
+      "inversedBy": "categories"
     }
   }
 }

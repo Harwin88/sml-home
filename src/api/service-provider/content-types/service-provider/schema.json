@@ -76,6 +76,12 @@
             ],
             "default": "moderado"
         },
+        "hourlyRate": {
+            "type": "decimal",
+            "required": true,
+            "min": 0,
+            "max": 1000000
+        },
         "serviceArea": {
             "type": "text"
         },
@@ -83,7 +89,7 @@
             "type": "relation",
             "relation": "manyToMany",
             "target": "api::category.category",
-            "inversedBy": "service_providers"
+            "mappedBy": "service_providers"
         },
         "certifications": {
             "type": "json",
