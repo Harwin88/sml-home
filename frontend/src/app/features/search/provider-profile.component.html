@@ -1,0 +1,144 @@
+<div class="profile-container">
+  <!-- Botón de regreso -->
+  <div class="back-button">
+    <button class="btn-back" (click)="router.navigate(['/'])">
+      ← Volver a búsqueda
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando perfil...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error">
+    <h3>⚠️ Error</h3>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="router.navigate(['/'])">Volver a búsqueda</button>
+  </div>
+
+  <!-- Perfil del proveedor -->
+  <div *ngIf="provider && !loading" class="profile-content">
+    
+    <!-- Header del perfil -->
+    <div class="profile-header">
+      <div class="profile-image-section">
+        <img [src]="getPhotoUrl()" [alt]="provider.name" class="profile-image"
+          onerror="this.src='assets/default-avatar.png'" />
+        <span *ngIf="provider.isVerified" class="verified-badge-large">
+          ✓ Verificado
+        </span>
+      </div>
+
+      <div class="profile-header-info">
+        <h1 class="provider-name">{{ provider.name }}</h1>
+        
+        <!-- Rating -->
+        <div class="rating-section">
+          <div class="stars-display">
+            <span *ngFor="let filled of getStars()" class="star" [class.filled]="filled">⭐</span>
+            <span class="rating-value">{{ provider.rating.toFixed(1) }}/5</span>
+          </div>
+          <span class="reviews-count">({{ provider.totalReviews }} reseña{{ provider.totalReviews !== 1 ? 's' : '' }})</span>
+        </div>
+
+        <!-- Experiencia -->
+        <div class="experience-badge">
+          <span class="icon">💼</span>
+          <span>{{ provider.experienceYears }} años de experiencia</span>
+        </div>
+
+        <!-- Rango de precio -->
+        <div class="price-range-badge" [ngClass]="provider.priceRange">
+          <span class="icon">💰</span>
+          <span>{{ getPriceRangeText() }}</span>
+        </div>
+
+        <!-- Botones de acción principales -->
+        <div class="action-buttons">
+          <button class="btn btn-whatsapp" (click)="openWhatsApp()">
+            <span class="icon">💬</span>
+            Contactar por WhatsApp
+          </button>
+          <button class="btn btn-call" (click)="callProvider()">
+            <span class="icon">📞</span>
+            Llamar
+          </button>
+          <button *ngIf="provider.email" class="btn btn-email" (click)="sendEmail()">
+            <span class="icon">✉️</span>
+            Email
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información detallada -->
+    <div class="profile-details">
+      
+      <!-- Descripción -->
+      <section class="detail-section" *ngIf="provider.description">
+        <h2>📝 Sobre el servicio</h2>
+        <p class="description-text">{{ provider.description }}</p>
+      </section>
+
+      <!-- Información de contacto -->
+      <section class="detail-section">
+        <h2>📞 Información de contacto</h2>
+        <div class="contact-info">
+          <div class="contact-item" *ngIf="provider.phone">
+            <span class="contact-label">Teléfono:</span>
+            <a [href]="'tel:' + provider.phone" class="contact-value">{{ provider.phone }}</a>
+          </div>
+          <div class="contact-item" *ngIf="provider.whatsapp">
+            <span class="contact-label">WhatsApp:</span>
+            <a [href]="getWhatsAppUrl()" target="_blank" class="contact-value">{{ provider.whatsapp }}</a>
+          </div>
+          <div class="contact-item" *ngIf="provider.email">
+            <span class="contact-label">Email:</span>
+            <a [href]="'mailto:' + provider.email" class="contact-value">{{ provider.email }}</a>
+          </div>
+          <div class="contact-item" *ngIf="provider.address">
+            <span class="contact-label">Dirección:</span>
+            <span class="contact-value">{{ provider.address }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categorías de servicio -->
+      <section class="detail-section" *ngIf="getCategories().length > 0">
+        <h2>🛠️ Servicios ofrecidos</h2>
+        <div class="categories-list">
+          <span *ngFor="let category of getCategories()" class="category-tag-large">
+            {{ category.name }}
+          </span>
+        </div>
+      </section>
+
+      <!-- Área de servicio -->
+      <section class="detail-section" *ngIf="provider.serviceArea">
+        <h2>📍 Área de servicio</h2>
+        <p class="service-area">{{ provider.serviceArea }}</p>
+      </section>
+
+      <!-- Certificaciones -->
+      <section class="detail-section" *ngIf="provider.certifications && provider.certifications.length > 0">
+        <h2>🏆 Certificaciones</h2>
+        <ul class="certifications-list">
+          <li *ngFor="let cert of provider.certifications">{{ cert }}</li>
+        </ul>
+      </section>
+
+      <!-- Horario de disponibilidad -->
+      <section class="detail-section" *ngIf="hasAvailabilitySchedule()">
+        <h2>🕐 Disponibilidad</h2>
+        <div class="schedule-info">
+          <pre>{{ provider!.availabilitySchedule | json }}</pre>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+

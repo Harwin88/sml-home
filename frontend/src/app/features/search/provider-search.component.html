@@ -1,0 +1,209 @@
+<div class="search-container">
+
+  <!-- Header con buscador -->
+  <div class="search-header">
+    <h1>🔍 Buscar Proveedores de Servicios</h1>
+
+    <div class="search-box">
+      <input type="text" [formControl]="searchControl" placeholder="Buscar por nombre, servicio o zona..."
+        class="search-input" />
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <div class="active-filters" *ngIf="activeFiltersCount > 0">
+      <span class="filter-count">{{ activeFiltersCount }} filtro(s) activo(s)</span>
+      <button class="btn-clear" (click)="clearFilters()">Limpiar todo</button>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+
+    <!-- Sidebar con filtros -->
+    <aside class="filters-sidebar">
+
+      <!-- Filtro por Categorías (Solo Nodos Hoja) -->
+      <div class="filter-section">
+        <h3>📋 Categorías de Servicio</h3>
+        <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 15px;">
+          Selecciona una categoría
+        </p>
+
+        <!-- Buscador de categorías (para filtrar la lista de categorías) -->
+        <div class="category-search-box">
+          <input type="text" 
+                 [formControl]="categorySearchControl" 
+                 placeholder="🔍 Buscar categoría..."
+                 class="category-search-input" />
+        </div>
+
+        <div *ngIf="loadingCategories" class="loading-small">
+          Cargando categorías...
+        </div>
+
+        <!-- Mostrar solo categorías nodo hoja como filtros seleccionables (filtradas por búsqueda) -->
+        <div *ngIf="!loadingCategories && subcategoryFilters.length > 0" class="leaf-categories-list">
+          <label *ngFor="let category of filteredSubcategoryFilters" class="checkbox-label"
+            [class.selected]="category.selected">
+            <input type="checkbox" [checked]="category.selected" (change)="toggleSubcategory(category)" />
+            <span class="subcategory-icon" *ngIf="category.icon">{{ category.icon }}</span>
+            <span class="subcategory-name">{{ category.name }}</span>
+            <span class="parent-badge" *ngIf="category.parentName">{{ category.parentName }}</span>
+          </label>
+        </div>
+
+        <!-- Mensaje cuando no hay categorías que coincidan con la búsqueda -->
+        <div *ngIf="!loadingCategories && subcategoryFilters.length > 0 && filteredSubcategoryFilters.length === 0" class="no-categories">
+          <p>No se encontraron categorías con ese término</p>
+        </div>
+
+        <!-- Mensaje cuando no hay categorías disponibles -->
+        <div *ngIf="!loadingCategories && subcategoryFilters.length === 0" class="no-categories">
+          <p>No hay categorías disponibles</p>
+        </div>
+      </div>
+
+      <!-- Filtro por Rating -->
+      <div class="filter-section">
+        <h3>⭐ Calificación Mínima</h3>
+        <div class="rating-filter">
+          <input type="range" min="0" max="5" step="0.5" [(ngModel)]="minRating" (change)="applyFilters()"
+            class="rating-slider" />
+          <div class="rating-value">
+            <span *ngIf="minRating > 0">{{ minRating }} ⭐ o más</span>
+            <span *ngIf="minRating === 0">Cualquier calificación</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtro por Verificación -->
+      <div class="filter-section">
+        <h3>✓ Estado</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="showOnlyVerified" (change)="applyFilters()" />
+          <span>Solo proveedores verificados</span>
+        </label>
+      </div>
+
+      <!-- Filtro por Rango de Precio -->
+      <div class="filter-section">
+        <h3>💰 Rango de Precio</h3>
+        <div class="price-filters">
+          <label *ngFor="let range of priceRanges" class="radio-label" [class.selected]="selectedPriceRange === range">
+            <input type="radio" name="priceRange" [value]="range" [(ngModel)]="selectedPriceRange"
+              (change)="applyFilters()" />
+            <span class="price-badge" [ngClass]="range">{{ range }}</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="priceRange" value="" [(ngModel)]="selectedPriceRange" (change)="applyFilters()" />
+            <span>Todos</span>
+          </label>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Resultados -->
+    <main class="results-section">
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Buscando proveedores...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="error && !loading" class="error">
+        {{ error }}
+      </div>
+
+      <!-- Sin resultados -->
+      <div *ngIf="!loading && !error && filteredProviders.length === 0" class="no-results">
+        <h3>😕 No se encontraron proveedores</h3>
+        <p>Intenta ajustar los filtros o realiza una nueva búsqueda</p>
+        <button class="btn-primary" (click)="clearFilters()">Limpiar filtros</button>
+      </div>
+
+      <!-- Resultados -->
+      <div *ngIf="!loading && filteredProviders.length > 0">
+
+        <!-- Contador de resultados -->
+        <div class="results-header">
+          <h2>{{ filteredProviders.length }} proveedor(es) encontrado(s)</h2>
+        </div>
+
+        <!-- Grid de proveedores -->
+        <div class="providers-grid">
+          <div *ngFor="let provider of filteredProviders" class="provider-card">
+
+            <!-- Imagen -->
+            <div class="provider-image">
+              <img [src]="provider.photoUrl || 'assets/default-avatar.png'" [alt]="provider.name"
+                onerror="this.src='assets/default-avatar.png'" />
+              <span *ngIf="provider.isVerified" class="verified-badge">
+                ✓ Verificado
+              </span>
+            </div>
+
+            <!-- Info -->
+            <div class="provider-info">
+              <h3 class="provider-name">{{ provider.name }}</h3>
+
+              <!-- Rating -->
+              <div class="rating">
+                <span class="stars">⭐ {{ provider.rating.toFixed(1) }}/5</span>
+                <span class="reviews">({{ provider.totalReviews }} reseñas)</span>
+              </div>
+
+              <!-- Experiencia -->
+              <p class="experience">
+                <span class="icon">💼</span>
+                {{ provider.experienceYears }} años de experiencia
+              </p>
+
+              <!-- Categorías -->
+              <div class="provider-categories">
+                <span *ngFor="let category of provider.categories" class="category-tag"
+                  [class.highlighted]="isCategoryHighlighted(category)">
+                  {{ category }}
+                </span>
+              </div>
+
+              <!-- Precio -->
+              <div class="price-info">
+                <span class="price-badge" [ngClass]="provider.priceRange">
+                  {{ provider.priceRange }}
+                </span>
+              </div>
+
+              <!-- Acciones -->
+              <div class="provider-actions">
+                <a [href]="'tel:' + provider.phone" class="btn btn-call">
+                  📞 Llamar
+                </a>
+                <a [routerLink]="['/provider', provider.documentId]" class="btn btn-details">
+                  Ver Perfil
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button class="btn-page" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+            ← Anterior
+          </button>
+
+          <span class="page-info">
+            Página {{ currentPage }} de {{ totalPages }}
+          </span>
+
+          <button class="btn-page" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>

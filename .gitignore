@@ -1,0 +1,64 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Strapi
+backend/.tmp/
+backend/.cache/
+backend/build/
+backend/dist/
+backend/.strapi-updater.json
+backend/exports/
+
+# Database
+*.sqlite
+*.sqlite3
+postgres-data/
+*.md
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Docker
+docker-compose.override.yml
+frontend/node_modules/
+frontend/package-lock.json
+frontend/yarn.lock
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/lerna-debug.log*
+frontend/.DS_Store
+frontend/Thumbs.db
+frontend/*.swp
+frontend/*~
+# Uploads (optional - uncomment if you don't want to track uploads)
+# backend/public/uploads/*
+frontend/public/uploads/*
+frontend/.angular/cache/*
+frontend/.angular/cache/17.3.17/angular-webpack/02f5ca1fdb95e58985897b16b73bb09ef1310c9f/0.pack
+frontend/src/environments/environment.prod.ts
+frontend/src/environments/environment.ts
