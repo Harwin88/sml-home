@@ -1,19 +1,9 @@
 <div class="search-container">
 
-  <!-- Header con buscador -->
-  <div class="search-header">
-    <h1>🔍 Buscar Proveedores de Servicios</h1>
-
-    <div class="search-box">
-      <input type="text" [formControl]="searchControl" placeholder="Buscar por nombre, servicio o zona..."
-        class="search-input" />
-      <span class="search-icon">🔍</span>
-    </div>
-
-    <div class="active-filters" *ngIf="activeFiltersCount > 0">
-      <span class="filter-count">{{ activeFiltersCount }} filtro(s) activo(s)</span>
-      <button class="btn-clear" (click)="clearFilters()">Limpiar todo</button>
-    </div>
+  <!-- Filtros activos -->
+  <div class="active-filters-bar" *ngIf="activeFiltersCount > 0">
+    <span class="filter-count">{{ activeFiltersCount }} filtro(s) activo(s)</span>
+    <button class="btn-clear" (click)="clearFilters()">Limpiar todo</button>
   </div>
 
   <div class="content-wrapper">
@@ -183,6 +173,9 @@
                 <a [routerLink]="['/provider', provider.documentId]" class="btn btn-details">
                   Ver Perfil
                 </a>
+                <button (click)="openRatingModal(provider)" class="btn btn-rate">
+                  ⭐ Calificar
+                </button>
               </div>
             </div>
           </div>
@@ -207,3 +200,12 @@
     </main>
   </div>
 </div>
+
+<!-- Modal de calificación -->
+<app-rating-modal 
+  *ngIf="showRatingModal && selectedProviderForRating"
+  [providerName]="selectedProviderForRating.name"
+  [providerId]="selectedProviderForRating.documentId"
+  (close)="closeRatingModal()"
+  (submit)="onSubmitRating($event)">
+</app-rating-modal>

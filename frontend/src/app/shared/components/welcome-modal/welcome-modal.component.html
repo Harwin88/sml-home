@@ -1,0 +1,32 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">✨ Bienvenido a MSL Hogar</h2>
+      <button class="modal-close-btn" (click)="closeModal()" aria-label="Cerrar">
+        ×
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-icon">🛡️</div>
+      <p class="modal-text">
+        Todos los proveedores de servicios que forman parte de nuestra plataforma 
+        han sido <strong>verificados mediante un proceso riguroso de validación</strong> que incluye 
+        la revisión de su experiencia profesional, antecedentes disciplinarios y 
+        la validación de los servicios que ofrecen.
+      </p>
+      <p class="modal-text">
+        La seguridad y confianza de nuestros clientes es nuestra máxima prioridad, 
+        y nos comprometemos a mantener los más altos estándares de calidad en 
+        cada detalle de nuestro servicio.
+      </p>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="modal-understand-btn" (click)="closeModal()">
+        Entendido
+      </button>
+    </div>
+  </div>
+</div>
+

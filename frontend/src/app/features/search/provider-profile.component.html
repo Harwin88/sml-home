@@ -58,6 +58,10 @@
 
         <!-- Botones de acción principales -->
         <div class="action-buttons">
+          <button class="btn btn-rate" (click)="openRatingModal()">
+            <span class="icon">⭐</span>
+            Calificar Servicio
+          </button>
           <button class="btn btn-whatsapp" (click)="openWhatsApp()">
             <span class="icon">💬</span>
             Contactar por WhatsApp
@@ -141,4 +145,13 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de calificación -->
+<app-rating-modal 
+  *ngIf="showRatingModal && provider"
+  [providerName]="provider.name"
+  [providerId]="provider.documentId"
+  (close)="closeRatingModal()"
+  (submit)="onSubmitRating($event)">
+</app-rating-modal>
 

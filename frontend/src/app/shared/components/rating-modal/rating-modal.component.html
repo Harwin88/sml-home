@@ -1,0 +1,111 @@
+<div class="rating-modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="rating-modal-container" (click)="$event.stopPropagation()">
+    <div class="rating-modal-header">
+      <h2 class="rating-modal-title">⭐ Calificar a {{ providerName }}</h2>
+      <button class="rating-modal-close-btn" (click)="closeModal()" [disabled]="submitting" aria-label="Cerrar">
+        ×
+      </button>
+    </div>
+    
+    <form [formGroup]="ratingForm" (ngSubmit)="onSubmit()" class="rating-modal-body">
+      <!-- Calificación con estrellas -->
+      <div class="rating-section">
+        <label class="rating-label">Calificación *</label>
+        <div class="stars-container">
+          <button 
+            type="button"
+            *ngFor="let star of getStars()" 
+            class="star-btn"
+            [class.active]="star <= (hoveredRating || selectedRating)"
+            [class.selected]="star <= selectedRating"
+            (click)="setRating(star)"
+            (mouseenter)="onStarHover(star)"
+            (mouseleave)="onStarLeave()"
+            [disabled]="submitting">
+            ⭐
+          </button>
+        </div>
+        <input type="hidden" formControlName="rating" />
+        <div class="error-message" *ngIf="isFieldInvalid('rating')">
+          {{ getFieldError('rating') }}
+        </div>
+      </div>
+
+      <!-- Comentario -->
+      <div class="form-group">
+        <label for="comment" class="form-label">Comentario *</label>
+        <textarea 
+          id="comment"
+          formControlName="comment" 
+          class="form-control"
+          rows="4"
+          placeholder="Escribe tu comentario sobre el servicio..."
+          [disabled]="submitting"></textarea>
+        <div class="error-message" *ngIf="isFieldInvalid('comment')">
+          {{ getFieldError('comment') }}
+        </div>
+      </div>
+
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="reviewerName" class="form-label">Tu Nombre *</label>
+        <input 
+          type="text" 
+          id="reviewerName"
+          formControlName="reviewerName" 
+          class="form-control"
+          placeholder="Ingresa tu nombre"
+          [disabled]="submitting" />
+        <div class="error-message" *ngIf="isFieldInvalid('reviewerName')">
+          {{ getFieldError('reviewerName') }}
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="reviewerEmail" class="form-label">Tu Email *</label>
+        <input 
+          type="email" 
+          id="reviewerEmail"
+          formControlName="reviewerEmail" 
+          class="form-control"
+          placeholder="tu@email.com"
+          [disabled]="submitting" />
+        <div class="error-message" *ngIf="isFieldInvalid('reviewerEmail')">
+          {{ getFieldError('reviewerEmail') }}
+        </div>
+      </div>
+
+      <!-- Teléfono (opcional) -->
+      <div class="form-group">
+        <label for="reviewerPhone" class="form-label">Tu Teléfono <span class="optional">(Opcional)</span></label>
+        <input 
+          type="tel" 
+          id="reviewerPhone"
+          formControlName="reviewerPhone" 
+          class="form-control"
+          placeholder="+57 300 123 4567"
+          [disabled]="submitting" />
+      </div>
+    </form>
+    
+    <div class="rating-modal-footer">
+      <button 
+        type="button"
+        class="rating-modal-cancel-btn" 
+        (click)="closeModal()" 
+        [disabled]="submitting">
+        Cancelar
+      </button>
+      <button 
+        type="button"
+        class="rating-modal-submit-btn" 
+        (click)="onSubmit()" 
+        [disabled]="ratingForm.invalid || submitting">
+        <span *ngIf="!submitting">Enviar Calificación</span>
+        <span *ngIf="submitting">Enviando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+

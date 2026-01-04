@@ -2,13 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ServiceProviderService } from '../../core/services/service-provider.service';
+import { ReviewService } from '../../core/services/review.service';
+import { RatingModalComponent } from '../../shared/components/rating-modal/rating-modal.component';
 import { ServiceProvider } from '../../core/models/service-provider.model';
 import { API_CONFIG } from '../../core/config/api.config';
 
 @Component({
     selector: 'app-provider-profile',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, RatingModalComponent],
     templateUrl: './provider-profile.component.html',
     styleUrls: ['./provider-profile.component.scss']
 })
@@ -17,11 +19,13 @@ export class ProviderProfileComponent implements OnInit {
     loading = false;
     error = '';
     router = this.routerService;
+    showRatingModal = false;
 
     constructor(
         private route: ActivatedRoute,
         private routerService: Router,
-        private providerService: ServiceProviderService
+        private providerService: ServiceProviderService,
+        private reviewService: ReviewService
     ) { }
 
     ngOnInit(): void {
@@ -174,6 +178,41 @@ export class ProviderProfileComponent implements OnInit {
             img.onerror = null;
             img.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'1\' height=\'1\'%3E%3C/svg%3E';
         }
+    }
+
+    /**
+     * Abrir modal de calificación
+     */
+    openRatingModal(): void {
+        this.showRatingModal = true;
+    }
+
+    /**
+     * Cerrar modal de calificación
+     */
+    closeRatingModal(): void {
+        this.showRatingModal = false;
+    }
+
+    /**
+     * Enviar calificación
+     */
+    onSubmitRating(reviewData: any): void {
+        if (!this.provider) return;
+
+        this.reviewService.submitReviewToProvider(reviewData).subscribe({
+            next: () => {
+                // Éxito - podríamos mostrar un mensaje o recargar los datos
+                alert('¡Gracias por tu calificación!');
+                this.closeRatingModal();
+                // Opcional: Recargar proveedor para actualizar ratings
+                // this.loadProvider(this.provider!.documentId);
+            },
+            error: (err) => {
+                console.error('Error al enviar calificación:', err);
+                alert('Hubo un error al enviar tu calificación. Por favor intenta de nuevo.');
+            }
+        });
     }
 }
 

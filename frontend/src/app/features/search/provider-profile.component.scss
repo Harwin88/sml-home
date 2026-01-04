@@ -219,6 +219,15 @@
   }
 }
 
+.btn-rate {
+  background: #f39c12;
+  color: #fff;
+
+  &:hover {
+    background: #e67e22;
+  }
+}
+
 .btn-whatsapp {
   background: #25d366;
   color: #fff;

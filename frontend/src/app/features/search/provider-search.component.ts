@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -6,9 +6,13 @@ import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CategoryService } from '../../core/services/category.service';
 import { ServiceProviderService } from '../../core/services/service-provider.service';
+import { SearchService } from '../../core/services/search.service';
+import { ReviewService } from '../../core/services/review.service';
+import { RatingModalComponent } from '../../shared/components/rating-modal/rating-modal.component';
 import { CategoryView } from '../../core/models/category.model';
 import { ServiceProviderCard } from '../../core/models/service-provider.model';
 import { API_CONFIG } from '../../core/config/api.config';
+import { Subscription } from 'rxjs';
 
 interface CategoryFilter {
     id: number;
@@ -23,14 +27,14 @@ interface CategoryFilter {
 @Component({
     selector: 'app-provider-search',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, RatingModalComponent],
     templateUrl: './provider-search.component.html',
     styleUrls: ['./provider-search.component.scss']
 })
-export class ProviderSearchComponent implements OnInit {
+export class ProviderSearchComponent implements OnInit, OnDestroy {
 
     // Búsqueda
-    searchControl = new FormControl(''); // Para buscar proveedores
+    searchControl = new FormControl(''); // Para buscar proveedores (mantener para compatibilidad interna)
     categorySearchControl = new FormControl(''); // Para filtrar la lista de categorías
 
     // Categorías y filtros
@@ -60,9 +64,17 @@ export class ProviderSearchComponent implements OnInit {
     selectedPriceRange: string = '';
     priceRanges = ['economico', 'moderado', 'premium'];
 
+    // Modal de calificación
+    showRatingModal = false;
+    selectedProviderForRating: ServiceProviderCard | null = null;
+
+    private searchSubscription?: Subscription;
+
     constructor(
         private categoryService: CategoryService,
-        private providerService: ServiceProviderService
+        private providerService: ServiceProviderService,
+        private searchService: SearchService,
+        private reviewService: ReviewService
     ) { }
 
     ngOnInit(): void {
@@ -71,6 +83,33 @@ export class ProviderSearchComponent implements OnInit {
         this.loadAllProviders();
         this.setupSearch();
         this.setupCategorySearch();
+        
+        // Sincronizar con el servicio de búsqueda compartido
+        this.syncWithSearchService();
+    }
+
+    ngOnDestroy(): void {
+        if (this.searchSubscription) {
+            this.searchSubscription.unsubscribe();
+        }
+    }
+
+    /**
+     * Sincronizar con el servicio de búsqueda compartido del header
+     */
+    private syncWithSearchService(): void {
+        // Inicializar con el valor actual del servicio
+        const currentTerm = this.searchService.getSearchTerm();
+        if (currentTerm) {
+            this.searchControl.setValue(currentTerm);
+        }
+
+        // Suscribirse a cambios en el servicio de búsqueda
+        this.searchSubscription = this.searchService.searchTerm$.subscribe(term => {
+            if (this.searchControl.value !== term) {
+                this.searchControl.setValue(term);
+            }
+        });
     }
 
     /**
@@ -566,5 +605,42 @@ export class ProviderSearchComponent implements OnInit {
             img.onerror = null;
             img.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'1\' height=\'1\'%3E%3C/svg%3E';
         }
+    }
+
+    /**
+     * Abrir modal de calificación
+     */
+    openRatingModal(provider: ServiceProviderCard): void {
+        this.selectedProviderForRating = provider;
+        this.showRatingModal = true;
+    }
+
+    /**
+     * Cerrar modal de calificación
+     */
+    closeRatingModal(): void {
+        this.showRatingModal = false;
+        this.selectedProviderForRating = null;
+    }
+
+    /**
+     * Enviar calificación
+     */
+    onSubmitRating(reviewData: any): void {
+        if (!this.selectedProviderForRating) return;
+
+        this.reviewService.submitReviewToProvider(reviewData).subscribe({
+            next: () => {
+                // Éxito - podríamos mostrar un mensaje o recargar los datos
+                alert('¡Gracias por tu calificación!');
+                this.closeRatingModal();
+                // Opcional: Recargar proveedores para actualizar ratings
+                // this.loadAllProviders();
+            },
+            error: (err) => {
+                console.error('Error al enviar calificación:', err);
+                alert('Hubo un error al enviar tu calificación. Por favor intenta de nuevo.');
+            }
+        });
     }
 }
