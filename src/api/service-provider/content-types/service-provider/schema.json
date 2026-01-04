@@ -1,0 +1,101 @@
+{
+    "kind": "collectionType",
+    "collectionName": "service_providers",
+    "info": {
+        "singularName": "service-provider",
+        "pluralName": "service-providers",
+        "displayName": "Proveedor de Servicio",
+        "description": "Personas o empresas que ofrecen servicios del hogar"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string",
+            "required": true
+        },
+        "email": {
+            "type": "email",
+            "required": false
+        },
+        "phone": {
+            "type": "string",
+            "required": true
+        },
+        "whatsapp": {
+            "type": "string"
+        },
+        "address": {
+            "type": "text"
+        },
+        "description": {
+            "type": "text"
+        },
+        "photo": {
+            "type": "media",
+            "multiple": false,
+            "required": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "experienceYears": {
+            "type": "integer",
+            "default": 0
+        },
+        "rating": {
+            "type": "decimal",
+            "default": 0,
+            "min": 0,
+            "max": 5
+        },
+        "totalReviews": {
+            "type": "integer",
+            "default": 0
+        },
+        "isVerified": {
+            "type": "boolean",
+            "default": false
+        },
+        "isActive": {
+            "type": "boolean",
+            "default": true
+        },
+        "availabilitySchedule": {
+            "type": "json",
+            "default": {}
+        },
+        "priceRange": {
+            "type": "enumeration",
+            "enum": [
+                "economico",
+                "moderado",
+                "premium"
+            ],
+            "default": "moderado"
+        },
+        "serviceArea": {
+            "type": "text"
+        },
+        "categories": {
+            "type": "relation",
+            "relation": "manyToMany",
+            "target": "api::category.category",
+            "inversedBy": "service_providers"
+        },
+        "certifications": {
+            "type": "json",
+            "default": []
+        },
+        "portfolio": {
+            "type": "media",
+            "multiple": true,
+            "required": false,
+            "allowedTypes": [
+                "images"
+            ]
+        }
+    }
+}
