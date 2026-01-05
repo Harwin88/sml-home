@@ -5,13 +5,14 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { SearchService } from './core/services/search.service';
 import { FirstVisitService } from './core/services/first-visit.service';
 import { WelcomeModalComponent } from './shared/components/welcome-modal/welcome-modal.component';
+import { WorkWithUsModalComponent } from './shared/components/work-with-us-modal/work-with-us-modal.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, WelcomeModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, WelcomeModalComponent, WorkWithUsModalComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -20,6 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
   searchControl = new FormControl('');
   showSearch = true;
   showWelcomeModal = false;
+  showWorkWithUsModal = false;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -77,6 +79,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
   openWelcomeModal(): void {
     this.showWelcomeModal = true;
+  }
+
+  openWorkWithUsModal(): void {
+    this.showWorkWithUsModal = true;
+  }
+
+  onCloseWorkWithUsModal(): void {
+    this.showWorkWithUsModal = false;
   }
 
   ngOnDestroy(): void {

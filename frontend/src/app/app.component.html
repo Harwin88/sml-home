@@ -4,6 +4,10 @@
       <h1 class="logo">{{ title }}</h1>
     </div>
     <div class="header-actions">
+      <button class="info-button" (click)="openWorkWithUsModal()" aria-label="Trabaja con nosotros">
+        <span class="info-icon">💼</span>
+        <span class="info-text">Trabaja con nosotros</span>
+      </button>
       <button class="info-button" (click)="openWelcomeModal()" aria-label="Información sobre verificación">
         <span class="info-icon">ℹ️</span>
         <span class="info-text">Sobre nosotros</span>
@@ -29,3 +33,6 @@
 
 <!-- Modal de bienvenida -->
 <app-welcome-modal *ngIf="showWelcomeModal" (close)="onCloseWelcomeModal()"></app-welcome-modal>
+
+<!-- Modal Trabaja con nosotros -->
+<app-work-with-us-modal *ngIf="showWorkWithUsModal" (close)="onCloseWorkWithUsModal()"></app-work-with-us-modal>
