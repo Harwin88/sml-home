@@ -472,6 +472,57 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiFormForm extends Struct.CollectionTypeSchema {
+  collectionName: 'forms';
+  info: {
+    description: 'Formularios enviados por usuarios';
+    displayName: 'Formulario';
+    pluralName: 'forms';
+    singularName: 'form';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    additionalData: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    formType: Schema.Attribute.Enumeration<['contact', 'general']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'general'>;
+    ipAddress: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::form.form'> &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text & Schema.Attribute.Required;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    notes: Schema.Attribute.Text;
+    phone: Schema.Attribute.String;
+    priority: Schema.Attribute.Enumeration<
+      ['low', 'medium', 'high', 'urgent']
+    > &
+      Schema.Attribute.DefaultTo<'medium'>;
+    publishedAt: Schema.Attribute.DateTime;
+    resolvedAt: Schema.Attribute.DateTime;
+    serviceProvider: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::service-provider.service-provider'
+    >;
+    status: Schema.Attribute.Enumeration<
+      ['new', 'in-progress', 'resolved', 'closed']
+    > &
+      Schema.Attribute.DefaultTo<'new'>;
+    subject: Schema.Attribute.String;
+    submittedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userAgent: Schema.Attribute.String;
+  };
+}
+
 export interface ApiMediasMedias extends Struct.CollectionTypeSchema {
   collectionName: 'media';
   info: {
@@ -1170,6 +1221,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::category.category': ApiCategoryCategory;
+      'api::form.form': ApiFormForm;
       'api::medias.medias': ApiMediasMedias;
       'api::review.review': ApiReviewReview;
       'api::service-provider.service-provider': ApiServiceProviderServiceProvider;

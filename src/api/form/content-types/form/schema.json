@@ -1,0 +1,94 @@
+{
+  "kind": "collectionType",
+  "collectionName": "forms",
+  "info": {
+    "singularName": "form",
+    "pluralName": "forms",
+    "displayName": "Formulario",
+    "description": "Formularios enviados por usuarios"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "formType": {
+      "type": "enumeration",
+      "required": true,
+      "default": "general",
+      "enum": [
+        "contact",
+        "general"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": false
+    },
+    "subject": {
+      "type": "string",
+      "required": false
+    },
+    "message": {
+      "type": "text",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "default": "new",
+      "enum": [
+        "new",
+        "in-progress",
+        "resolved",
+        "closed"
+      ]
+    },
+    "priority": {
+      "type": "enumeration",
+      "default": "medium",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ]
+    },
+    "additionalData": {
+      "type": "json",
+      "required": false
+    },
+    "ipAddress": {
+      "type": "string",
+      "required": false
+    },
+    "userAgent": {
+      "type": "string",
+      "required": false
+    },
+    "submittedAt": {
+      "type": "datetime",
+      "required": false
+    },
+    "resolvedAt": {
+      "type": "datetime",
+      "required": false
+    },
+    "notes": {
+      "type": "text",
+      "required": false
+    },
+    "serviceProvider": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::service-provider.service-provider"
+    }
+  }
+}
