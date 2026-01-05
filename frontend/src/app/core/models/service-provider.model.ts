@@ -3,6 +3,11 @@ import { Category } from './category.model';
 
 export type PriceRange = 'economico' | 'moderado' | 'premium';
 
+export interface Certification {
+    name: string;
+    issuer: string;
+}
+
 export interface ServiceProvider extends StrapiDocument {
     name: string;
     email?: string;
@@ -20,9 +25,10 @@ export interface ServiceProvider extends StrapiDocument {
 
     // Información adicional
     priceRange: PriceRange;
+    hourlyRate?: number;
     serviceArea?: string;
     availabilitySchedule?: any;
-    certifications?: any[];
+    certifications?: Certification[];
 
     // Relaciones
     photo?: StrapiRelation<any>;
@@ -40,6 +46,7 @@ export interface CreateServiceProviderDTO {
     description?: string;
     experienceYears?: number;
     priceRange?: PriceRange;
+    hourlyRate?: number;
     serviceArea?: string;
     categories?: string[]; // documentIds de categorías
 }
@@ -54,6 +61,7 @@ export interface ServiceProviderCard {
     totalReviews: number;
     experienceYears: number;
     priceRange: PriceRange;
+    hourlyRate?: number;
     isVerified: boolean;
     photoUrl?: string;
     categories: string[]; // nombres de categorías

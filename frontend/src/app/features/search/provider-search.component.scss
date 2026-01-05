@@ -618,6 +618,18 @@
   .price-info {
     margin-bottom: var(--spacing-sm);
     font-size: 0.8125rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .hourly-rate {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .provider-actions {

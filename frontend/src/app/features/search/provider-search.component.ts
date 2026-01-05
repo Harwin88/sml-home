@@ -222,6 +222,7 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
 
     /**
      * Cargar todos los proveedores activos
+     * Solo se usa cuando NO hay ningún filtro activo
      */
     loadAllProviders(): void {
         this.loading = true;
@@ -242,14 +243,8 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
                 console.log('ProviderSearchComponent: Proveedores cargados:', response);
                 this.providersFull = response.data; // Guardar objetos completos
                 this.providers = response.data.map(p => this.toCard(p));
+                this.filteredProviders = [...this.providers];
                 this.totalProviders = response.meta.pagination.total;
-                // Aplicar filtros y búsqueda si hay término de búsqueda activo
-                const searchQuery = this.searchControl.value?.trim();
-                if (searchQuery) {
-                    this.searchInCache(searchQuery);
-                } else {
-                    this.applyFilters();
-                }
                 this.loading = false;
             },
             error: (err) => {
@@ -270,10 +265,21 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
                 distinctUntilChanged()
             )
             .subscribe(query => {
-                if (query && query.trim()) {
-                    this.searchInCache(query.trim());
+                // Si se borra el texto (query vacío o null), recargar todos los proveedores
+                if (!query || query.trim() === '') {
+                    // Si hay otros filtros activos, aplicar filtros sin búsqueda
+                    // Si no hay filtros, recargar todos los proveedores
+                    if (this.selectedSubcategory || 
+                        this.minRating > 0 || 
+                        this.showOnlyVerified || 
+                        this.selectedPriceRange) {
+                        this.applyFilters();
+                    } else {
+                        // No hay filtros ni búsqueda, recargar todos
+                        this.loadAllProviders();
+                    }
                 } else {
-                    // Si no hay búsqueda, aplicar solo los filtros activos
+                    // Hay texto de búsqueda, aplicar filtros (que incluirá la búsqueda)
                     this.applyFilters();
                 }
             });
@@ -459,6 +465,12 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
             };
         }
 
+        // Filtro por nombre (búsqueda del header) - usar $containsi (case-insensitive)
+        const searchQuery = this.searchControl.value?.trim();
+        if (searchQuery) {
+            filters.name = { $containsi: searchQuery };
+        }
+
         // Filtro por rating mínimo
         if (this.minRating > 0) {
             filters.rating = { $gte: this.minRating };
@@ -477,7 +489,7 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
         // Hacer petición al API con los filtros
         this.providerService.getAll({
             filters,
-            populate: '*',
+            populate: '*', // Usar populate=* para obtener todo
             sort: ['rating:desc'],
             pagination: {
                 page: this.currentPage,
@@ -488,13 +500,7 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
                 console.log('ProviderSearchComponent: Proveedores filtrados cargados:', response);
                 this.providersFull = response.data; // Guardar objetos completos
                 this.providers = response.data.map(p => this.toCard(p));
-                // Aplicar búsqueda si hay término de búsqueda activo
-                const searchQuery = this.searchControl.value?.trim();
-                if (searchQuery) {
-                    this.searchInCache(searchQuery);
-                } else {
-                    this.filteredProviders = [...this.providers]; // Mostrar todos ya que vienen filtrados del servidor
-                }
+                this.filteredProviders = [...this.providers]; // Mostrar todos ya que vienen filtrados del servidor
                 this.totalProviders = response.meta.pagination.total;
                 this.loading = false;
             },
@@ -508,19 +514,30 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
 
     /**
      * Aplicar filtros - siempre hacer petición al API para obtener resultados filtrados del servidor
+     * Los filtros funcionan de forma independiente y pueden combinarse
      */
     applyFilters(): void {
-        // Si hay cualquier filtro activo, usar el método que hace petición al API
-        if (this.selectedSubcategory || 
-            this.minRating > 0 || 
-            this.showOnlyVerified || 
-            this.selectedPriceRange) {
-            this.loadProvidersWithFilters();
-            return;
-        }
+        // Verificar si hay algún filtro activo o término de búsqueda
+        const searchQuery = this.searchControl.value?.trim();
+        const hasFilters = this.selectedSubcategory || 
+                          this.minRating > 0 || 
+                          this.showOnlyVerified || 
+                          this.selectedPriceRange ||
+                          (searchQuery && searchQuery.length > 0);
 
-        // Si no hay filtros, simplemente mostrar todos los proveedores
-        this.filteredProviders = [...this.providers];
+        if (hasFilters) {
+            // Si hay filtros o búsqueda, hacer petición al API
+            this.loadProvidersWithFilters();
+        } else {
+            // Si no hay filtros ni búsqueda, cargar todos los proveedores
+            if (this.providers.length === 0) {
+                // Solo cargar si no hay proveedores en caché
+                this.loadAllProviders();
+            } else {
+                // Si ya hay proveedores cargados, mostrarlos todos
+                this.filteredProviders = [...this.providers];
+            }
+        }
     }
 
 
@@ -533,6 +550,8 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
         if (this.minRating > 0) count++;
         if (this.showOnlyVerified) count++;
         if (this.selectedPriceRange) count++;
+        const searchQuery = this.searchControl.value?.trim();
+        if (searchQuery) count++;
         return count;
     }
 
@@ -566,6 +585,7 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
             totalReviews: provider.totalReviews,
             experienceYears: provider.experienceYears,
             priceRange: provider.priceRange,
+            hourlyRate: provider.hourlyRate,
             isVerified: provider.isVerified,
             photoUrl: photoUrl,
             categories: Array.isArray(categories) 
@@ -719,5 +739,15 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
         this.geolocationService.clearLocation();
         this.userLocation = null;
         this.locationError = null;
+    }
+
+    /**
+     * Formatear precio en formato colombiano
+     */
+    formatPrice(price: number): string {
+        return new Intl.NumberFormat('es-CO', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(price);
     }
 }

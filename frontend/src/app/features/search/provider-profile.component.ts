@@ -118,6 +118,16 @@ export class ProviderProfileComponent implements OnInit {
     }
 
     /**
+     * Formatear precio en formato colombiano
+     */
+    formatPrice(price: number): string {
+        return new Intl.NumberFormat('es-CO', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(price);
+    }
+
+    /**
      * Generar estrellas para el rating
      */
     getStars(): boolean[] {
@@ -159,6 +169,64 @@ export class ProviderProfileComponent implements OnInit {
             return false;
         }
         return Object.keys(this.provider.availabilitySchedule).length > 0;
+    }
+
+    /**
+     * Obtener horarios de disponibilidad ordenados por día de la semana
+     */
+    getAvailabilitySchedule(): Array<{ day: string; hours: string; dayOrder: number }> {
+        if (!this.provider?.availabilitySchedule) {
+            return [];
+        }
+
+        const schedule = this.provider.availabilitySchedule;
+        const dayOrder: { [key: string]: number } = {
+            'lunes': 1,
+            'martes': 2,
+            'miercoles': 3,
+            'miércoles': 3,
+            'jueves': 4,
+            'viernes': 5,
+            'sabado': 6,
+            'sábado': 6,
+            'domingo': 7
+        };
+
+        const dayLabels: { [key: string]: string } = {
+            'lunes': 'Lunes',
+            'martes': 'Martes',
+            'miercoles': 'Miércoles',
+            'miércoles': 'Miércoles',
+            'jueves': 'Jueves',
+            'viernes': 'Viernes',
+            'sabado': 'Sábado',
+            'sábado': 'Sábado',
+            'domingo': 'Domingo'
+        };
+
+        return Object.keys(schedule)
+            .filter(day => schedule[day] && schedule[day].trim() !== '')
+            .map(day => ({
+                day: dayLabels[day.toLowerCase()] || day.charAt(0).toUpperCase() + day.slice(1),
+                hours: schedule[day],
+                dayOrder: dayOrder[day.toLowerCase()] || 99
+            }))
+            .sort((a, b) => a.dayOrder - b.dayOrder);
+    }
+
+    /**
+     * Obtener certificaciones de forma segura
+     * Las certificaciones vienen como array de objetos con name e issuer
+     */
+    getCertifications(): any[] {
+        const certifications = (this.provider as any)?.certifications;
+        if (Array.isArray(certifications) && certifications.length > 0) {
+            // Filtrar certificaciones válidas (que tengan name)
+            return certifications.filter((cert: any) => 
+                cert && (typeof cert === 'object') && cert.name
+            );
+        }
+        return [];
     }
 
     /**

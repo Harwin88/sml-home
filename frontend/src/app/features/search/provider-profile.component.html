@@ -56,6 +56,12 @@
           <span>{{ getPriceRangeText() }}</span>
         </div>
 
+        <!-- Tarifa por hora -->
+        <div *ngIf="provider.hourlyRate" class="hourly-rate-badge">
+          <span class="icon">💵</span>
+          <span>${{ formatPrice(provider.hourlyRate) }} / hora</span>
+        </div>
+
         <!-- Botones de acción principales -->
         <div class="action-buttons">
           <button class="btn btn-rate" (click)="openRatingModal()">
@@ -127,10 +133,15 @@
       </section>
 
       <!-- Certificaciones -->
-      <section class="detail-section" *ngIf="provider.certifications && provider.certifications.length > 0">
+      <section class="detail-section" *ngIf="getCertifications().length > 0">
         <h2>🏆 Certificaciones</h2>
         <ul class="certifications-list">
-          <li *ngFor="let cert of provider.certifications">{{ cert }}</li>
+          <li *ngFor="let cert of getCertifications()" class="certification-item">
+            <div class="certification-content">
+              <span class="certification-name">{{ cert.name }}</span>
+              <span class="certification-issuer" *ngIf="cert.issuer">- {{ cert.issuer }}</span>
+            </div>
+          </li>
         </ul>
       </section>
 
@@ -138,7 +149,12 @@
       <section class="detail-section" *ngIf="hasAvailabilitySchedule()">
         <h2>🕐 Disponibilidad</h2>
         <div class="schedule-info">
-          <pre>{{ provider!.availabilitySchedule | json }}</pre>
+          <div class="schedule-list">
+            <div *ngFor="let item of getAvailabilitySchedule()" class="schedule-item">
+              <span class="schedule-day">{{ item.day }}</span>
+              <span class="schedule-hours">{{ item.hours }}</span>
+            </div>
+          </div>
         </div>
       </section>
 

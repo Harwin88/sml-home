@@ -56,7 +56,7 @@
       <div class="filter-section">
         <h3>⭐ Calificación Mínima</h3>
         <div class="rating-filter">
-          <input type="range" min="0" max="5" step="0.5" [(ngModel)]="minRating" (change)="applyFilters()"
+          <input type="range" min="0" max="5" step="0.5" [(ngModel)]="minRating" (ngModelChange)="applyFilters()"
             class="rating-slider" />
           <div class="rating-value">
             <span *ngIf="minRating > 0">{{ minRating }} ⭐ o más</span>
@@ -69,7 +69,7 @@
       <div class="filter-section">
         <h3>✓ Estado</h3>
         <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="showOnlyVerified" (change)="applyFilters()" />
+          <input type="checkbox" [(ngModel)]="showOnlyVerified" (ngModelChange)="applyFilters()" />
           <span>Solo proveedores verificados</span>
         </label>
       </div>
@@ -129,11 +129,11 @@
         <div class="price-filters">
           <label *ngFor="let range of priceRanges" class="radio-label" [class.selected]="selectedPriceRange === range">
             <input type="radio" name="priceRange" [value]="range" [(ngModel)]="selectedPriceRange"
-              (change)="applyFilters()" />
+              (ngModelChange)="applyFilters()" />
             <span class="price-badge" [ngClass]="range">{{ range }}</span>
           </label>
           <label class="radio-label">
-            <input type="radio" name="priceRange" value="" [(ngModel)]="selectedPriceRange" (change)="applyFilters()" />
+            <input type="radio" name="priceRange" value="" [(ngModel)]="selectedPriceRange" (ngModelChange)="applyFilters()" />
             <span>Todos</span>
           </label>
         </div>
@@ -211,6 +211,9 @@
               <div class="price-info">
                 <span class="price-badge" [ngClass]="provider.priceRange">
                   {{ provider.priceRange }}
+                </span>
+                <span *ngIf="provider.hourlyRate" class="hourly-rate">
+                  💵 ${{ formatPrice(provider.hourlyRate) }}/hora
                 </span>
               </div>
 

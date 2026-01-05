@@ -174,7 +174,9 @@ export class ServiceProviderService extends StrapiBaseService {
             totalReviews: provider.totalReviews,
             experienceYears: provider.experienceYears,
             priceRange: provider.priceRange,
+            hourlyRate: provider.hourlyRate,
             isVerified: provider.isVerified,
+            
             photoUrl: photo?.url ? this.getMediaUrl(photo) : undefined,
             categories: Array.isArray(categories) 
                 ? categories.map((cat: any) => cat.name || cat)
