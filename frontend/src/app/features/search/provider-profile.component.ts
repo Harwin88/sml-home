@@ -200,7 +200,7 @@ export class ProviderProfileComponent implements OnInit {
     onSubmitRating(reviewData: any): void {
         if (!this.provider) return;
 
-        this.reviewService.submitReviewToProvider(reviewData).subscribe({
+        this.reviewService.submitReview(reviewData).subscribe({
             next: () => {
                 // Éxito - podríamos mostrar un mensaje o recargar los datos
                 alert('¡Gracias por tu calificación!');

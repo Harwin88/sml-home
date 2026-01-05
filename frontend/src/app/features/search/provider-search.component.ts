@@ -8,6 +8,7 @@ import { CategoryService } from '../../core/services/category.service';
 import { ServiceProviderService } from '../../core/services/service-provider.service';
 import { SearchService } from '../../core/services/search.service';
 import { ReviewService } from '../../core/services/review.service';
+import { GeolocationService, GeolocationPosition } from '../../core/services/geolocation.service';
 import { RatingModalComponent } from '../../shared/components/rating-modal/rating-modal.component';
 import { CategoryView } from '../../core/models/category.model';
 import { ServiceProviderCard } from '../../core/models/service-provider.model';
@@ -68,13 +69,21 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
     showRatingModal = false;
     selectedProviderForRating: ServiceProviderCard | null = null;
 
+    // Geolocalización
+    userLocation: GeolocationPosition | null = null;
+    isGettingLocation = false;
+    locationError: string | null = null;
+    geolocationSupported = false;
+
     private searchSubscription?: Subscription;
+    private locationSubscription?: Subscription;
 
     constructor(
         private categoryService: CategoryService,
         private providerService: ServiceProviderService,
         private searchService: SearchService,
-        private reviewService: ReviewService
+        private reviewService: ReviewService,
+        private geolocationService: GeolocationService
     ) { }
 
     ngOnInit(): void {
@@ -86,11 +95,17 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
         
         // Sincronizar con el servicio de búsqueda compartido
         this.syncWithSearchService();
+
+        // Configurar geolocalización
+        this.setupGeolocation();
     }
 
     ngOnDestroy(): void {
         if (this.searchSubscription) {
             this.searchSubscription.unsubscribe();
+        }
+        if (this.locationSubscription) {
+            this.locationSubscription.unsubscribe();
         }
     }
 
@@ -629,7 +644,7 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
     onSubmitRating(reviewData: any): void {
         if (!this.selectedProviderForRating) return;
 
-        this.reviewService.submitReviewToProvider(reviewData).subscribe({
+        this.reviewService.submitReview(reviewData).subscribe({
             next: () => {
                 // Éxito - podríamos mostrar un mensaje o recargar los datos
                 alert('¡Gracias por tu calificación!');
@@ -642,5 +657,67 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
                 alert('Hubo un error al enviar tu calificación. Por favor intenta de nuevo.');
             }
         });
+    }
+
+    /**
+     * Configurar geolocalización
+     */
+    private setupGeolocation(): void {
+        this.geolocationSupported = this.geolocationService.isSupported();
+        
+        // Suscribirse a cambios en la ubicación actual
+        this.locationSubscription = this.geolocationService.getCurrentPositionObservable().subscribe(
+            position => {
+                this.userLocation = position;
+            }
+        );
+
+        // Suscribirse al estado de obtención de ubicación
+        this.geolocationService.getIsGettingLocationObservable().subscribe(
+            isGetting => {
+                this.isGettingLocation = isGetting;
+            }
+        );
+
+        // Cargar ubicación guardada si existe
+        const savedLocation = this.geolocationService.getCurrentPositionSync();
+        if (savedLocation) {
+            this.userLocation = savedLocation;
+        }
+    }
+
+    /**
+     * Obtener ubicación del usuario
+     */
+    getUserLocation(): void {
+        if (!this.geolocationSupported) {
+            this.locationError = 'Tu navegador no soporta geolocalización';
+            return;
+        }
+
+        this.locationError = null;
+        this.isGettingLocation = true;
+
+        this.geolocationService.getCurrentPosition().subscribe({
+            next: (position) => {
+                this.userLocation = position;
+                this.locationError = null;
+                console.log('Ubicación obtenida:', position);
+            },
+            error: (error) => {
+                this.locationError = error.message || 'Error al obtener la ubicación';
+                this.userLocation = null;
+                console.error('Error de geolocalización:', error);
+            }
+        });
+    }
+
+    /**
+     * Limpiar ubicación
+     */
+    clearLocation(): void {
+        this.geolocationService.clearLocation();
+        this.userLocation = null;
+        this.locationError = null;
     }
 }

@@ -74,6 +74,55 @@
         </label>
       </div>
 
+      <!-- Filtro por Ubicación -->
+      <div class="filter-section">
+        <h3>📍 Mi Ubicación</h3>
+        <div class="location-filter">
+          <div *ngIf="!geolocationSupported" class="location-not-supported">
+            <p class="location-message">Tu navegador no soporta geolocalización</p>
+          </div>
+          
+          <div *ngIf="geolocationSupported">
+            <div *ngIf="!userLocation && !isGettingLocation && !locationError" class="location-action">
+              <button class="btn-location" (click)="getUserLocation()" type="button">
+                <span class="location-icon">📍</span>
+                <span>Obtener mi ubicación</span>
+              </button>
+            </div>
+
+            <div *ngIf="isGettingLocation" class="location-loading">
+              <div class="location-spinner"></div>
+              <p class="location-message">Obteniendo ubicación...</p>
+            </div>
+
+            <div *ngIf="locationError" class="location-error">
+              <p class="location-message error-text">{{ locationError }}</p>
+              <button class="btn-location-small" (click)="getUserLocation()" type="button">
+                Intentar de nuevo
+              </button>
+            </div>
+
+            <div *ngIf="userLocation && !isGettingLocation" class="location-success">
+              <div class="location-info">
+                <p class="location-message success-text">
+                  <span class="location-icon">✅</span>
+                  Ubicación obtenida
+                </p>
+                <p class="location-coords">
+                  {{ userLocation.latitude.toFixed(6) }}, {{ userLocation.longitude.toFixed(6) }}
+                </p>
+                <p class="location-accuracy" *ngIf="userLocation.accuracy">
+                  Precisión: {{ (userLocation.accuracy / 1000).toFixed(2) }} km
+                </p>
+              </div>
+              <button class="btn-location-clear" (click)="clearLocation()" type="button">
+                Limpiar ubicación
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Filtro por Rango de Precio -->
       <div class="filter-section">
         <h3>💰 Rango de Precio</h3>
