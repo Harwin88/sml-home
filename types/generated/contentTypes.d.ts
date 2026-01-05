@@ -506,6 +506,56 @@ export interface ApiMediasMedias extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiReviewReview extends Struct.CollectionTypeSchema {
+  collectionName: 'reviews';
+  info: {
+    description: 'Calificaciones y comentarios de clientes sobre proveedores de servicios';
+    displayName: 'Rese\u00F1a';
+    pluralName: 'reviews';
+    singularName: 'review';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    comment: Schema.Attribute.Text & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    isValidated: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::review.review'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    rating: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 5;
+          min: 1;
+        },
+        number
+      >;
+    reviewerEmail: Schema.Attribute.Email & Schema.Attribute.Required;
+    reviewerName: Schema.Attribute.String & Schema.Attribute.Required;
+    reviewerPhone: Schema.Attribute.String;
+    serviceProvider: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::service-provider.service-provider'
+    >;
+    status: Schema.Attribute.Enumeration<['PENDING', 'APPROVED', 'REJECTED']> &
+      Schema.Attribute.DefaultTo<'PENDING'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    validatedAt: Schema.Attribute.DateTime;
+    validationNotes: Schema.Attribute.Text;
+  };
+}
+
 export interface ApiServiceProviderServiceProvider
   extends Struct.CollectionTypeSchema {
   collectionName: 'service_providers';
@@ -520,19 +570,28 @@ export interface ApiServiceProviderServiceProvider
   };
   attributes: {
     address: Schema.Attribute.Text;
-    availabilitySchedule: Schema.Attribute.JSON &
-      Schema.Attribute.DefaultTo<{}>;
+    availabilitySchedule: Schema.Attribute.JSON;
     categories: Schema.Attribute.Relation<
       'manyToMany',
       'api::category.category'
     >;
-    certifications: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
+    certifications: Schema.Attribute.JSON;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
     email: Schema.Attribute.Email;
     experienceYears: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    hourlyRate: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 1000000;
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<65000>;
     isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     isVerified: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -559,6 +618,7 @@ export interface ApiServiceProviderServiceProvider
         number
       > &
       Schema.Attribute.DefaultTo<0>;
+    reviews: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
     serviceArea: Schema.Attribute.Text;
     totalReviews: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     updatedAt: Schema.Attribute.DateTime;
@@ -1111,6 +1171,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::category.category': ApiCategoryCategory;
       'api::medias.medias': ApiMediasMedias;
+      'api::review.review': ApiReviewReview;
       'api::service-provider.service-provider': ApiServiceProviderServiceProvider;
       'api::tag.tag': ApiTagTag;
       'plugin::content-releases.release': PluginContentReleasesRelease;

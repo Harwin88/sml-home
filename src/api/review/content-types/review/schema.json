@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "reviews",
+  "info": {
+    "singularName": "review",
+    "pluralName": "reviews",
+    "displayName": "Reseña",
+    "description": "Calificaciones y comentarios de clientes sobre proveedores de servicios"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "rating": {
+      "type": "decimal",
+      "required": true,
+      "min": 1,
+      "max": 5
+    },
+    "comment": {
+      "type": "text",
+      "required": true
+    },
+    "reviewerName": {
+      "type": "string",
+      "required": true
+    },
+    "reviewerEmail": {
+      "type": "email",
+      "required": true
+    },
+    "reviewerPhone": {
+      "type": "string",
+      "required": false
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "PENDING",
+        "APPROVED",
+        "REJECTED"
+      ],
+      "default": "PENDING"
+    },
+    "isValidated": {
+      "type": "boolean",
+      "default": false
+    },
+    "validatedAt": {
+      "type": "datetime",
+      "required": false
+    },
+    "validationNotes": {
+      "type": "text",
+      "required": false
+    },
+    "serviceProvider": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::service-provider.service-provider",
+      "inversedBy": "reviews"
+    }
+  }
+}
