@@ -5,7 +5,7 @@ import { ServiceProviderService } from '../../core/services/service-provider.ser
 import { ReviewService } from '../../core/services/review.service';
 import { RatingModalComponent } from '../../shared/components/rating-modal/rating-modal.component';
 import { ServiceProvider } from '../../core/models/service-provider.model';
-import { API_CONFIG } from '../../core/config/api.config';
+import { ConfigService } from '../../core/services/config.service';
 
 @Component({
     selector: 'app-provider-profile',
@@ -25,7 +25,8 @@ export class ProviderProfileComponent implements OnInit {
         private route: ActivatedRoute,
         private routerService: Router,
         private providerService: ServiceProviderService,
-        private reviewService: ReviewService
+        private reviewService: ReviewService,
+        private configService: ConfigService
     ) { }
 
     ngOnInit(): void {
@@ -100,7 +101,7 @@ export class ProviderProfileComponent implements OnInit {
                 return url;
             }
             // Construir URL completa: apiUrl + url
-            return `${API_CONFIG.baseUrl}${url}`;
+            return `${this.configService.apiUrl}${url}`;
         }
         return 'assets/default-avatar.png';
     }

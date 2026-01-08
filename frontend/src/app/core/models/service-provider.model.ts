@@ -10,11 +10,13 @@ export interface Certification {
 
 export interface ServiceProvider extends StrapiDocument {
     name: string;
+    name_normalized?: string;
     email?: string;
     phone: string;
     whatsapp?: string;
     address?: string;
     description?: string;
+    description_normalized?: string;
 
     // Campos profesionales
     experienceYears: number;

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { API_URL, API_CONFIG } from '../config/api.config';
+import { API_CONFIG, getApiUrl } from '../config/api.config';
+import { ConfigService } from './config.service';
 import { StrapiCollectionResponse, StrapiSingleResponse } from '../models/strapi-response.model';
 
 export interface QueryParams {
@@ -20,7 +21,10 @@ export interface QueryParams {
 })
 export class StrapiBaseService {
 
-    constructor(protected http: HttpClient) { }
+    constructor(
+        protected http: HttpClient,
+        protected configService: ConfigService
+    ) { }
 
     /**
      * Construye los headers HTTP con Authorization si hay API key
@@ -29,11 +33,19 @@ export class StrapiBaseService {
         let headers = new HttpHeaders();
         
         // Agregar API Token de Strapi si está configurado
-        if (API_CONFIG.strapiKey) {
-            headers = headers.set('Authorization', `Bearer ${API_CONFIG.strapiKey}`);
+        const strapiKey = this.configService.strapiKey;
+        if (strapiKey) {
+            headers = headers.set('Authorization', `Bearer ${strapiKey}`);
         }
         
         return headers;
+    }
+
+    /**
+     * Obtiene la URL base de la API
+     */
+    protected getApiUrl(): string {
+        return getApiUrl(this.configService);
     }
 
     /**
@@ -154,7 +166,7 @@ export class StrapiBaseService {
         params?: QueryParams
     ): Observable<StrapiCollectionResponse<T>> {
         return this.http.get<StrapiCollectionResponse<T>>(
-            `${API_URL}${endpoint}`,
+            `${this.getApiUrl()}${endpoint}`,
             { 
                 params: this.buildParams(params),
                 headers: this.getHeaders()
@@ -171,7 +183,7 @@ export class StrapiBaseService {
         params?: QueryParams
     ): Observable<StrapiSingleResponse<T>> {
         return this.http.get<StrapiSingleResponse<T>>(
-            `${API_URL}${endpoint}/${documentId}`,
+            `${this.getApiUrl()}${endpoint}/${documentId}`,
             { 
                 params: this.buildParams(params),
                 headers: this.getHeaders()
@@ -187,7 +199,7 @@ export class StrapiBaseService {
         data: any
     ): Observable<StrapiSingleResponse<T>> {
         return this.http.post<StrapiSingleResponse<T>>(
-            `${API_URL}${endpoint}`,
+            `${this.getApiUrl()}${endpoint}`,
             { data },
             { headers: this.getHeaders() }
         );
@@ -202,7 +214,7 @@ export class StrapiBaseService {
         data: any
     ): Observable<StrapiSingleResponse<T>> {
         return this.http.put<StrapiSingleResponse<T>>(
-            `${API_URL}${endpoint}/${documentId}`,
+            `${this.getApiUrl()}${endpoint}/${documentId}`,
             { data },
             { headers: this.getHeaders() }
         );
@@ -216,7 +228,7 @@ export class StrapiBaseService {
         documentId: string
     ): Observable<StrapiSingleResponse<T>> {
         return this.http.delete<StrapiSingleResponse<T>>(
-            `${API_URL}${endpoint}/${documentId}`,
+            `${this.getApiUrl()}${endpoint}/${documentId}`,
             { headers: this.getHeaders() }
         );
     }

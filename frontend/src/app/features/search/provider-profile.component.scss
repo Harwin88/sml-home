@@ -265,11 +265,11 @@
 }
 
 .btn-rate {
-  background: var(--color-warning);
+  background: var(--color-btn-rate);
   color: var(--color-text-light);
 
   &:hover {
-    background: #d97706;
+    background: var(--color-btn-rate-hover);
   }
 }
 

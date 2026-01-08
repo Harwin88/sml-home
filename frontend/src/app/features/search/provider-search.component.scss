@@ -645,17 +645,17 @@
 
     .btn-rate {
       grid-column: 1 / -1;
-      background: var(--color-warning);
-      color: var(--color-text-light);
+      background: var(--color-btn-rate);
+      color: var(--color-text-primary);
       font-weight: 600;
 
       &:hover {
-        background: #d97706;
+        background: var(--color-btn-rate-hover);
         transform: translateY(-1px);
         box-shadow: var(--shadow-md);
       }
     }
-  }
+  }       
 }
 
 /* ===== BOTONES ===== */

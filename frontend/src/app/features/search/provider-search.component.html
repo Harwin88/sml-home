@@ -219,8 +219,8 @@
 
               <!-- Acciones -->
               <div class="provider-actions">
-                <a [href]="'tel:' + provider.phone" class="btn btn-call">
-                  📞 Llamar
+                <a [href]="getWhatsAppUrl(provider)" target="_blank" rel="noopener noreferrer" class="btn btn-call">
+                  💬 Chatear por WhatsApp
                 </a>
                 <a [routerLink]="['/provider', provider.documentId]" class="btn btn-details">
                   Ver Perfil

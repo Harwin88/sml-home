@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CategoryService } from '../../core/services/category.service';
@@ -12,7 +12,7 @@ import { GeolocationService, GeolocationPosition } from '../../core/services/geo
 import { RatingModalComponent } from '../../shared/components/rating-modal/rating-modal.component';
 import { CategoryView } from '../../core/models/category.model';
 import { ServiceProviderCard } from '../../core/models/service-provider.model';
-import { API_CONFIG } from '../../core/config/api.config';
+import { ConfigService } from '../../core/services/config.service';
 import { Subscription } from 'rxjs';
 
 interface CategoryFilter {
@@ -83,7 +83,9 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
         private providerService: ServiceProviderService,
         private searchService: SearchService,
         private reviewService: ReviewService,
-        private geolocationService: GeolocationService
+        private geolocationService: GeolocationService,
+        private configService: ConfigService,
+        private route: ActivatedRoute
     ) { }
 
     ngOnInit(): void {
@@ -189,6 +191,28 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
 
         // Inicializar la lista filtrada con todas las categorías
         this.filteredSubcategoryFilters = [...this.subcategoryFilters];
+
+        // Verificar si hay un queryParam de categoría y seleccionarla
+        this.checkCategoryQueryParam();
+    }
+
+    /**
+     * Verificar queryParams y seleccionar categoría si existe
+     */
+    private checkCategoryQueryParam(): void {
+        // Leer el queryParam una vez (no suscribirse para evitar múltiples llamadas)
+        const categorySlug = this.route.snapshot.queryParams['category'];
+        if (categorySlug) {
+            // Buscar la categoría por slug
+            const category = this.subcategoryFilters.find(cat => cat.slug === categorySlug);
+            if (category) {
+                // Seleccionar la categoría automáticamente
+                this.selectedSubcategory = categorySlug;
+                category.selected = true;
+                // Cargar proveedores con el filtro aplicado
+                this.loadProvidersWithFilters();
+            }
+        }
     }
 
     /**
@@ -327,10 +351,27 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Normaliza un texto removiendo tildes y caracteres especiales
+     * (debe coincidir con la función del backend)
+     */
+    private normalizeText(text: string): string {
+        if (!text) return '';
+        
+        return text
+            .normalize('NFD') // Descompone los caracteres con acentos
+            .replace(/[\u0300-\u036f]/g, '') // Elimina los diacríticos (tildes)
+            .toLowerCase() // Convierte a minúsculas
+            .trim(); // Elimina espacios al inicio y final
+    }
+
+    /**
      * Buscar proveedores en la caché (proveedores ya cargados)
      * No hace petición al API, solo filtra localmente
+     * Usa campos normalizados para búsqueda sin tildes
      */
     searchInCache(query: string): void {
+        // Normalizar el término de búsqueda
+        const normalizedSearchTerm = this.normalizeText(query);
         const searchTerm = query.toLowerCase().trim();
         
         // Usar los proveedores completos para búsqueda más exhaustiva
@@ -340,13 +381,15 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
 
         // Filtrar por término de búsqueda en los objetos completos
         let filteredFull = sourceProviders.filter((provider: any) => {
-            // Buscar en el nombre
-            const nameMatch = provider.name?.toLowerCase().includes(searchTerm) || false;
+            // Buscar en el nombre normalizado (usar campo normalizado si existe, sino normalizar on-the-fly)
+            const nameNormalized = provider.name_normalized || this.normalizeText(provider.name || '');
+            const nameMatch = nameNormalized.includes(normalizedSearchTerm);
             
-            // Buscar en descripción
-            const descriptionMatch = provider.description?.toLowerCase().includes(searchTerm) || false;
+            // Buscar en descripción normalizada (usar campo normalizado si existe, sino normalizar on-the-fly)
+            const descriptionNormalized = provider.description_normalized || this.normalizeText(provider.description || '');
+            const descriptionMatch = descriptionNormalized.includes(normalizedSearchTerm);
             
-            // Buscar en área de servicio
+            // Buscar en área de servicio (sin normalizar por si acaso)
             const serviceAreaMatch = provider.serviceArea?.toLowerCase().includes(searchTerm) || false;
             
             // Buscar en categorías (puede venir como array de objetos o strings)
@@ -572,7 +615,7 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
                 photoUrl = url;
             } else {
                 // Construir URL completa: apiUrl + url
-                photoUrl = `${API_CONFIG.baseUrl}${url}`;
+                photoUrl = `${this.configService.apiUrl}${url}`;
             }
         }
         
@@ -749,5 +792,23 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(price);
+    }
+
+    /**
+     * Generar URL de WhatsApp con el ID y nombre del proveedor
+     */
+    getWhatsAppUrl(provider: ServiceProviderCard): string {
+        // Limpiar el número de teléfono (remover espacios, guiones, paréntesis)
+        const cleanPhone = provider.phone.replace(/[\s\-\(\)]/g, '');
+        
+        // Crear el mensaje con el nombre e ID del proveedor
+        const message = `Hola ${provider.name}, estoy interesado en tu servicio. ID: ${provider.documentId}`;
+        
+        // Codificar el mensaje para la URL
+        const encodedMessage = encodeURIComponent(message);
+        
+        // Generar la URL de WhatsApp
+        // Formato: https://wa.me/[número]?text=[mensaje]
+        return `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
     }
 }

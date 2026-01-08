@@ -62,3 +62,4 @@ frontend/.angular/cache/*
 frontend/.angular/cache/17.3.17/angular-webpack/02f5ca1fdb95e58985897b16b73bb09ef1310c9f/0.pack
 frontend/src/environments/environment.prod.ts
 frontend/src/environments/environment.ts
+frontend/src/assets/config.json

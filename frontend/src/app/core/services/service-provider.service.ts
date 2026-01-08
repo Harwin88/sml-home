@@ -82,15 +82,32 @@ export class ServiceProviderService extends StrapiBaseService {
     }
 
     /**
-     * Buscar proveedores
+     * Normaliza un texto removiendo tildes y caracteres especiales
+     * (debe coincidir con la función del backend)
+     */
+    private normalizeText(text: string): string {
+        if (!text) return '';
+        
+        return text
+            .normalize('NFD') // Descompone los caracteres con acentos
+            .replace(/[\u0300-\u036f]/g, '') // Elimina los diacríticos (tildes)
+            .toLowerCase() // Convierte a minúsculas
+            .trim(); // Elimina espacios al inicio y final
+    }
+
+    /**
+     * Buscar proveedores usando campos normalizados
      */
     search(query: string, page = 1, pageSize = 10): Observable<ServiceProviderCard[]> {
+        // Normalizar el query de búsqueda
+        const normalizedQuery = this.normalizeText(query);
+        
         const params: QueryParams = {
             filters: {
                 $or: [
-                    { name: { $containsi: query } },
-                    { description: { $containsi: query } },
-                    { serviceArea: { $containsi: query } }
+                    { name_normalized: { $containsi: normalizedQuery } },
+                    { description_normalized: { $containsi: normalizedQuery } },
+                    { serviceArea: { $containsi: query } } // Mantener serviceArea sin normalizar por si acaso
                 ],
                 isActive: { $eq: true }
             },
@@ -198,6 +215,6 @@ export class ServiceProviderService extends StrapiBaseService {
         
         // Construir URL completa: apiUrl + url
         // Ejemplo: http://localhost:1338 + /uploads/unnamed_2fb2245d0c.jpg
-        return `${API_CONFIG.baseUrl}${media.url}`;
+        return `${this.configService.apiUrl}${media.url}`;
     }
 }

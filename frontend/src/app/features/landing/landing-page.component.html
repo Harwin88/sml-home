@@ -1,0 +1,168 @@
+<div class="landing-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          Encuentra el proveedor de servicios perfecto para tu hogar
+        </h1>
+        <p class="hero-subtitle">
+          Conectamos a familias con profesionales verificados y confiables. 
+          Todos nuestros proveedores han sido validados para garantizar tu tranquilidad.
+        </p>
+        <div class="hero-cta">
+          <a routerLink="/search" class="btn-primary">
+            Buscar Proveedores
+            <span class="btn-icon">🔍</span>
+          </a>
+          <a routerLink="/search" class="btn-secondary">
+            Ver Todos los Servicios
+          </a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-illustration">
+          <div class="illustration-icon">🏠</div>
+          <div class="illustration-badge verified">✓ Verificado</div>
+          <div class="illustration-badge rating">⭐ 4.8</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Indicators -->
+  <section class="trust-section">
+    <div class="container">
+      <div class="trust-grid">
+        <div class="trust-item">
+          <div class="trust-icon">🛡️</div>
+          <h3>Proveedores Verificados</h3>
+          <p>Todos nuestros proveedores pasan por un riguroso proceso de verificación</p>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">⭐</div>
+          <h3>Calificaciones Reales</h3>
+          <p>Reseñas auténticas de clientes que han usado nuestros servicios</p>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">🔒</div>
+          <h3>Seguridad Garantizada</h3>
+          <p>Validamos antecedentes y experiencia de cada proveedor</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Statistics Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">{{ formatNumber(totalProviders) }}+</div>
+          <div class="stat-label">Proveedores Activos</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ formatNumber(verifiedProviders) }}+</div>
+          <div class="stat-label">Proveedores Verificados</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ formatRating(averageRating) }}</div>
+          <div class="stat-label">Calificación Promedio</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ formatNumber(totalReviews) }}+</div>
+          <div class="stat-label">Reseñas de Clientes</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Categories -->
+  <section class="services-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Nuestros Servicios</h2>
+        <p class="section-subtitle">
+          Encuentra profesionales especializados en diferentes áreas del hogar
+        </p>
+      </div>
+      
+      <div class="categories-grid" *ngIf="!loadingCategories && mainCategories.length > 0">
+        <div 
+          class="category-card" 
+          *ngFor="let category of mainCategories"
+          [routerLink]="['/search']"
+          [queryParams]="{ category: category.slug }"
+        >
+          <div class="category-icon">{{ category.icon }}</div>
+          <h3 class="category-name">{{ category.name }}</h3>
+          <p class="category-description">{{ category.description }}</p>
+          <div class="category-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="loading-state" *ngIf="loadingCategories">
+        <div class="spinner"></div>
+        <p>Cargando servicios...</p>
+      </div>
+
+      <div class="view-all">
+        <a routerLink="/search" class="btn-outline">
+          Ver Todos los Servicios
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">¿Cómo Funciona?</h2>
+        <p class="section-subtitle">
+          Encuentra y contrata servicios de manera fácil y segura
+        </p>
+      </div>
+      
+      <div class="steps-grid">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <h3>Busca</h3>
+          <p>Explora nuestra plataforma y busca el servicio que necesitas</p>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <h3>Revisa</h3>
+          <p>Lee las calificaciones y reseñas de otros clientes</p>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <h3>Contacta</h3>
+          <p>Comunícate directamente con el proveedor de tu elección</p>
+        </div>
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <h3>Califica</h3>
+          <p>Comparte tu experiencia para ayudar a otros clientes</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">¿Listo para encontrar tu proveedor ideal?</h2>
+        <p class="cta-subtitle">
+          Únete a miles de familias que confían en MSL Hogar para sus necesidades del hogar
+        </p>
+        <a routerLink="/search" class="btn-primary-large">
+          Comenzar Búsqueda
+          <span class="btn-icon">🚀</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+

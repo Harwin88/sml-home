@@ -17,7 +17,7 @@ import { Subscription, filter } from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'MSL Hogar';
+  title = 'SLM Hogar';
   searchControl = new FormControl('');
   showSearch = true;
   showWelcomeModal = false;
