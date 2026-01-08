@@ -46,15 +46,26 @@
 
   .header-actions {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: var(--spacing-md);
     flex: 1;
-    justify-content: flex-end;
 
     @media (max-width: 768px) {
-      flex-direction: column;
       width: 100%;
       gap: var(--spacing-sm);
+    }
+  }
+
+  .header-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    justify-content: center;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      justify-content: center;
     }
   }
 
@@ -96,9 +107,10 @@
   }
 
   .search-section {
-    flex: 1;
-    max-width: 600px;
     width: 100%;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
 
     @media (max-width: 768px) {
       max-width: 100%;
