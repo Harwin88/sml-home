@@ -4,74 +4,92 @@
 
 import { factories } from '@strapi/strapi'
 
-const coreController = factories.createCoreController('api::form.form');
+export default factories.createCoreController('api::form.form', ({ strapi }) => {
+  // Obtener el controlador base completo
+  const baseController = factories.createCoreController('api::form.form');
+  
+  return {
+    // Incluir explícitamente todos los métodos del controlador base
+    find: async (ctx: any, next: any) => {
+      const base = baseController({ strapi });
+      return await base.find(ctx, next);
+    },
+    findOne: async (ctx: any, next: any) => {
+      const base = baseController({ strapi });
+      return await base.findOne(ctx, next);
+    },
+    update: async (ctx: any, next: any) => {
+      const base = baseController({ strapi });
+      return await base.update(ctx, next);
+    },
+    delete: async (ctx: any, next: any) => {
+      const base = baseController({ strapi });
+      return await base.delete(ctx, next);
+    },
+    async create(ctx: any, next: any) {
+      // Capturar IP address del cliente
+      const getClientIp = (request: any): string => {
+        // Intentar obtener la IP real si está detrás de un proxy
+        const forwarded = request.headers['x-forwarded-for'];
+        if (forwarded) {
+          // x-forwarded-for puede contener múltiples IPs, tomar la primera
+          return String(forwarded).split(',')[0].trim();
+        }
+        
+        // Intentar x-real-ip
+        const realIp = request.headers['x-real-ip'];
+        if (realIp) {
+          return String(realIp);
+        }
+        
+        // Fallback a la IP de la conexión
+        if (request.ip) {
+          return String(request.ip);
+        }
+        
+        if (request.socket?.remoteAddress) {
+          return String(request.socket.remoteAddress);
+        }
+        
+        return 'unknown';
+      };
 
-export default {
-  ...coreController,
-  async create(ctx) {
-    const { strapi } = ctx;
-    
-    // Capturar IP address del cliente
-    const getClientIp = (request: any): string => {
-      // Intentar obtener la IP real si está detrás de un proxy
-      const forwarded = request.headers['x-forwarded-for'];
-      if (forwarded) {
-        // x-forwarded-for puede contener múltiples IPs, tomar la primera
-        return String(forwarded).split(',')[0].trim();
-      }
+      // Capturar user agent
+      const userAgent = ctx.request.headers['user-agent'] || 'unknown';
+
+      // Obtener los datos del body
+      const bodyData = ctx.request.body?.data || ctx.request.body || {};
       
-      // Intentar x-real-ip
-      const realIp = request.headers['x-real-ip'];
-      if (realIp) {
-        return String(realIp);
-      }
+      // Si la IP viene del frontend, usarla; si no, capturarla del request
+      const clientIp = bodyData.ipAddress || getClientIp(ctx.request);
+      const clientUserAgent = bodyData.userAgent || userAgent;
       
-      // Fallback a la IP de la conexión
-      if (request.ip) {
-        return String(request.ip);
-      }
-      
-      if (request.socket?.remoteAddress) {
-        return String(request.socket.remoteAddress);
-      }
-      
-      return 'unknown';
-    };
+      // Agregar ipAddress y userAgent automáticamente (priorizar los del frontend)
+      const formData = {
+        ...bodyData,
+        ipAddress: clientIp,
+        userAgent: clientUserAgent,
+        submittedAt: bodyData.submittedAt || new Date().toISOString()
+      };
 
-    // Capturar user agent
-    const userAgent = ctx.request.headers['user-agent'] || 'unknown';
+      // Log para debugging
+      console.log('Form data being saved:', {
+        ipAddress: formData.ipAddress,
+        userAgent: formData.userAgent,
+        formType: formData.formType,
+        name: formData.name
+      });
 
-    // Obtener los datos del body
-    const bodyData = ctx.request.body?.data || ctx.request.body || {};
-    
-    // Si la IP viene del frontend, usarla; si no, capturarla del request
-    const clientIp = bodyData.ipAddress || getClientIp(ctx.request);
-    const clientUserAgent = bodyData.userAgent || userAgent;
-    
-    // Agregar ipAddress y userAgent automáticamente (priorizar los del frontend)
-    const formData = {
-      ...bodyData,
-      ipAddress: clientIp,
-      userAgent: clientUserAgent,
-      submittedAt: bodyData.submittedAt || new Date().toISOString()
-    };
+      // Modificar el body con los datos actualizados
+      ctx.request.body = {
+        ...ctx.request.body,
+        data: formData
+      };
 
-    // Log para debugging
-    console.log('Form data being saved:', {
-      ipAddress: formData.ipAddress,
-      userAgent: formData.userAgent,
-      formType: formData.formType,
-      name: formData.name
-    });
-
-    // Modificar el body con los datos actualizados
-    ctx.request.body = {
-      ...ctx.request.body,
-      data: formData
-    };
-
-    // Llamar al método create del controlador base
-    return await (coreController as any).create(ctx);
-  }
-};
+      // Llamar al método create del controlador base
+      const base = baseController({ strapi });
+      return await base.create(ctx, next);
+    }
+  };
+});
 

@@ -631,6 +631,7 @@ export interface ApiServiceProviderServiceProvider
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
+    description_normalized: Schema.Attribute.Text;
     email: Schema.Attribute.Email;
     experienceYears: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     hourlyRate: Schema.Attribute.Decimal &
@@ -652,6 +653,7 @@ export interface ApiServiceProviderServiceProvider
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    name_normalized: Schema.Attribute.String;
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     photo: Schema.Attribute.Media<'images'>;
     portfolio: Schema.Attribute.Media<'images', true>;

@@ -16,6 +16,9 @@
       "type": "string",
       "required": true
     },
+    "name_normalized": {
+      "type": "string"
+    },
     "email": {
       "type": "email",
       "required": false
@@ -31,6 +34,9 @@
       "type": "text"
     },
     "description": {
+      "type": "text"
+    },
+    "description_normalized": {
       "type": "text"
     },
     "photo": {
