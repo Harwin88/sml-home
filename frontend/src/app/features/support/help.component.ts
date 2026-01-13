@@ -38,11 +38,18 @@ export class HelpComponent implements OnInit {
   faqs: Faq[] = [];
   loading = true;
   error: string | null = null;
+  
+  // Control de votos para evitar spam
+  private votedFaqs: Set<string> = new Set();
+  private readonly VOTED_FAQS_KEY = 'msl_faq_voted';
 
   constructor(
     private analytics: AnalyticsService,
     private faqService: FaqService
-  ) {}
+  ) {
+    // Cargar FAQs votadas desde localStorage
+    this.loadVotedFaqs();
+  }
 
   ngOnInit(): void {
     // Track page view
@@ -263,8 +270,10 @@ export class HelpComponent implements OnInit {
     this.expandedIndex = this.expandedIndex === index ? null : index;
     
     // Si se expandió (no se colapsó), incrementar vistas
-    if (!wasExpanded && faq.id) {
-      this.faqService.incrementView(faq.id).subscribe({
+    // Priorizar documentId sobre id para Strapi 5
+    const faqId = faq.documentId || faq.id;
+    if (!wasExpanded && faqId) {
+      this.faqService.incrementView(faqId).subscribe({
         next: (result) => {
           if (faq.viewCount !== undefined) {
             faq.viewCount = result.viewCount;
@@ -299,17 +308,72 @@ export class HelpComponent implements OnInit {
   }
 
   /**
+   * Verificar si el usuario ya votó por esta FAQ
+   */
+  hasVoted(faq: Faq): boolean {
+    const faqId = faq.documentId || faq.id?.toString();
+    return faqId ? this.votedFaqs.has(faqId) : false;
+  }
+
+  /**
+   * Cargar FAQs votadas desde localStorage
+   */
+  private loadVotedFaqs(): void {
+    try {
+      const stored = localStorage.getItem(this.VOTED_FAQS_KEY);
+      if (stored) {
+        const votedArray = JSON.parse(stored);
+        this.votedFaqs = new Set(votedArray);
+      }
+    } catch (error) {
+      console.error('Error al cargar votos desde localStorage:', error);
+      this.votedFaqs = new Set();
+    }
+  }
+
+  /**
+   * Guardar FAQs votadas en localStorage
+   */
+  private saveVotedFaqs(): void {
+    try {
+      const votedArray = Array.from(this.votedFaqs);
+      localStorage.setItem(this.VOTED_FAQS_KEY, JSON.stringify(votedArray));
+    } catch (error) {
+      console.error('Error al guardar votos en localStorage:', error);
+    }
+  }
+
+  /**
+   * Marcar que el usuario votó por esta FAQ
+   */
+  private markAsVoted(faqId: string): void {
+    this.votedFaqs.add(faqId);
+    this.saveVotedFaqs();
+  }
+
+  /**
    * Marcar FAQ como útil
    */
   markAsHelpful(faq: Faq, helpful: boolean, event: Event): void {
     event.stopPropagation(); // Evitar que se expanda/colapse el accordion
     
-    if (!faq.id) return;
+    // Priorizar documentId sobre id para Strapi 5
+    const faqId = faq.documentId || faq.id?.toString();
+    if (!faqId) return;
 
-    this.faqService.markHelpful(faq.id, helpful).subscribe({
+    // Verificar si ya votó
+    if (this.hasVoted(faq)) {
+      console.log('Ya has votado por esta FAQ');
+      return;
+    }
+
+    this.faqService.markHelpful(faqId, helpful).subscribe({
       next: (result) => {
         faq.helpfulCount = result.helpfulCount;
         faq.notHelpfulCount = result.notHelpfulCount;
+        
+        // Marcar como votado
+        this.markAsVoted(faqId);
         
         // Track evento
         this.analytics.trackEvent('FAQ', helpful ? 'Helpful' : 'Not Helpful', faq.question);

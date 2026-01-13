@@ -140,8 +140,8 @@ export class FaqService extends StrapiBaseService {
   /**
    * Incrementar contador de vistas de una FAQ
    */
-  incrementView(id: number): Observable<{ viewCount: number }> {
-    return this.http.post<{ success: boolean; viewCount: number }>(
+  incrementView(id: number | string): Observable<{ viewCount: number }> {
+    return this.http.put<{ viewCount: number }>(
       `${this.getApiUrl()}/faqs/${id}/view`,
       {},
       { headers: this.getHeaders() }
@@ -157,9 +157,8 @@ export class FaqService extends StrapiBaseService {
   /**
    * Marcar FAQ como útil o no útil
    */
-  markHelpful(id: number, helpful: boolean): Observable<{ helpfulCount: number; notHelpfulCount: number }> {
+  markHelpful(id: number | string, helpful: boolean): Observable<{ helpfulCount: number; notHelpfulCount: number }> {
     return this.http.post<{
-      success: boolean;
       data: { helpfulCount: number; notHelpfulCount: number };
     }>(
       `${this.getApiUrl()}/faqs/${id}/helpful`,

@@ -96,25 +96,41 @@
             <!-- Feedback Buttons -->
             <div class="faq-feedback">
               <p class="feedback-question">¿Te resultó útil esta respuesta?</p>
-              <div class="feedback-buttons">
+              
+              <!-- Botones de votación -->
+              <div class="feedback-buttons" *ngIf="!hasVoted(faq)">
                 <button 
                   class="feedback-btn"
                   (click)="markAsHelpful(faq, true, $event)"
-                  [disabled]="!faq.id"
+                  [disabled]="!faq.documentId && !faq.id"
                 >
                   <mat-icon>thumb_up</mat-icon>
                   Sí
-                  <span *ngIf="faq.helpfulCount">({{ faq.helpfulCount }})</span>
+                  <span *ngIf="faq.helpfulCount && faq.helpfulCount > 0">({{ faq.helpfulCount }})</span>
                 </button>
                 <button 
                   class="feedback-btn"
                   (click)="markAsHelpful(faq, false, $event)"
-                  [disabled]="!faq.id"
+                  [disabled]="!faq.documentId && !faq.id"
                 >
                   <mat-icon>thumb_down</mat-icon>
                   No
-                  <span *ngIf="faq.notHelpfulCount">({{ faq.notHelpfulCount }})</span>
+                  <span *ngIf="faq.notHelpfulCount && faq.notHelpfulCount > 0">({{ faq.notHelpfulCount }})</span>
                 </button>
+              </div>
+              
+              <!-- Mensaje si ya votó -->
+              <div class="feedback-voted" *ngIf="hasVoted(faq)">
+                <mat-icon class="voted-icon">check_circle</mat-icon>
+                <p class="voted-message">Gracias por tu opinión</p>
+                <div class="feedback-stats">
+                  <span *ngIf="faq.helpfulCount && faq.helpfulCount > 0">
+                    <mat-icon>thumb_up</mat-icon> {{ faq.helpfulCount }}
+                  </span>
+                  <span *ngIf="faq.notHelpfulCount && faq.notHelpfulCount > 0">
+                    <mat-icon>thumb_down</mat-icon> {{ faq.notHelpfulCount }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
