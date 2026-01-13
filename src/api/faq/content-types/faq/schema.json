@@ -4,18 +4,19 @@
   "info": {
     "singularName": "faq",
     "pluralName": "faqs",
-    "displayName": "Pregunta Frecuente (FAQ)",
-    "description": "Preguntas frecuentes para el centro de ayuda"
+    "displayName": "FAQ",
+    "description": "Preguntas Frecuentes"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": true,
+    "comment": ""
   },
   "pluginOptions": {},
   "attributes": {
     "question": {
       "type": "string",
       "required": true,
-      "maxLength": 300
+      "maxLength": 255
     },
     "answer": {
       "type": "text",
@@ -25,67 +26,57 @@
       "type": "enumeration",
       "enum": [
         "general",
+        "technical",
+        "account",
         "search",
         "payments",
         "security",
-        "account",
-        "providers",
-        "technical"
+        "providers"
       ],
       "required": true,
       "default": "general"
     },
-    "icon": {
-      "type": "string",
-      "required": false,
-      "default": "help"
-    },
     "order": {
       "type": "integer",
-      "default": 0,
-      "description": "Orden de visualización (menor número = primero)"
+      "default": 0
     },
-    "isPopular": {
-      "type": "boolean",
-      "default": false,
-      "description": "Marcar como pregunta popular"
+    "icon": {
+      "type": "string",
+      "maxLength": 50
     },
     "viewCount": {
       "type": "integer",
-      "default": 0,
-      "description": "Número de veces que se ha visto esta FAQ"
+      "default": 0
     },
     "helpfulCount": {
       "type": "integer",
-      "default": 0,
-      "description": "Número de usuarios que marcaron como útil"
+      "default": 0
     },
     "notHelpfulCount": {
       "type": "integer",
-      "default": 0,
-      "description": "Número de usuarios que marcaron como no útil"
+      "default": 0
     },
     "keywords": {
-      "type": "json",
-      "description": "Keywords para búsqueda",
-      "default": []
+      "type": "json"
     },
     "relatedFaqs": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::faq.faq",
-      "description": "FAQs relacionadas"
+      "target": "api::faq.faq"
     },
     "videoUrl": {
       "type": "string",
-      "required": false,
-      "description": "URL de video explicativo (YouTube, Vimeo, etc.)"
+      "maxLength": 500
     },
-    "attachments": {
+    "attachment": {
       "type": "media",
-      "multiple": true,
+      "multiple": false,
       "required": false,
-      "allowedTypes": ["images", "files"]
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ]
     }
   }
 }

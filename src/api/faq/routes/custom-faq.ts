@@ -29,7 +29,7 @@ export default {
       },
     },
     {
-      method: 'POST',
+      method: 'PUT',
       path: '/faqs/:id/view',
       handler: 'faq.incrementView',
       config: {

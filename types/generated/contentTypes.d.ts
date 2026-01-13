@@ -558,26 +558,27 @@ export interface ApiContactFormContactForm extends Struct.CollectionTypeSchema {
 export interface ApiFaqFaq extends Struct.CollectionTypeSchema {
   collectionName: 'faqs';
   info: {
-    description: 'Preguntas frecuentes para el centro de ayuda';
-    displayName: 'Pregunta Frecuente (FAQ)';
+    description: 'Preguntas Frecuentes';
+    displayName: 'FAQ';
     pluralName: 'faqs';
     singularName: 'faq';
   };
   options: {
+    comment: '';
     draftAndPublish: true;
   };
   attributes: {
     answer: Schema.Attribute.Text & Schema.Attribute.Required;
-    attachments: Schema.Attribute.Media<'images' | 'files', true>;
+    attachment: Schema.Attribute.Media<'images' | 'files' | 'videos'>;
     category: Schema.Attribute.Enumeration<
       [
         'general',
+        'technical',
+        'account',
         'search',
         'payments',
         'security',
-        'account',
         'providers',
-        'technical',
       ]
     > &
       Schema.Attribute.Required &
@@ -586,9 +587,11 @@ export interface ApiFaqFaq extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     helpfulCount: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
-    icon: Schema.Attribute.String & Schema.Attribute.DefaultTo<'help'>;
-    isPopular: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    keywords: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
+    icon: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    keywords: Schema.Attribute.JSON;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::faq.faq'> &
       Schema.Attribute.Private;
@@ -598,13 +601,16 @@ export interface ApiFaqFaq extends Struct.CollectionTypeSchema {
     question: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
+        maxLength: 255;
       }>;
     relatedFaqs: Schema.Attribute.Relation<'manyToMany', 'api::faq.faq'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    videoUrl: Schema.Attribute.String;
+    videoUrl: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
     viewCount: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
   };
 }

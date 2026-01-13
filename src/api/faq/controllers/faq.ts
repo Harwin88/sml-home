@@ -5,233 +5,214 @@
 import { factories } from '@strapi/strapi';
 
 export default factories.createCoreController('api::faq.faq', ({ strapi }) => ({
-  /**
-   * Encontrar FAQs con filtros personalizados
-   */
+  // Sobrescribir el método find para asegurar respuesta correcta
   async find(ctx) {
-    const { query } = ctx;
-    
-    // Permitir acceso público a FAQs publicadas
+    // Sanitizar la consulta
     const sanitizedQuery = await this.sanitizeQuery(ctx);
     
+    strapi.log.info('FAQ find query:', JSON.stringify(sanitizedQuery, null, 2));
+    
+    // Buscar las entidades
+    const results = await strapi.documents('api::faq.faq').findMany({
+      ...sanitizedQuery,
+    });
+    
+    strapi.log.info(`FAQ find result: ${results.length} FAQs encontradas`);
+    
+    // Sanitizar y transformar los resultados
+    const sanitizedResults = await this.sanitizeOutput(results, ctx);
+    return this.transformResponse(sanitizedResults);
+  },
+
+  // Obtener FAQs por categoría
+  async findByCategory(ctx) {
+    const { category } = ctx.params;
+
+    if (!category) {
+      return ctx.badRequest('Category is required');
+    }
+
+    const sanitizedQuery = await this.sanitizeQuery(ctx);
+    
+    // Asegurar que filters sea un objeto
     const baseFilters = sanitizedQuery.filters && typeof sanitizedQuery.filters === 'object' 
       ? sanitizedQuery.filters 
       : {};
-    
-    const entities = await strapi.entityService.findMany('api::faq.faq', {
+
+    const results = await strapi.documents('api::faq.faq').findMany({
       ...sanitizedQuery,
       filters: {
         ...baseFilters,
-        publishedAt: { $notNull: true }, // Solo FAQs publicadas
+        category: { $eq: category },
       },
-      sort: { order: 'asc', createdAt: 'desc' },
-      populate: ['relatedFaqs'],
+      sort: { order: 'asc' },
     });
 
-    return entities;
+    const sanitizedResults = await this.sanitizeOutput(results, ctx);
+    return this.transformResponse(sanitizedResults);
   },
 
-  /**
-   * Encontrar FAQs por categoría
-   */
-  async findByCategory(ctx) {
-    try {
-      const { category } = ctx.params;
-
-      const faqs = await strapi.entityService.findMany('api::faq.faq', {
-        filters: {
-          category,
-          publishedAt: { $notNull: true },
-        },
-        sort: { order: 'asc', isPopular: 'desc' },
-        populate: ['relatedFaqs'],
-      });
-
-      return {
-        success: true,
-        category,
-        count: faqs.length,
-        data: faqs,
-      };
-    } catch (error) {
-      strapi.log.error('Error al buscar FAQs por categoría:', error);
-      ctx.throw(500, 'Error al buscar FAQs');
-    }
-  },
-
-  /**
-   * Obtener FAQs populares
-   */
+  // Obtener FAQs populares
   async findPopular(ctx) {
-    try {
-      const faqs = await strapi.entityService.findMany('api::faq.faq', {
-        filters: {
-          isPopular: true,
-          publishedAt: { $notNull: true },
-        },
-        sort: { viewCount: 'desc', helpfulCount: 'desc' },
-        limit: 10,
-      });
+    const sanitizedQuery = await this.sanitizeQuery(ctx);
 
-      return {
-        success: true,
-        data: faqs,
-      };
-    } catch (error) {
-      strapi.log.error('Error al buscar FAQs populares:', error);
-      ctx.throw(500, 'Error al buscar FAQs populares');
-    }
+    const results = await strapi.documents('api::faq.faq').findMany({
+      ...sanitizedQuery,
+      filters: {
+        viewCount: { $gte: 10 },
+      },
+      sort: { viewCount: 'desc' },
+      limit: 10,
+    });
+
+    const sanitizedResults = await this.sanitizeOutput(results, ctx);
+    return this.transformResponse(sanitizedResults);
   },
 
-  /**
-   * Buscar FAQs por keywords
-   */
+  // Buscar FAQs
   async search(ctx) {
-    try {
-      const { q } = ctx.query as { q?: string };
+    const query = ctx.query as { q?: string };
+    const { q } = query;
 
-      if (!q || q.length < 3) {
-        return ctx.badRequest('La búsqueda debe tener al menos 3 caracteres');
-      }
-
-      const searchTerm = q.toLowerCase();
-
-      const faqs = await strapi.entityService.findMany('api::faq.faq', {
-        filters: {
-          $or: [
-            { question: { $containsi: searchTerm } },
-            { answer: { $containsi: searchTerm } },
-            { keywords: { $contains: searchTerm } },
-          ],
-          publishedAt: { $notNull: true },
-        },
-        sort: { isPopular: 'desc', viewCount: 'desc' },
-      });
-
-      return {
-        success: true,
-        query: q,
-        count: faqs.length,
-        data: faqs,
-      };
-    } catch (error) {
-      strapi.log.error('Error al buscar FAQs:', error);
-      ctx.throw(500, 'Error en la búsqueda');
+    if (!q || q.length < 3) {
+      return ctx.badRequest('Search term must be at least 3 characters');
     }
+
+    // Normalizar el término de búsqueda
+    const searchTerm = q.toLowerCase().trim();
+    
+    // Dividir en palabras (separadas por espacios)
+    // Filtrar palabras muy cortas (< 3 caracteres) para evitar ruido
+    const words = searchTerm
+      .split(/\s+/)
+      .filter(word => word.length >= 3);
+
+    if (words.length === 0) {
+      return ctx.badRequest('Search term must contain at least one word with 3+ characters');
+    }
+
+    // Buscar todas las FAQs
+    const allFaqs = await strapi.documents('api::faq.faq').findMany({});
+
+    // Filtrar FAQs que contengan al menos una de las palabras buscadas
+    const results = allFaqs.filter((faq: any) => {
+      const questionLower = (faq.question || '').toLowerCase();
+      const answerLower = (faq.answer || '').toLowerCase();
+      const keywordsLower = JSON.stringify(faq.keywords || []).toLowerCase();
+      
+      // Verificar si al menos una palabra está en la pregunta, respuesta o keywords
+      return words.some(word => {
+        return questionLower.includes(word) ||
+               answerLower.includes(word) ||
+               keywordsLower.includes(word);
+      });
+    });
+
+    // Ordenar resultados por relevancia
+    // 1. Priorizar si la palabra está en la pregunta
+    // 2. Luego por número de palabras encontradas
+    // 3. Finalmente por viewCount
+    const scoredResults = results.map((faq: any) => {
+      const questionLower = (faq.question || '').toLowerCase();
+      const answerLower = (faq.answer || '').toLowerCase();
+      
+      // Contar cuántas palabras coinciden
+      const matchCount = words.filter(word => 
+        questionLower.includes(word) || answerLower.includes(word)
+      ).length;
+      
+      // Bonus si está en la pregunta
+      const inQuestion = words.some(word => questionLower.includes(word));
+      
+      return {
+        faq,
+        score: matchCount * 10 + (inQuestion ? 50 : 0) + (faq.viewCount || 0)
+      };
+    });
+
+    // Ordenar por score descendente
+    scoredResults.sort((a, b) => b.score - a.score);
+    
+    // Extraer solo las FAQs ordenadas
+    const sortedResults = scoredResults.map(item => item.faq);
+
+    const sanitizedResults = await this.sanitizeOutput(sortedResults, ctx);
+    return this.transformResponse(sanitizedResults);
   },
 
-  /**
-   * Incrementar contador de vistas
-   */
+  // Incrementar contador de vistas
   async incrementView(ctx) {
-    try {
-      const { id } = ctx.params;
+    const { id } = ctx.params;
 
-      const faq = await strapi.entityService.findOne('api::faq.faq', id);
+    const faq = await strapi.documents('api::faq.faq').findOne({
+      documentId: id,
+    });
 
-      if (!faq) {
-        return ctx.notFound('FAQ no encontrada');
-      }
-
-      const updatedFaq = await strapi.entityService.update('api::faq.faq', id, {
-        data: {
-          viewCount: (faq.viewCount || 0) + 1,
-        },
-      });
-
-      return {
-        success: true,
-        viewCount: updatedFaq.viewCount,
-      };
-    } catch (error) {
-      strapi.log.error('Error al incrementar vistas:', error);
-      ctx.throw(500, 'Error al actualizar vistas');
+    if (!faq) {
+      return ctx.notFound('FAQ not found');
     }
+
+    const updatedFaq = await strapi.documents('api::faq.faq').update({
+      documentId: id,
+      data: {
+        viewCount: (faq.viewCount || 0) + 1,
+      },
+    });
+
+    // Retornar solo el contador de vistas en el formato que espera el frontend
+    return {
+      viewCount: updatedFaq.viewCount || 0
+    };
   },
 
-  /**
-   * Marcar FAQ como útil
-   */
+  // Marcar FAQ como útil
   async markHelpful(ctx) {
-    try {
-      const { id } = ctx.params;
-      const { helpful } = ctx.request.body;
+    const { id } = ctx.params;
+    const { helpful } = ctx.request.body as { helpful: boolean };
 
-      const faq = await strapi.entityService.findOne('api::faq.faq', id);
+    const faq = await strapi.documents('api::faq.faq').findOne({
+      documentId: id,
+    });
 
-      if (!faq) {
-        return ctx.notFound('FAQ no encontrada');
-      }
-
-      const updateData = helpful
-        ? { helpfulCount: (faq.helpfulCount || 0) + 1 }
-        : { notHelpfulCount: (faq.notHelpfulCount || 0) + 1 };
-
-      const updatedFaq = await strapi.entityService.update('api::faq.faq', id, {
-        data: updateData,
-      });
-
-      return {
-        success: true,
-        data: {
-          helpfulCount: updatedFaq.helpfulCount,
-          notHelpfulCount: updatedFaq.notHelpfulCount,
-        },
-      };
-    } catch (error) {
-      strapi.log.error('Error al marcar FAQ:', error);
-      ctx.throw(500, 'Error al actualizar feedback');
+    if (!faq) {
+      return ctx.notFound('FAQ not found');
     }
+
+    const updatedFaq = await strapi.documents('api::faq.faq').update({
+      documentId: id,
+      data: helpful
+        ? { helpfulCount: (faq.helpfulCount || 0) + 1 }
+        : { notHelpfulCount: (faq.notHelpfulCount || 0) + 1 },
+    });
+
+    // Retornar solo los contadores en el formato que espera el frontend
+    return {
+      data: {
+        helpfulCount: updatedFaq.helpfulCount || 0,
+        notHelpfulCount: updatedFaq.notHelpfulCount || 0,
+      }
+    };
   },
 
-  /**
-   * Obtener estadísticas de FAQs
-   */
+  // Obtener estadísticas
   async stats(ctx) {
-    try {
-      const faqs = await strapi.entityService.findMany('api::faq.faq', {
-        filters: {
-          publishedAt: { $notNull: true },
-        },
-        fields: ['category', 'viewCount', 'helpfulCount', 'notHelpfulCount', 'isPopular'],
-      });
+    const faqs = await strapi.documents('api::faq.faq').findMany({});
 
-      const stats = {
-        total: faqs.length,
-        totalViews: 0,
-        totalHelpful: 0,
-        totalNotHelpful: 0,
-        byCategory: {},
-        popular: 0,
-      };
+    const stats = {
+      total: faqs.length,
+      byCategory: {} as Record<string, number>,
+      totalViews: 0,
+      totalHelpful: 0,
+      totalNotHelpful: 0,
+    };
 
-      faqs.forEach((faq: any) => {
-        stats.totalViews += faq.viewCount || 0;
-        stats.totalHelpful += faq.helpfulCount || 0;
-        stats.totalNotHelpful += faq.notHelpfulCount || 0;
-        
-        if (faq.isPopular) {
-          stats.popular++;
-        }
+    faqs.forEach((faq: any) => {
+      stats.byCategory[faq.category] = (stats.byCategory[faq.category] || 0) + 1;
+      stats.totalViews += faq.viewCount || 0;
+      stats.totalHelpful += faq.helpfulCount || 0;
+      stats.totalNotHelpful += faq.notHelpfulCount || 0;
+    });
 
-        stats.byCategory[faq.category] = (stats.byCategory[faq.category] || 0) + 1;
-      });
-
-      const helpfulRate = stats.totalHelpful + stats.totalNotHelpful > 0
-        ? Math.round((stats.totalHelpful / (stats.totalHelpful + stats.totalNotHelpful)) * 100)
-        : 0;
-
-      return {
-        success: true,
-        data: {
-          ...stats,
-          helpfulRate,
-        },
-      };
-    } catch (error) {
-      strapi.log.error('Error al obtener estadísticas de FAQs:', error);
-      ctx.throw(500, 'Error al obtener estadísticas');
-    }
+    return stats;
   },
 }));
-
