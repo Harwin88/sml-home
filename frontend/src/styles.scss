@@ -1,11 +1,17 @@
+/* Angular Material Theme */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
 /* Global Styles */
 :root {
-  // Colores principales - Paleta moderna y profesional
-  --color-primary: #6366f1;
-  --color-primary-dark: #4f46e5;
-  --color-primary-light: #818cf8;
-  --color-secondary: #10b981;
-  --color-secondary-dark: #059669;
+  // Colores principales - Paleta azul y verde (natural y confiable)
+  --color-primary: #0ea5e9;          // Sky Blue - Confianza y profesionalismo
+  --color-primary-dark: #0284c7;     // Sky Blue 600 - Versión oscura
+  --color-primary-light: #38bdf8;    // Sky Blue 400 - Versión clara
+  --color-secondary: #10b981;        // Emerald - Crecimiento y naturaleza
+  --color-secondary-dark: #059669;   // Emerald 600 - Versión oscura
+  --color-secondary-light: #34d399;  // Emerald 400 - Versión clara
+  --color-accent: #3b82f6;           // Blue - Acento para CTAs
+  --color-accent-dark: #2563eb;      // Blue 600 - Acento oscuro
   --color-btn-rate: #d1fae5;
   --color-btn-rate-hover: #55bd9f;
   // Colores de texto
@@ -18,7 +24,9 @@
   --color-bg-primary: #ffffff;
   --color-bg-secondary: #f9fafb;
   --color-bg-tertiary: #f3f4f6;
-  --color-bg-gradient: linear-gradient(135deg, #d1fae5 0%, #059669 100%);
+  --color-bg-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+  --color-bg-gradient-alt: linear-gradient(135deg, #06b6d4 0%, #34d399 100%);
+  --color-bg-gradient-soft: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 100%);
   
   // Colores de estado
   --color-success: #10b981;
@@ -79,6 +87,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 // Mejoras de tipografía
@@ -86,16 +95,65 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.2;
   color: var(--color-text-primary);
+  margin: 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  
+  @media (max-width: 768px) {
+    font-size: 1.75rem;
+  }
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 p {
   color: var(--color-text-secondary);
+  margin: 0;
+}
+
+// Enlaces
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-base);
+  
+  &:hover {
+    color: var(--color-primary-dark);
+  }
+}
+
+// Botones - reset de estilos base
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 // Scrollbar personalizado
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
@@ -103,10 +161,64 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-text-tertiary);
+  background: linear-gradient(135deg, #0ea5e9, #10b981);
   border-radius: var(--radius-full);
+  border: 2px solid var(--color-bg-tertiary);
   
   &:hover {
-    background: var(--color-text-secondary);
+    background: linear-gradient(135deg, #0284c7, #059669);
+  }
+}
+
+// Smooth scroll
+html {
+  scroll-behavior: smooth;
+}
+
+// Animaciones de entrada para elementos
+@media (prefers-reduced-motion: no-preference) {
+  [data-aos] {
+    opacity: 0;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    
+    &.aos-animate {
+      opacity: 1;
+    }
+  }
+}
+
+// Mejora de accesibilidad
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+// Skip to content (accesibilidad)
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+  
+  &:focus {
+    top: 0;
+  }
+}
+
+// Utilidades de responsive
+.mobile-only {
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
+.desktop-only {
+  @media (max-width: 768px) {
+    display: none !important;
   }
 }

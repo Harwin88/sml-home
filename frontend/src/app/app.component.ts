@@ -2,22 +2,24 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { SearchService } from './core/services/search.service';
 import { FirstVisitService } from './core/services/first-visit.service';
 import { WelcomeModalComponent } from './shared/components/welcome-modal/welcome-modal.component';
 import { WorkWithUsModalComponent } from './shared/components/work-with-us-modal/work-with-us-modal.component';
+import { FooterComponent } from './shared/components/footer/footer.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, WelcomeModalComponent, WorkWithUsModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, MatIconModule, WelcomeModalComponent, WorkWithUsModalComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'SLM Hogar';
+  title = 'HOME';
   searchControl = new FormControl('');
   showSearch = true;
   showWelcomeModal = false;

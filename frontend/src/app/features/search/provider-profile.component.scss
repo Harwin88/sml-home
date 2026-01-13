@@ -127,6 +127,16 @@
   font-size: 0.75rem;
   font-weight: 600;
   box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+    line-height: 1rem;
+  }
   backdrop-filter: blur(10px);
   z-index: 2;
 }
@@ -166,15 +176,19 @@
   gap: var(--spacing-xs);
 }
 
-.star {
+mat-icon.star {
   font-size: 1.5rem;
-  opacity: 0.3;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  color: #E0E0E0 !important; /* Gris claro para estrellas vacías */
   transition: all var(--transition-fast);
 
   &.filled {
+    color: #FFD700 !important; /* Dorado para estrellas llenas */
     opacity: 1;
     transform: scale(1.1);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
   }
 }
 

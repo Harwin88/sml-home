@@ -1,19 +1,22 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
   <div class="modal-container" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2 class="modal-title">💼 Trabaja con nosotros</h2>
+      <h2 class="modal-title">
+        <mat-icon>work</mat-icon>
+        Trabaja con nosotros
+      </h2>
       <button 
         class="modal-close-btn" 
         (click)="closeModal()" 
         aria-label="Cerrar"
         [disabled]="isSubmitting">
-        ×
+        <mat-icon>close</mat-icon>
       </button>
     </div>
     
     <div class="modal-body">
       <div *ngIf="submitSuccess" class="success-message">
-        <div class="success-icon">✅</div>
+        <mat-icon class="success-icon">check_circle</mat-icon>
         <p>¡Formulario enviado exitosamente! Nos pondremos en contacto contigo pronto.</p>
       </div>
 
@@ -109,7 +112,7 @@
         </div>
 
         <div class="error-alert" *ngIf="submitError">
-          <span class="error-icon">⚠️</span>
+          <mat-icon class="error-icon">warning</mat-icon>
           <span>{{ submitError }}</span>
         </div>
       </form>
@@ -129,7 +132,10 @@
         (click)="onSubmit()"
         [disabled]="isSubmitting || formGroup.invalid">
         <span *ngIf="!isSubmitting">Enviar</span>
-        <span *ngIf="isSubmitting" class="loading-spinner">⏳ Enviando...</span>
+        <span *ngIf="isSubmitting" class="loading-spinner">
+          <mat-icon>hourglass_empty</mat-icon>
+          Enviando...
+        </span>
       </button>
     </div>
   </div>

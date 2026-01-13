@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FormService } from '../../../core/services/form.service';
 import { FormType } from '../../../core/models/form.model';
@@ -7,7 +8,7 @@ import { FormType } from '../../../core/models/form.model';
 @Component({
   selector: 'app-work-with-us-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './work-with-us-modal.component.html',
   styleUrls: ['./work-with-us-modal.component.scss']
 })

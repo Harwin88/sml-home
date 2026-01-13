@@ -1,9 +1,12 @@
 <div class="rating-modal-backdrop" (click)="onBackdropClick($event)">
   <div class="rating-modal-container" (click)="$event.stopPropagation()">
     <div class="rating-modal-header">
-      <h2 class="rating-modal-title">⭐ Calificar a {{ providerName }}</h2>
+      <h2 class="rating-modal-title">
+        <mat-icon>star</mat-icon>
+        Calificar a {{ providerName }}
+      </h2>
       <button class="rating-modal-close-btn" (click)="closeModal()" [disabled]="submitting" aria-label="Cerrar">
-        ×
+        <mat-icon>close</mat-icon>
       </button>
     </div>
     
@@ -22,7 +25,7 @@
             (mouseenter)="onStarHover(star)"
             (mouseleave)="onStarLeave()"
             [disabled]="submitting">
-            ⭐
+            <mat-icon>star</mat-icon>
           </button>
         </div>
         <input type="hidden" formControlName="rating" />

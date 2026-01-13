@@ -1,0 +1,161 @@
+<footer class="app-footer">
+  <!-- Main Footer Content -->
+  <div class="footer-main">
+    <div class="footer-container">
+      <!-- Brand Section -->
+      <div class="footer-brand">
+        <div class="brand-logo">
+          <h2 class="brand-name">MSL Hogar</h2>
+          <span class="brand-emoji">🏠</span>
+        </div>
+        <p class="brand-tagline">
+          Conectando familias con profesionales de confianza para hacer tu hogar mejor cada día.
+        </p>
+        
+        <!-- Trust Badges -->
+        <div class="trust-badges">
+          <div class="trust-badge" *ngFor="let feature of features">
+            <mat-icon>{{ feature.icon }}</mat-icon>
+            <span>{{ feature.text }}</span>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="contact-info">
+          <div class="contact-item">
+            <mat-icon>email</mat-icon>
+            <a [href]="'mailto:' + contactInfo.email">{{ contactInfo.email }}</a>
+          </div>
+          <div class="contact-item">
+            <mat-icon>phone</mat-icon>
+            <a [href]="'tel:' + contactInfo.phone">{{ contactInfo.phone }}</a>
+          </div>
+          <div class="contact-item">
+            <mat-icon>location_on</mat-icon>
+            <span>{{ contactInfo.address }}</span>
+          </div>
+          <div class="contact-item">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ contactInfo.hours }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Links Sections -->
+      <div class="footer-links">
+        <div class="footer-section" *ngFor="let section of footerSections">
+          <h3 class="section-title">{{ section.title }}</h3>
+          <ul class="section-links">
+            <li *ngFor="let link of section.links">
+              <a 
+                *ngIf="link.route" 
+                [routerLink]="link.route"
+                class="footer-link"
+                [attr.aria-label]="link.label"
+              >
+                <mat-icon *ngIf="link.icon" class="link-icon">{{ link.icon }}</mat-icon>
+                <span>{{ link.label }}</span>
+              </a>
+              <a 
+                *ngIf="link.external" 
+                [href]="link.external"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="footer-link"
+                [attr.aria-label]="link.label"
+              >
+                <mat-icon *ngIf="link.icon" class="link-icon">{{ link.icon }}</mat-icon>
+                <span>{{ link.label }}</span>
+                <mat-icon class="external-icon">open_in_new</mat-icon>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Media Section -->
+  <div class="footer-social">
+    <div class="footer-container">
+      <div class="social-content">
+        <div class="social-text">
+          <h3>Síguenos en Redes Sociales</h3>
+          <p>Mantente al día con noticias, tips y ofertas especiales</p>
+        </div>
+        <div class="social-links">
+          <a 
+            *ngFor="let social of socialLinks"
+            [href]="social.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-link"
+            [attr.aria-label]="social.name"
+            [style.--social-color]="social.color"
+          >
+            <mat-icon>{{ social.icon }}</mat-icon>
+            <span class="social-name">{{ social.name }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Newsletter Section -->
+  <div class="footer-newsletter">
+    <div class="footer-container">
+      <div class="newsletter-content">
+        <div class="newsletter-text">
+          <mat-icon class="newsletter-icon">mail_outline</mat-icon>
+          <div>
+            <h3>Suscríbete a Nuestro Newsletter</h3>
+            <p>Recibe ofertas exclusivas y tips para el hogar directo en tu correo</p>
+          </div>
+        </div>
+        <div class="newsletter-form">
+          <input 
+            type="email" 
+            placeholder="Tu correo electrónico" 
+            class="newsletter-input"
+            aria-label="Correo electrónico para newsletter"
+          />
+          <button class="newsletter-button" aria-label="Suscribirse al newsletter">
+            <span>Suscribirse</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="footer-bottom">
+    <div class="footer-container">
+      <div class="bottom-content">
+        <div class="copyright">
+          <p>© {{ currentYear }} MSL Hogar. Todos los derechos reservados.</p>
+          <p class="made-with">
+            Hecho con 
+            <mat-icon class="heart-icon">favorite</mat-icon> 
+            en Colombia
+          </p>
+        </div>
+        
+        <div class="bottom-links">
+          <a routerLink="/legal/terms">Términos</a>
+          <span class="separator">•</span>
+          <a routerLink="/legal/privacy">Privacidad</a>
+          <span class="separator">•</span>
+          <a routerLink="/legal/cookies">Cookies</a>
+          <span class="separator">•</span>
+          <a routerLink="/help">Ayuda</a>
+        </div>
+
+        <button class="scroll-top" (click)="scrollToTop()" aria-label="Volver arriba">
+          <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</footer>
+

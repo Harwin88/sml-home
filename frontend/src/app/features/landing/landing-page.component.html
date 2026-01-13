@@ -1,89 +1,156 @@
 <div class="landing-page">
   <!-- Hero Section -->
-  <section class="hero-section">
+  <section class="hero-section" aria-label="Sección principal">
     <div class="hero-content">
       <div class="hero-text">
+        <div class="hero-badge">
+          <mat-icon class="badge-icon">verified</mat-icon>
+          <span>+{{ formatNumber(verifiedProviders) }} Profesionales Verificados</span>
+        </div>
         <h1 class="hero-title">
-          Encuentra el proveedor de servicios perfecto para tu hogar
+          El servicio perfecto para tu hogar está a un clic de distancia
         </h1>
         <p class="hero-subtitle">
-          Conectamos a familias con profesionales verificados y confiables. 
-          Todos nuestros proveedores han sido validados para garantizar tu tranquilidad.
+          Conectamos familias con los mejores profesionales del hogar. 
+          <strong>100% verificados</strong>, calificados por miles de clientes satisfechos.
+          Tu tranquilidad es nuestra prioridad.
         </p>
         <div class="hero-cta">
-          <a routerLink="/search" class="btn-primary">
-            Buscar Proveedores
-            <span class="btn-icon">🔍</span>
+          <a routerLink="/search" class="btn-primary" aria-label="Buscar proveedores de servicios">
+            Comenzar Ahora
+            <mat-icon class="btn-icon">arrow_forward</mat-icon>
           </a>
-          <a routerLink="/search" class="btn-secondary">
-            Ver Todos los Servicios
+          <a routerLink="/search" class="btn-secondary" aria-label="Ver todos los servicios disponibles">
+            <mat-icon class="btn-secondary-icon">play_circle</mat-icon>
+            Ver Cómo Funciona
           </a>
+        </div>
+        <div class="hero-features">
+          <div class="feature-item">
+            <mat-icon>check_circle</mat-icon>
+            <span>Sin costos ocultos</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon>check_circle</mat-icon>
+            <span>Respuesta inmediata</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon>check_circle</mat-icon>
+            <span>Garantía de calidad</span>
+          </div>
         </div>
       </div>
       <div class="hero-image">
         <div class="hero-illustration">
-          <div class="illustration-icon">🏠</div>
-          <div class="illustration-badge verified">✓ Verificado</div>
-          <div class="illustration-badge rating">⭐ 4.8</div>
+          <mat-icon class="illustration-icon">home</mat-icon>
+          <div class="illustration-badge verified pulse">
+            <mat-icon>verified</mat-icon>
+            Verificado
+          </div>
+          <div class="illustration-badge rating">
+            <mat-icon>star</mat-icon>
+            {{ formatRating(averageRating) }}
+          </div>
+          <div class="illustration-badge providers">
+            <mat-icon>people</mat-icon>
+            {{ formatNumber(totalProviders) }}+
+          </div>
         </div>
       </div>
+    </div>
+    <div class="hero-wave">
+      <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z" fill="var(--color-bg-primary)"/>
+      </svg>
     </div>
   </section>
 
   <!-- Trust Indicators -->
-  <section class="trust-section">
+  <section class="trust-section" aria-label="Indicadores de confianza">
     <div class="container">
+      <div class="trust-header">
+        <h2 class="trust-title">¿Por qué confiar en MSL Hogar?</h2>
+        <p class="trust-subtitle">Miles de familias ya eligieron la seguridad y calidad que ofrecemos</p>
+      </div>
       <div class="trust-grid">
         <div class="trust-item">
-          <div class="trust-icon">🛡️</div>
-          <h3>Proveedores Verificados</h3>
-          <p>Todos nuestros proveedores pasan por un riguroso proceso de verificación</p>
+          <div class="trust-icon-wrapper">
+            <mat-icon class="trust-icon">verified_user</mat-icon>
+          </div>
+          <h3>Verificación Rigurosa</h3>
+          <p>Validamos identidad, antecedentes y referencias de cada profesional antes de aprobarlos</p>
+          <div class="trust-badge">100% Verificados</div>
         </div>
         <div class="trust-item">
-          <div class="trust-icon">⭐</div>
-          <h3>Calificaciones Reales</h3>
-          <p>Reseñas auténticas de clientes que han usado nuestros servicios</p>
+          <div class="trust-icon-wrapper">
+            <mat-icon class="trust-icon">star</mat-icon>
+          </div>
+          <h3>Calificaciones Transparentes</h3>
+          <p>Sistema de reseñas auténticas. Solo clientes reales pueden calificar los servicios</p>
+          <div class="trust-badge">{{ formatNumber(totalReviews) }}+ Reseñas</div>
         </div>
         <div class="trust-item">
-          <div class="trust-icon">🔒</div>
-          <h3>Seguridad Garantizada</h3>
-          <p>Validamos antecedentes y experiencia de cada proveedor</p>
+          <div class="trust-icon-wrapper">
+            <mat-icon class="trust-icon">lock</mat-icon>
+          </div>
+          <h3>Seguridad Total</h3>
+          <p>Protección de datos, verificación de experiencia y garantía en cada servicio contratado</p>
+          <div class="trust-badge">Garantía MSL</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon-wrapper">
+            <mat-icon class="trust-icon">support_agent</mat-icon>
+          </div>
+          <h3>Soporte Dedicado</h3>
+          <p>Equipo de atención disponible para resolver cualquier duda o inconveniente</p>
+          <div class="trust-badge">24/7 Disponible</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Statistics Section -->
-  <section class="stats-section">
+  <section class="stats-section" aria-label="Estadísticas de la plataforma">
     <div class="container">
+      <h2 class="stats-title">Números que hablan por sí solos</h2>
       <div class="stats-grid">
         <div class="stat-item">
+          <mat-icon class="stat-icon">people</mat-icon>
           <div class="stat-number">{{ formatNumber(totalProviders) }}+</div>
-          <div class="stat-label">Proveedores Activos</div>
+          <div class="stat-label">Profesionales Activos</div>
+          <div class="stat-description">Listos para ayudarte</div>
         </div>
         <div class="stat-item">
+          <mat-icon class="stat-icon">verified</mat-icon>
           <div class="stat-number">{{ formatNumber(verifiedProviders) }}+</div>
-          <div class="stat-label">Proveedores Verificados</div>
+          <div class="stat-label">100% Verificados</div>
+          <div class="stat-description">Con antecedentes validados</div>
         </div>
         <div class="stat-item">
-          <div class="stat-number">{{ formatRating(averageRating) }}</div>
+          <mat-icon class="stat-icon">star_rate</mat-icon>
+          <div class="stat-number">{{ formatRating(averageRating) }}<span class="stat-suffix">/5.0</span></div>
           <div class="stat-label">Calificación Promedio</div>
+          <div class="stat-description">Excelencia comprobada</div>
         </div>
         <div class="stat-item">
+          <mat-icon class="stat-icon">reviews</mat-icon>
           <div class="stat-number">{{ formatNumber(totalReviews) }}+</div>
-          <div class="stat-label">Reseñas de Clientes</div>
+          <div class="stat-label">Reseñas Reales</div>
+          <div class="stat-description">De clientes satisfechos</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Services Categories -->
-  <section class="services-section">
+  <section class="services-section" aria-label="Categorías de servicios">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Nuestros Servicios</h2>
+        <div class="section-badge">Servicios</div>
+        <h2 class="section-title">Todo lo que necesitas para tu hogar</h2>
         <p class="section-subtitle">
-          Encuentra profesionales especializados en diferentes áreas del hogar
+          Profesionales especializados en cada área, verificados y listos para atenderte.
+          Encuentra exactamente lo que buscas.
         </p>
       </div>
       
@@ -97,7 +164,7 @@
           <div class="category-icon">{{ category.icon }}</div>
           <h3 class="category-name">{{ category.name }}</h3>
           <p class="category-description">{{ category.description }}</p>
-          <div class="category-arrow">→</div>
+          <mat-icon class="category-arrow">arrow_forward</mat-icon>
         </div>
       </div>
 
@@ -115,52 +182,245 @@
   </section>
 
   <!-- How It Works -->
-  <section class="how-it-works-section">
+  <section class="how-it-works-section" aria-label="Cómo funciona la plataforma">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">¿Cómo Funciona?</h2>
+        <div class="section-badge">Proceso Simple</div>
+        <h2 class="section-title">Tu servicio ideal en 4 pasos</h2>
         <p class="section-subtitle">
-          Encuentra y contrata servicios de manera fácil y segura
+          Un proceso simple, rápido y seguro para conectarte con los mejores profesionales
         </p>
       </div>
       
       <div class="steps-grid">
         <div class="step-item">
-          <div class="step-number">1</div>
-          <h3>Busca</h3>
-          <p>Explora nuestra plataforma y busca el servicio que necesitas</p>
+          <div class="step-number">
+            <span>1</span>
+            <mat-icon class="step-icon">search</mat-icon>
+          </div>
+          <h3>Busca el Servicio</h3>
+          <p>Explora nuestra amplia red de profesionales. Usa filtros para encontrar exactamente lo que necesitas en tu zona.</p>
+          <div class="step-time">
+            <mat-icon>schedule</mat-icon>
+            <span>1 minuto</span>
+          </div>
         </div>
         <div class="step-item">
-          <div class="step-number">2</div>
-          <h3>Revisa</h3>
-          <p>Lee las calificaciones y reseñas de otros clientes</p>
+          <div class="step-number">
+            <span>2</span>
+            <mat-icon class="step-icon">rate_review</mat-icon>
+          </div>
+          <h3>Compara Perfiles</h3>
+          <p>Revisa calificaciones, reseñas verificadas, experiencia y tarifas. Toma una decisión informada y segura.</p>
+          <div class="step-time">
+            <mat-icon>schedule</mat-icon>
+            <span>3 minutos</span>
+          </div>
         </div>
         <div class="step-item">
-          <div class="step-number">3</div>
-          <h3>Contacta</h3>
-          <p>Comunícate directamente con el proveedor de tu elección</p>
+          <div class="step-number">
+            <span>3</span>
+            <mat-icon class="step-icon">phone</mat-icon>
+          </div>
+          <h3>Contacta Directamente</h3>
+          <p>Comunícate con el profesional elegido. Coordina horarios, precios y detalles del servicio sin intermediarios.</p>
+          <div class="step-time">
+            <mat-icon>schedule</mat-icon>
+            <span>Inmediato</span>
+          </div>
         </div>
         <div class="step-item">
-          <div class="step-number">4</div>
-          <h3>Califica</h3>
-          <p>Comparte tu experiencia para ayudar a otros clientes</p>
+          <div class="step-number">
+            <span>4</span>
+            <mat-icon class="step-icon">thumb_up</mat-icon>
+          </div>
+          <h3>Califica la Experiencia</h3>
+          <p>Ayuda a la comunidad compartiendo tu experiencia. Tu opinión es valiosa y ayuda a otros a decidir mejor.</p>
+          <div class="step-time">
+            <mat-icon>schedule</mat-icon>
+            <span>2 minutos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="testimonials-section" aria-label="Testimonios de clientes">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">Testimonios</div>
+        <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+        <p class="section-subtitle">
+          Miles de familias confían en MSL Hogar para encontrar los mejores servicios
+        </p>
+      </div>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-rating">
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+          </div>
+          <p class="testimonial-text">
+            "Encontré una excelente empleada doméstica en menos de una semana. El proceso de verificación me dio mucha confianza. Totalmente recomendado."
+          </p>
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="author-info">
+              <h4>María González</h4>
+              <p>Bogotá, Colombia</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-rating">
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+          </div>
+          <p class="testimonial-text">
+            "Necesitaba un plomero urgente y MSL Hogar me ayudó a encontrar uno verificado en mi zona. Excelente servicio y muy profesional."
+          </p>
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="author-info">
+              <h4>Carlos Ramírez</h4>
+              <p>Medellín, Colombia</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-rating">
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+            <mat-icon>star</mat-icon>
+          </div>
+          <p class="testimonial-text">
+            "La plataforma es muy fácil de usar y las reseñas me ayudaron a elegir el mejor electricista. El trabajo quedó perfecto."
+          </p>
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="author-info">
+              <h4>Ana Martínez</h4>
+              <p>Cali, Colombia</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guarantees Section -->
+  <section class="guarantees-section" aria-label="Nuestras garantías">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">Garantías MSL</div>
+        <h2 class="section-title">Tu tranquilidad es lo primero</h2>
+      </div>
+      
+      <div class="guarantees-grid">
+        <div class="guarantee-card">
+          <div class="guarantee-icon">
+            <mat-icon>shield</mat-icon>
+          </div>
+          <h3>Verificación Exhaustiva</h3>
+          <p>Cada proveedor es verificado minuciosamente: identidad, antecedentes, referencias laborales y experiencia comprobada.</p>
+        </div>
+        
+        <div class="guarantee-card">
+          <div class="guarantee-icon">
+            <mat-icon>gavel</mat-icon>
+          </div>
+          <h3>Protección Legal</h3>
+          <p>Todos nuestros proveedores cumplen con requisitos legales y regulatorios. Tu seguridad está garantizada.</p>
+        </div>
+        
+        <div class="guarantee-card">
+          <div class="guarantee-icon">
+            <mat-icon>support</mat-icon>
+          </div>
+          <h3>Soporte Continuo</h3>
+          <p>Nuestro equipo está disponible para ayudarte en cualquier momento. Resolvemos tus dudas e inquietudes rápidamente.</p>
+        </div>
+        
+        <div class="guarantee-card">
+          <div class="guarantee-icon">
+            <mat-icon>workspace_premium</mat-icon>
+          </div>
+          <h3>Calidad Asegurada</h3>
+          <p>Monitoreamos constantemente la calidad del servicio. Si algo no cumple tus expectativas, trabajamos para solucionarlo.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- CTA Section -->
-  <section class="cta-section">
+  <section class="cta-section" aria-label="Llamado a la acción">
+    <div class="cta-background">
+      <div class="cta-shape cta-shape-1"></div>
+      <div class="cta-shape cta-shape-2"></div>
+      <div class="cta-shape cta-shape-3"></div>
+    </div>
     <div class="container">
       <div class="cta-content">
-        <h2 class="cta-title">¿Listo para encontrar tu proveedor ideal?</h2>
+        <mat-icon class="cta-big-icon">rocket_launch</mat-icon>
+        <h2 class="cta-title">Comienza hoy mismo</h2>
         <p class="cta-subtitle">
-          Únete a miles de familias que confían en MSL Hogar para sus necesidades del hogar
+          Únete a <strong>miles de familias</strong> que ya encontraron los mejores profesionales para su hogar.
+          <br>Es gratis, rápido y 100% seguro.
         </p>
-        <a routerLink="/search" class="btn-primary-large">
-          Comenzar Búsqueda
-          <span class="btn-icon">🚀</span>
-        </a>
+        <div class="cta-buttons">
+          <a routerLink="/search" class="btn-primary-large" aria-label="Comenzar búsqueda de proveedores">
+            Buscar Profesionales Ahora
+            <mat-icon class="btn-icon">arrow_forward</mat-icon>
+          </a>
+        </div>
+        <div class="cta-features">
+          <div class="cta-feature">
+            <mat-icon>check</mat-icon>
+            <span>Registro gratuito</span>
+          </div>
+          <div class="cta-feature">
+            <mat-icon>check</mat-icon>
+            <span>Sin comisiones ocultas</span>
+          </div>
+          <div class="cta-feature">
+            <mat-icon>check</mat-icon>
+            <span>Cancela cuando quieras</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Info -->
+  <section class="footer-info">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3>MSL Hogar</h3>
+          <p>Conectando familias con profesionales de confianza</p>
+        </div>
+        <div class="footer-trust">
+          <mat-icon>verified</mat-icon>
+          <span>Plataforma verificada y segura</span>
+        </div>
       </div>
     </div>
   </section>

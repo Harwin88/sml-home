@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, from } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, BehaviorSubject, from, of, throwError } from 'rxjs';
+import { map, catchError, switchMap, timeout, retry } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
 export interface GeolocationPosition {
   latitude: number;
   longitude: number;
   accuracy?: number;
   timestamp?: number;
+  source?: 'gps' | 'ip' | 'manual';
+  address?: string;
 }
 
 export interface GeolocationError {
@@ -21,17 +24,39 @@ export class GeolocationService {
   private currentPosition$ = new BehaviorSubject<GeolocationPosition | null>(null);
   private isGettingLocation$ = new BehaviorSubject<boolean>(false);
 
-  constructor() {
+  constructor(private http: HttpClient) {
     // Intentar cargar la ubicación guardada en localStorage
     this.loadSavedLocation();
   }
 
   /**
-   * Obtener la ubicación actual del usuario
+   * Obtener la ubicación actual del usuario con fallback automático
    */
   getCurrentPosition(options?: PositionOptions): Observable<GeolocationPosition> {
     this.isGettingLocation$.next(true);
 
+    // Primero intentar con GPS
+    return this.getCurrentPositionGPS(options).pipe(
+      catchError((gpsError) => {
+        console.warn('GPS falló, intentando con IP:', gpsError);
+        // Si falla GPS, intentar con IP
+        return this.getCurrentPositionByIP().pipe(
+          catchError((ipError) => {
+            this.isGettingLocation$.next(false);
+            return throwError(() => ({
+              code: -2,
+              message: 'No se pudo obtener la ubicación. Por favor, ingresa tu dirección manualmente.'
+            }));
+          })
+        );
+      })
+    );
+  }
+
+  /**
+   * Obtener ubicación usando GPS del navegador
+   */
+  private getCurrentPositionGPS(options?: PositionOptions): Observable<GeolocationPosition> {
     return from(
       new Promise<GeolocationPosition>((resolve, reject) => {
         if (!navigator.geolocation) {
@@ -42,10 +67,11 @@ export class GeolocationService {
           return;
         }
 
+        // Opciones mejoradas con timeout más largo y mejor precisión
         const defaultOptions: PositionOptions = {
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000 // 5 minutos
+          timeout: 20000, // 20 segundos (aumentado)
+          maximumAge: 600000 // 10 minutos (aumentado)
         };
 
         navigator.geolocation.getCurrentPosition(
@@ -54,7 +80,8 @@ export class GeolocationService {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
               accuracy: position.coords.accuracy,
-              timestamp: position.timestamp
+              timestamp: position.timestamp,
+              source: 'gps'
             };
 
             // Guardar en localStorage
@@ -73,6 +100,112 @@ export class GeolocationService {
           },
           { ...defaultOptions, ...options }
         );
+      })
+    ).pipe(
+      timeout(25000), // Timeout adicional en RxJS
+      retry({
+        count: 2,
+        delay: 1000
+      })
+    );
+  }
+
+  /**
+   * Obtener ubicación aproximada usando la IP (fallback)
+   */
+  private getCurrentPositionByIP(): Observable<GeolocationPosition> {
+    // Usar servicio gratuito de geolocalización por IP
+    // ip-api.com es gratuito y no requiere API key
+    return this.http.get<any>('http://ip-api.com/json/?fields=status,message,lat,lon,city,region,country').pipe(
+      timeout(10000),
+      map((response) => {
+        if (response.status === 'success') {
+          const geoPosition: GeolocationPosition = {
+            latitude: response.lat,
+            longitude: response.lon,
+            accuracy: 5000, // Baja precisión para IP (~5km)
+            timestamp: Date.now(),
+            source: 'ip',
+            address: `${response.city}, ${response.region}, ${response.country}`
+          };
+
+          this.saveLocation(geoPosition);
+          this.currentPosition$.next(geoPosition);
+          this.isGettingLocation$.next(false);
+          return geoPosition;
+        } else {
+          throw new Error(response.message || 'Error al obtener ubicación por IP');
+        }
+      }),
+      catchError((error) => {
+        this.isGettingLocation$.next(false);
+        return throwError(() => ({
+          code: -3,
+          message: 'No se pudo obtener la ubicación aproximada por IP'
+        }));
+      })
+    );
+  }
+
+  /**
+   * Establecer ubicación manualmente (por dirección)
+   */
+  setManualLocation(latitude: number, longitude: number, address?: string): void {
+    const geoPosition: GeolocationPosition = {
+      latitude,
+      longitude,
+      accuracy: 100, // Asumimos buena precisión para ubicación manual
+      timestamp: Date.now(),
+      source: 'manual',
+      address
+    };
+
+    this.saveLocation(geoPosition);
+    this.currentPosition$.next(geoPosition);
+  }
+
+  /**
+   * Geocodificar una dirección (convertir dirección a coordenadas)
+   * Usando Nominatim (OpenStreetMap) - servicio gratuito
+   */
+  geocodeAddress(address: string): Observable<GeolocationPosition> {
+    this.isGettingLocation$.next(true);
+    
+    const encodedAddress = encodeURIComponent(address);
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`;
+    
+    return this.http.get<any[]>(url, {
+      headers: {
+        'User-Agent': 'MSL-Hogar-App' // Requerido por Nominatim
+      }
+    }).pipe(
+      timeout(10000),
+      map((results) => {
+        if (results && results.length > 0) {
+          const result = results[0];
+          const geoPosition: GeolocationPosition = {
+            latitude: parseFloat(result.lat),
+            longitude: parseFloat(result.lon),
+            accuracy: 100,
+            timestamp: Date.now(),
+            source: 'manual',
+            address: result.display_name
+          };
+
+          this.saveLocation(geoPosition);
+          this.currentPosition$.next(geoPosition);
+          this.isGettingLocation$.next(false);
+          return geoPosition;
+        } else {
+          throw new Error('No se encontró la dirección');
+        }
+      }),
+      catchError((error) => {
+        this.isGettingLocation$.next(false);
+        return throwError(() => ({
+          code: -4,
+          message: 'No se pudo encontrar la dirección. Por favor, verifica e intenta de nuevo.'
+        }));
       })
     );
   }
@@ -149,6 +282,30 @@ export class GeolocationService {
     } catch (error) {
       console.warn('No se pudo guardar la ubicación en localStorage:', error);
     }
+  }
+
+  /**
+   * Obtener nombre de la ubicación (reverse geocoding)
+   */
+  reverseGeocode(latitude: number, longitude: number): Observable<string> {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+    
+    return this.http.get<any>(url, {
+      headers: {
+        'User-Agent': 'MSL-Hogar-App'
+      }
+    }).pipe(
+      timeout(10000),
+      map((response) => {
+        if (response && response.display_name) {
+          return response.display_name;
+        }
+        return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      }),
+      catchError(() => {
+        return of(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+      })
+    );
   }
 
   /**

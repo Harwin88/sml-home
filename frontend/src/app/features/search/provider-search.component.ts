@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CategoryService } from '../../core/services/category.service';
@@ -28,7 +29,7 @@ interface CategoryFilter {
 @Component({
     selector: 'app-provider-search',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, RatingModalComponent],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, MatIconModule, RatingModalComponent],
     templateUrl: './provider-search.component.html',
     styleUrls: ['./provider-search.component.scss']
 })
@@ -74,6 +75,9 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
     isGettingLocation = false;
     locationError: string | null = null;
     geolocationSupported = false;
+    showManualLocation = false;
+    manualAddress = '';
+    isGeocoding = false;
 
     private searchSubscription?: Subscription;
     private locationSubscription?: Subscription;
@@ -750,39 +754,89 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Obtener ubicación del usuario
-     */
-    getUserLocation(): void {
-        if (!this.geolocationSupported) {
-            this.locationError = 'Tu navegador no soporta geolocalización';
-            return;
-        }
-
-        this.locationError = null;
-        this.isGettingLocation = true;
-
-        this.geolocationService.getCurrentPosition().subscribe({
-            next: (position) => {
-                this.userLocation = position;
-                this.locationError = null;
-                console.log('Ubicación obtenida:', position);
-            },
-            error: (error) => {
-                this.locationError = error.message || 'Error al obtener la ubicación';
-                this.userLocation = null;
-                console.error('Error de geolocalización:', error);
-            }
-        });
-    }
-
-    /**
      * Limpiar ubicación
      */
     clearLocation(): void {
         this.geolocationService.clearLocation();
         this.userLocation = null;
         this.locationError = null;
+        this.showManualLocation = false;
+        this.manualAddress = '';
     }
+
+    /**
+     * Obtener ubicación del usuario (con fallback automático)
+     */
+    getUserLocation(): void {
+        this.locationError = null;
+        this.isGettingLocation = true;
+        this.showManualLocation = false;
+
+        this.geolocationService.getCurrentPosition().subscribe({
+            next: (position) => {
+                this.userLocation = position;
+                this.locationError = null;
+                console.log('Ubicación obtenida:', position);
+                
+                // Si es por IP, obtener nombre de la ubicación
+                if (position.source === 'ip' && !position.address) {
+                    this.geolocationService.reverseGeocode(position.latitude, position.longitude).subscribe({
+                        next: (address) => {
+                            if (this.userLocation) {
+                                this.userLocation.address = address;
+                            }
+                        }
+                    });
+                }
+            },
+            error: (error) => {
+                this.locationError = error.message || 'Error al obtener la ubicación';
+                this.userLocation = null;
+                // Si falla todo, mostrar opción manual
+                if (error.code === -2 || error.code === -3) {
+                    this.showManualLocation = true;
+                }
+                console.error('Error de geolocalización:', error);
+            }
+        });
+    }
+
+    /**
+     * Buscar ubicación por dirección manual
+     */
+    searchManualLocation(): void {
+        if (!this.manualAddress.trim()) {
+            this.locationError = 'Por favor, ingresa una dirección';
+            return;
+        }
+
+        this.isGeocoding = true;
+        this.locationError = null;
+
+        this.geolocationService.geocodeAddress(this.manualAddress).subscribe({
+            next: (position) => {
+                this.userLocation = position;
+                this.locationError = null;
+                this.showManualLocation = false;
+                this.manualAddress = '';
+                this.isGeocoding = false;
+            },
+            error: (error) => {
+                this.locationError = error.message || 'No se pudo encontrar la dirección';
+                this.isGeocoding = false;
+            }
+        });
+    }
+
+    /**
+     * Mostrar/ocultar opción de ubicación manual
+     */
+    toggleManualLocation(): void {
+        this.showManualLocation = !this.showManualLocation;
+        this.manualAddress = '';
+        this.locationError = null;
+    }
+
 
     /**
      * Formatear precio en formato colombiano

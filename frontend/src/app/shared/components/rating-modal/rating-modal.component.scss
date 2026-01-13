@@ -126,18 +126,24 @@
         cursor: pointer;
         padding: 0;
         transition: all 0.2s;
-        filter: grayscale(100%);
-        opacity: 0.4;
+        color: #E0E0E0; /* Gris claro para estrellas no calificadas */
+        opacity: 1;
+
+        mat-icon {
+          width: 2.5rem;
+          height: 2.5rem;
+          line-height: 2.5rem;
+        }
 
         &.active {
-          filter: grayscale(0%);
-          opacity: 1;
+          color: #FFD700; /* Dorado al pasar el mouse */
           transform: scale(1.1);
+          filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
         }
 
         &.selected {
-          filter: grayscale(0%);
-          opacity: 1;
+          color: #FFD700; /* Dorado para estrellas seleccionadas */
+          filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
         }
 
         &:disabled {

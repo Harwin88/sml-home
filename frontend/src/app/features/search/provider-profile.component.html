@@ -2,7 +2,8 @@
   <!-- Botón de regreso -->
   <div class="back-button">
     <button class="btn-back" (click)="router.navigate(['/'])">
-      ← Volver a búsqueda
+      <mat-icon>arrow_back</mat-icon>
+      Volver a búsqueda
     </button>
   </div>
 
@@ -14,7 +15,10 @@
 
   <!-- Error -->
   <div *ngIf="error && !loading" class="error">
-    <h3>⚠️ Error</h3>
+    <h3>
+      <mat-icon>warning</mat-icon>
+      Error
+    </h3>
     <p>{{ error }}</p>
     <button class="btn-primary" (click)="router.navigate(['/'])">Volver a búsqueda</button>
   </div>
@@ -28,7 +32,8 @@
         <img [src]="getPhotoUrl()" [alt]="provider.name" class="profile-image"
           (error)="onImageError($event)" />
         <span *ngIf="provider.isVerified" class="verified-badge-large">
-          ✓ Verificado
+          <mat-icon>verified</mat-icon>
+          Verificado
         </span>
       </div>
 
@@ -38,7 +43,7 @@
         <!-- Rating -->
         <div class="rating-section">
           <div class="stars-display">
-            <span *ngFor="let filled of getStars()" class="star" [class.filled]="filled">⭐</span>
+            <mat-icon *ngFor="let filled of getStars()" class="star" [class.filled]="filled">star</mat-icon>
             <span class="rating-value">{{ provider.rating.toFixed(1) }}/5</span>
           </div>
           <span class="reviews-count">({{ provider.totalReviews }} reseña{{ provider.totalReviews !== 1 ? 's' : '' }})</span>
@@ -46,38 +51,38 @@
 
         <!-- Experiencia -->
         <div class="experience-badge">
-          <span class="icon">💼</span>
+          <mat-icon class="icon">work</mat-icon>
           <span>{{ provider.experienceYears }} años de experiencia</span>
         </div>
 
         <!-- Rango de precio -->
         <div class="price-range-badge" [ngClass]="provider.priceRange">
-          <span class="icon">💰</span>
+          <mat-icon class="icon">attach_money</mat-icon>
           <span>{{ getPriceRangeText() }}</span>
         </div>
 
         <!-- Tarifa por hora -->
         <div *ngIf="provider.hourlyRate" class="hourly-rate-badge">
-          <span class="icon">💵</span>
+          <mat-icon class="icon">payments</mat-icon>
           <span>${{ formatPrice(provider.hourlyRate) }} / hora</span>
         </div>
 
         <!-- Botones de acción principales -->
         <div class="action-buttons">
           <button class="btn btn-rate" (click)="openRatingModal()">
-            <span class="icon">⭐</span>
+            <mat-icon class="icon">star</mat-icon>
             Calificar Servicio
           </button>
           <button class="btn btn-whatsapp" (click)="openWhatsApp()">
-            <span class="icon">💬</span>
+            <mat-icon class="icon">chat</mat-icon>
             Contactar por WhatsApp
           </button>
           <button class="btn btn-call" (click)="callProvider()">
-            <span class="icon">📞</span>
+            <mat-icon class="icon">phone</mat-icon>
             Llamar
           </button>
           <button *ngIf="provider.email" class="btn btn-email" (click)="sendEmail()">
-            <span class="icon">✉️</span>
+            <mat-icon class="icon">email</mat-icon>
             Email
           </button>
         </div>
@@ -89,13 +94,19 @@
       
       <!-- Descripción -->
       <section class="detail-section" *ngIf="provider.description">
-        <h2>📝 Sobre el servicio</h2>
+        <h2>
+          <mat-icon>description</mat-icon>
+          Sobre el servicio
+        </h2>
         <p class="description-text">{{ provider.description }}</p>
       </section>
 
       <!-- Información de contacto -->
       <section class="detail-section">
-        <h2>📞 Información de contacto</h2>
+        <h2>
+          <mat-icon>phone</mat-icon>
+          Información de contacto
+        </h2>
         <div class="contact-info">
           <div class="contact-item" *ngIf="provider.phone">
             <span class="contact-label">Teléfono:</span>
@@ -118,7 +129,10 @@
 
       <!-- Categorías de servicio -->
       <section class="detail-section" *ngIf="getCategories().length > 0">
-        <h2>🛠️ Servicios ofrecidos</h2>
+        <h2>
+          <mat-icon>build</mat-icon>
+          Servicios ofrecidos
+        </h2>
         <div class="categories-list">
           <span *ngFor="let category of getCategories()" class="category-tag-large">
             {{ category.name }}
@@ -128,13 +142,19 @@
 
       <!-- Área de servicio -->
       <section class="detail-section" *ngIf="provider.serviceArea">
-        <h2>📍 Área de servicio</h2>
+        <h2>
+          <mat-icon>location_on</mat-icon>
+          Área de servicio
+        </h2>
         <p class="service-area">{{ provider.serviceArea }}</p>
       </section>
 
       <!-- Certificaciones -->
       <section class="detail-section" *ngIf="getCertifications().length > 0">
-        <h2>🏆 Certificaciones</h2>
+        <h2>
+          <mat-icon>emoji_events</mat-icon>
+          Certificaciones
+        </h2>
         <ul class="certifications-list">
           <li *ngFor="let cert of getCertifications()" class="certification-item">
             <div class="certification-content">
@@ -147,7 +167,10 @@
 
       <!-- Horario de disponibilidad -->
       <section class="detail-section" *ngIf="hasAvailabilitySchedule()">
-        <h2>🕐 Disponibilidad</h2>
+        <h2>
+          <mat-icon>schedule</mat-icon>
+          Disponibilidad
+        </h2>
         <div class="schedule-info">
           <div class="schedule-list">
             <div *ngFor="let item of getAvailabilitySchedule()" class="schedule-item">

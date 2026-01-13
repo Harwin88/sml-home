@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { ServiceProviderService } from '../../core/services/service-provider.service';
 import { ReviewService } from '../../core/services/review.service';
 import { RatingModalComponent } from '../../shared/components/rating-modal/rating-modal.component';
@@ -10,7 +11,7 @@ import { ConfigService } from '../../core/services/config.service';
 @Component({
     selector: 'app-provider-profile',
     standalone: true,
-    imports: [CommonModule, RouterModule, RatingModalComponent],
+    imports: [CommonModule, RouterModule, MatIconModule, RatingModalComponent],
     templateUrl: './provider-profile.component.html',
     styleUrls: ['./provider-profile.component.scss']
 })

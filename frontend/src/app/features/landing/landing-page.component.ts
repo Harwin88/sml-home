@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { CategoryService } from '../../core/services/category.service';
 import { ServiceProviderService } from '../../core/services/service-provider.service';
 import { CategoryView } from '../../core/models/category.model';
@@ -8,7 +9,7 @@ import { CategoryView } from '../../core/models/category.model';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatIconModule],
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss']
 })

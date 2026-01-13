@@ -1,14 +1,17 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
   <div class="modal-container" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2 class="modal-title">✨ Bienvenido a MSL Hogar</h2>
+      <h2 class="modal-title">
+        <mat-icon>sparkles</mat-icon>
+        Bienvenido a MSL Hogar
+      </h2>
       <button class="modal-close-btn" (click)="closeModal()" aria-label="Cerrar">
-        ×
+        <mat-icon>close</mat-icon>
       </button>
     </div>
     
     <div class="modal-body">
-      <div class="modal-icon">🛡️</div>
+      <mat-icon class="modal-icon">verified_user</mat-icon>
       <p class="modal-text">
         Todos los proveedores de servicios que forman parte de nuestra plataforma 
         han sido <strong>verificados mediante un proceso riguroso de validación</strong> que incluye 
