@@ -6,16 +6,18 @@ export default ({ env }) => [
   {
     name: 'strapi::cors',
     config: {
-      interval: 60 * 1000, 
-      max: env.int('RATE_LIMIT_MAX'),
       enabled: true,
-      origin: env('CORS_ORIGINS', '')
+      origin: env('CORS_ORIGINS', '*')
         .split(',')
         .map(o => o.trim())
-        .filter(Boolean),
+        .filter(Boolean)
+        .length > 0 
+          ? env('CORS_ORIGINS', '*').split(',').map(o => o.trim()).filter(Boolean)
+          : ['http://localhost:4200', 'http://localhost:4201', 'http://127.0.0.1:4200'],
       credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      headers: ['Content-Type', 'Authorization'],
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+      headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+      keepHeadersOnError: true,
     },
   },
 

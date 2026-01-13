@@ -1,0 +1,42 @@
+{
+  "collectionName": "components_support_ticket_responses",
+  "info": {
+    "displayName": "Respuesta de Ticket",
+    "icon": "message",
+    "description": "Respuesta individual en un ticket de soporte"
+  },
+  "options": {},
+  "attributes": {
+    "message": {
+      "type": "text",
+      "required": true
+    },
+    "respondedBy": {
+      "type": "string",
+      "required": true
+    },
+    "respondedByEmail": {
+      "type": "email",
+      "required": true
+    },
+    "isInternal": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si es true, no se muestra al cliente"
+    },
+    "isCustomerResponse": {
+      "type": "boolean",
+      "default": false
+    },
+    "attachments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images", "files"]
+    },
+    "responseTime": {
+      "type": "datetime"
+    }
+  }
+}
+

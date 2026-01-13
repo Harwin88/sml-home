@@ -1,0 +1,92 @@
+{
+  "kind": "collectionType",
+  "collectionName": "faqs",
+  "info": {
+    "singularName": "faq",
+    "pluralName": "faqs",
+    "displayName": "Pregunta Frecuente (FAQ)",
+    "description": "Preguntas frecuentes para el centro de ayuda"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "question": {
+      "type": "string",
+      "required": true,
+      "maxLength": 300
+    },
+    "answer": {
+      "type": "text",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "general",
+        "search",
+        "payments",
+        "security",
+        "account",
+        "providers",
+        "technical"
+      ],
+      "required": true,
+      "default": "general"
+    },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "default": "help"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0,
+      "description": "Orden de visualización (menor número = primero)"
+    },
+    "isPopular": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marcar como pregunta popular"
+    },
+    "viewCount": {
+      "type": "integer",
+      "default": 0,
+      "description": "Número de veces que se ha visto esta FAQ"
+    },
+    "helpfulCount": {
+      "type": "integer",
+      "default": 0,
+      "description": "Número de usuarios que marcaron como útil"
+    },
+    "notHelpfulCount": {
+      "type": "integer",
+      "default": 0,
+      "description": "Número de usuarios que marcaron como no útil"
+    },
+    "keywords": {
+      "type": "json",
+      "description": "Keywords para búsqueda",
+      "default": []
+    },
+    "relatedFaqs": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::faq.faq",
+      "description": "FAQs relacionadas"
+    },
+    "videoUrl": {
+      "type": "string",
+      "required": false,
+      "description": "URL de video explicativo (YouTube, Vimeo, etc.)"
+    },
+    "attachments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images", "files"]
+    }
+  }
+}
+

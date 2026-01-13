@@ -1,0 +1,113 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contact_forms",
+  "info": {
+    "singularName": "contact-form",
+    "pluralName": "contact-forms",
+    "displayName": "Formulario de Contacto",
+    "description": "Mensajes de contacto enviados desde el sitio web"
+  },
+  "options": {
+    "draftAndPublish": false,
+    "comment": "No necesita draft/publish ya que son envíos directos"
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "minLength": 3,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": false,
+      "maxLength": 20
+    },
+    "contactType": {
+      "type": "enumeration",
+      "enum": [
+        "general",
+        "technical",
+        "billing",
+        "provider",
+        "account",
+        "suggestion",
+        "other"
+      ],
+      "required": true,
+      "default": "general"
+    },
+    "subject": {
+      "type": "string",
+      "required": true,
+      "minLength": 5,
+      "maxLength": 200
+    },
+    "message": {
+      "type": "text",
+      "required": true,
+      "minLength": 20
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "new",
+        "read",
+        "in_progress",
+        "resolved",
+        "closed"
+      ],
+      "default": "new"
+    },
+    "priority": {
+      "type": "enumeration",
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "urgent"
+      ],
+      "default": "normal"
+    },
+    "assignedTo": {
+      "type": "string",
+      "required": false
+    },
+    "responseNotes": {
+      "type": "text",
+      "required": false
+    },
+    "respondedAt": {
+      "type": "datetime",
+      "required": false
+    },
+    "ipAddress": {
+      "type": "string",
+      "required": false
+    },
+    "userAgent": {
+      "type": "string",
+      "required": false
+    },
+    "source": {
+      "type": "string",
+      "default": "website"
+    },
+    "ticketId": {
+      "type": "string",
+      "unique": true,
+      "required": false
+    },
+    "relatedTicket": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::support-ticket.support-ticket"
+    }
+  }
+}
+

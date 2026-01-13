@@ -1,0 +1,170 @@
+{
+  "kind": "collectionType",
+  "collectionName": "support_tickets",
+  "info": {
+    "singularName": "support-ticket",
+    "pluralName": "support-tickets",
+    "displayName": "Ticket de Soporte",
+    "description": "Sistema de tickets para seguimiento de solicitudes de soporte"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "ticketNumber": {
+      "type": "string",
+      "unique": true,
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "general",
+        "technical",
+        "billing",
+        "provider_issue",
+        "account",
+        "suggestion",
+        "complaint",
+        "other"
+      ],
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "open",
+        "pending",
+        "in_progress",
+        "waiting_customer",
+        "resolved",
+        "closed",
+        "cancelled"
+      ],
+      "default": "open",
+      "required": true
+    },
+    "priority": {
+      "type": "enumeration",
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "urgent",
+        "critical"
+      ],
+      "default": "normal",
+      "required": true
+    },
+    "requesterName": {
+      "type": "string",
+      "required": true
+    },
+    "requesterEmail": {
+      "type": "email",
+      "required": true
+    },
+    "requesterPhone": {
+      "type": "string",
+      "required": false
+    },
+    "assignedTo": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "department": {
+      "type": "enumeration",
+      "enum": [
+        "customer_service",
+        "technical_support",
+        "billing",
+        "operations",
+        "management"
+      ],
+      "default": "customer_service"
+    },
+    "tags": {
+      "type": "json",
+      "default": []
+    },
+    "attachments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images", "files", "videos"]
+    },
+    "internalNotes": {
+      "type": "text",
+      "required": false
+    },
+    "customerResponse": {
+      "type": "text",
+      "required": false
+    },
+    "resolution": {
+      "type": "text",
+      "required": false
+    },
+    "resolvedAt": {
+      "type": "datetime",
+      "required": false
+    },
+    "resolvedBy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "closedAt": {
+      "type": "datetime",
+      "required": false
+    },
+    "firstResponseTime": {
+      "type": "integer",
+      "required": false,
+      "description": "Tiempo en minutos hasta la primera respuesta"
+    },
+    "resolutionTime": {
+      "type": "integer",
+      "required": false,
+      "description": "Tiempo en minutos hasta la resolución"
+    },
+    "satisfactionRating": {
+      "type": "integer",
+      "min": 1,
+      "max": 5,
+      "required": false
+    },
+    "satisfactionComment": {
+      "type": "text",
+      "required": false
+    },
+    "relatedProvider": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::service-provider.service-provider"
+    },
+    "sourceForm": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact-form.contact-form",
+      "inversedBy": "relatedTicket"
+    },
+    "responses": {
+      "type": "component",
+      "repeatable": true,
+      "component": "support.ticket-response"
+    }
+  }
+}
+

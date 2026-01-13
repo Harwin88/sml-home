@@ -472,6 +472,143 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiContactFormContactForm extends Struct.CollectionTypeSchema {
+  collectionName: 'contact_forms';
+  info: {
+    description: 'Mensajes de contacto enviados desde el sitio web';
+    displayName: 'Formulario de Contacto';
+    pluralName: 'contact-forms';
+    singularName: 'contact-form';
+  };
+  options: {
+    comment: 'No necesita draft/publish ya que son env\u00EDos directos';
+    draftAndPublish: false;
+  };
+  attributes: {
+    assignedTo: Schema.Attribute.String;
+    contactType: Schema.Attribute.Enumeration<
+      [
+        'general',
+        'technical',
+        'billing',
+        'provider',
+        'account',
+        'suggestion',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'general'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    ipAddress: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::contact-form.contact-form'
+    > &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 20;
+      }>;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+        minLength: 3;
+      }>;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 20;
+      }>;
+    priority: Schema.Attribute.Enumeration<
+      ['low', 'normal', 'high', 'urgent']
+    > &
+      Schema.Attribute.DefaultTo<'normal'>;
+    publishedAt: Schema.Attribute.DateTime;
+    relatedTicket: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::support-ticket.support-ticket'
+    >;
+    respondedAt: Schema.Attribute.DateTime;
+    responseNotes: Schema.Attribute.Text;
+    source: Schema.Attribute.String & Schema.Attribute.DefaultTo<'website'>;
+    status: Schema.Attribute.Enumeration<
+      ['new', 'read', 'in_progress', 'resolved', 'closed']
+    > &
+      Schema.Attribute.DefaultTo<'new'>;
+    subject: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+        minLength: 5;
+      }>;
+    ticketId: Schema.Attribute.String & Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userAgent: Schema.Attribute.String;
+  };
+}
+
+export interface ApiFaqFaq extends Struct.CollectionTypeSchema {
+  collectionName: 'faqs';
+  info: {
+    description: 'Preguntas frecuentes para el centro de ayuda';
+    displayName: 'Pregunta Frecuente (FAQ)';
+    pluralName: 'faqs';
+    singularName: 'faq';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    answer: Schema.Attribute.Text & Schema.Attribute.Required;
+    attachments: Schema.Attribute.Media<'images' | 'files', true>;
+    category: Schema.Attribute.Enumeration<
+      [
+        'general',
+        'search',
+        'payments',
+        'security',
+        'account',
+        'providers',
+        'technical',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'general'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    helpfulCount: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    icon: Schema.Attribute.String & Schema.Attribute.DefaultTo<'help'>;
+    isPopular: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    keywords: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::faq.faq'> &
+      Schema.Attribute.Private;
+    notHelpfulCount: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    question: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    relatedFaqs: Schema.Attribute.Relation<'manyToMany', 'api::faq.faq'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    videoUrl: Schema.Attribute.String;
+    viewCount: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+  };
+}
+
 export interface ApiFormForm extends Struct.CollectionTypeSchema {
   collectionName: 'forms';
   info: {
@@ -678,6 +815,123 @@ export interface ApiServiceProviderServiceProvider
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     whatsapp: Schema.Attribute.String;
+  };
+}
+
+export interface ApiSupportTicketSupportTicket
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'support_tickets';
+  info: {
+    description: 'Sistema de tickets para seguimiento de solicitudes de soporte';
+    displayName: 'Ticket de Soporte';
+    pluralName: 'support-tickets';
+    singularName: 'support-ticket';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    assignedTo: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    attachments: Schema.Attribute.Media<'images' | 'files' | 'videos', true>;
+    category: Schema.Attribute.Enumeration<
+      [
+        'general',
+        'technical',
+        'billing',
+        'provider_issue',
+        'account',
+        'suggestion',
+        'complaint',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required;
+    closedAt: Schema.Attribute.DateTime;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customerResponse: Schema.Attribute.Text;
+    department: Schema.Attribute.Enumeration<
+      [
+        'customer_service',
+        'technical_support',
+        'billing',
+        'operations',
+        'management',
+      ]
+    > &
+      Schema.Attribute.DefaultTo<'customer_service'>;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    firstResponseTime: Schema.Attribute.Integer;
+    internalNotes: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::support-ticket.support-ticket'
+    > &
+      Schema.Attribute.Private;
+    priority: Schema.Attribute.Enumeration<
+      ['low', 'normal', 'high', 'urgent', 'critical']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'normal'>;
+    publishedAt: Schema.Attribute.DateTime;
+    relatedProvider: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::service-provider.service-provider'
+    >;
+    requesterEmail: Schema.Attribute.Email & Schema.Attribute.Required;
+    requesterName: Schema.Attribute.String & Schema.Attribute.Required;
+    requesterPhone: Schema.Attribute.String;
+    resolution: Schema.Attribute.Text;
+    resolutionTime: Schema.Attribute.Integer;
+    resolvedAt: Schema.Attribute.DateTime;
+    resolvedBy: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    responses: Schema.Attribute.Component<'support.ticket-response', true>;
+    satisfactionComment: Schema.Attribute.Text;
+    satisfactionRating: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 5;
+          min: 1;
+        },
+        number
+      >;
+    sourceForm: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::contact-form.contact-form'
+    >;
+    status: Schema.Attribute.Enumeration<
+      [
+        'open',
+        'pending',
+        'in_progress',
+        'waiting_customer',
+        'resolved',
+        'closed',
+        'cancelled',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'open'>;
+    tags: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
+    ticketNumber: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1223,10 +1477,13 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::category.category': ApiCategoryCategory;
+      'api::contact-form.contact-form': ApiContactFormContactForm;
+      'api::faq.faq': ApiFaqFaq;
       'api::form.form': ApiFormForm;
       'api::medias.medias': ApiMediasMedias;
       'api::review.review': ApiReviewReview;
       'api::service-provider.service-provider': ApiServiceProviderServiceProvider;
+      'api::support-ticket.support-ticket': ApiSupportTicketSupportTicket;
       'api::tag.tag': ApiTagTag;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
