@@ -1,0 +1,120 @@
+<div class="support-page-container">
+  <!-- Header -->
+  <div class="support-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">help_center</mat-icon>
+      <h1>Centro de Ayuda</h1>
+      <p class="subtitle">Encuentra respuestas a las preguntas más frecuentes</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="support-content">
+    <!-- Categories Grid -->
+    <section class="categories-section">
+      <h2>Explora por Categoría</h2>
+      <div class="categories-grid">
+        <div 
+          class="category-card"
+          [class.active]="selectedCategory === 'all'"
+          (click)="selectCategory('all')"
+        >
+          <mat-icon>apps</mat-icon>
+          <h3>Todas</h3>
+          <p>{{ faqs.length }} preguntas</p>
+        </div>
+        <div 
+          *ngFor="let category of categories"
+          class="category-card"
+          [class.active]="selectedCategory === category.name"
+          (click)="selectCategory(category.name)"
+        >
+          <mat-icon>{{ category.icon }}</mat-icon>
+          <h3>{{ category.name }}</h3>
+          <p>{{ category.description }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQs Section -->
+    <section class="faqs-section">
+      <div class="section-header">
+        <h2>
+          Preguntas Frecuentes
+          <span class="category-badge" *ngIf="selectedCategory !== 'all'">
+            {{ selectedCategory }}
+          </span>
+        </h2>
+        <p class="results-count">{{ filteredFaqs.length }} preguntas encontradas</p>
+      </div>
+
+      <div class="faqs-list">
+        <div 
+          *ngFor="let faq of filteredFaqs; let i = index"
+          class="faq-item"
+          [class.expanded]="expandedIndex === i"
+        >
+          <div class="faq-question" (click)="toggleFaq(i)">
+            <div class="question-content">
+              <mat-icon class="question-icon">{{ faq.icon }}</mat-icon>
+              <h3>{{ faq.question }}</h3>
+            </div>
+            <mat-icon class="expand-icon">
+              {{ expandedIndex === i ? 'expand_less' : 'expand_more' }}
+            </mat-icon>
+          </div>
+          <div class="faq-answer" [@slideDown] *ngIf="expandedIndex === i">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="contact-cta">
+      <div class="cta-content">
+        <mat-icon>contact_support</mat-icon>
+        <h2>¿No encontraste lo que buscabas?</h2>
+        <p>Nuestro equipo de soporte está listo para ayudarte</p>
+        <div class="cta-buttons">
+          <a routerLink="/contact" class="btn btn-primary">
+            <mat-icon>mail</mat-icon>
+            Contáctanos
+          </a>
+          <a href="https://wa.me/573001234567" target="_blank" class="btn btn-secondary">
+            <mat-icon>message</mat-icon>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Links -->
+    <section class="quick-links">
+      <h2>Enlaces Útiles</h2>
+      <div class="links-grid">
+        <a routerLink="/contact" class="quick-link-card">
+          <mat-icon>contact_mail</mat-icon>
+          <h3>Contacto</h3>
+          <p>Envíanos un mensaje</p>
+        </a>
+        <a routerLink="/legal/terms" class="quick-link-card">
+          <mat-icon>description</mat-icon>
+          <h3>Términos y Condiciones</h3>
+          <p>Lee nuestros términos</p>
+        </a>
+        <a routerLink="/legal/privacy" class="quick-link-card">
+          <mat-icon>privacy_tip</mat-icon>
+          <h3>Privacidad</h3>
+          <p>Política de privacidad</p>
+        </a>
+        <a routerLink="/" class="quick-link-card">
+          <mat-icon>work</mat-icon>
+          <h3>Trabaja con Nosotros</h3>
+          <p>Únete a nuestro equipo</p>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>
+

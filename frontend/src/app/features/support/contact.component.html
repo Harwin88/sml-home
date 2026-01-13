@@ -1,0 +1,266 @@
+<div class="support-page-container">
+  <!-- Header -->
+  <div class="support-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">contact_mail</mat-icon>
+      <h1>Contáctanos</h1>
+      <p class="subtitle">Estamos aquí para ayudarte. Envíanos tu consulta y te responderemos pronto.</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="support-content">
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="showSuccessMessage">
+      <mat-icon>check_circle</mat-icon>
+      <div class="message-content">
+        <h3>¡Mensaje enviado exitosamente!</h3>
+        <p>Gracias por contactarnos. Nuestro equipo revisará tu mensaje y te responderá en un plazo máximo de 24 horas.</p>
+      </div>
+    </div>
+
+    <div class="contact-grid">
+      <!-- Contact Form -->
+      <section class="contact-form-section">
+        <h2>Envíanos un Mensaje</h2>
+        <p class="section-description">
+          Completa el formulario y nos pondremos en contacto contigo lo antes posible.
+        </p>
+
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+          <!-- Nombre -->
+          <div class="form-group">
+            <label for="name">
+              Nombre Completo <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <mat-icon>person</mat-icon>
+              <input
+                type="text"
+                id="name"
+                formControlName="name"
+                placeholder="Tu nombre completo"
+                [class.error]="hasError('name', 'required') || hasError('name', 'minlength')"
+              />
+            </div>
+            <span class="error-message" *ngIf="hasError('name', 'required')">
+              El nombre es obligatorio
+            </span>
+            <span class="error-message" *ngIf="hasError('name', 'minlength')">
+              El nombre debe tener al menos 3 caracteres
+            </span>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">
+              Correo Electrónico <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <mat-icon>email</mat-icon>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder="tu.email@ejemplo.com"
+                [class.error]="hasError('email', 'required') || hasError('email', 'email')"
+              />
+            </div>
+            <span class="error-message" *ngIf="hasError('email', 'required')">
+              El email es obligatorio
+            </span>
+            <span class="error-message" *ngIf="hasError('email', 'email')">
+              Ingresa un email válido
+            </span>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="form-group">
+            <label for="phone">
+              Teléfono (Opcional)
+            </label>
+            <div class="input-wrapper">
+              <mat-icon>phone</mat-icon>
+              <input
+                type="tel"
+                id="phone"
+                formControlName="phone"
+                placeholder="3001234567"
+                [class.error]="hasError('phone', 'pattern')"
+              />
+            </div>
+            <span class="error-message" *ngIf="hasError('phone', 'pattern')">
+              Ingresa un número de teléfono válido (10 dígitos)
+            </span>
+          </div>
+
+          <!-- Tipo de Consulta -->
+          <div class="form-group">
+            <label for="contactType">
+              Tipo de Consulta <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <mat-icon>category</mat-icon>
+              <select
+                id="contactType"
+                formControlName="contactType"
+                [class.error]="hasError('contactType', 'required')"
+              >
+                <option *ngFor="let type of contactTypes" [value]="type.value">
+                  {{ type.label }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Asunto -->
+          <div class="form-group">
+            <label for="subject">
+              Asunto <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <mat-icon>subject</mat-icon>
+              <input
+                type="text"
+                id="subject"
+                formControlName="subject"
+                placeholder="Breve descripción del asunto"
+                [class.error]="hasError('subject', 'required') || hasError('subject', 'minlength')"
+              />
+            </div>
+            <span class="error-message" *ngIf="hasError('subject', 'required')">
+              El asunto es obligatorio
+            </span>
+            <span class="error-message" *ngIf="hasError('subject', 'minlength')">
+              El asunto debe tener al menos 5 caracteres
+            </span>
+          </div>
+
+          <!-- Mensaje -->
+          <div class="form-group">
+            <label for="message">
+              Mensaje <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <mat-icon>message</mat-icon>
+              <textarea
+                id="message"
+                formControlName="message"
+                rows="6"
+                placeholder="Describe tu consulta o problema en detalle..."
+                [class.error]="hasError('message', 'required') || hasError('message', 'minlength')"
+              ></textarea>
+            </div>
+            <span class="error-message" *ngIf="hasError('message', 'required')">
+              El mensaje es obligatorio
+            </span>
+            <span class="error-message" *ngIf="hasError('message', 'minlength')">
+              El mensaje debe tener al menos 20 caracteres
+            </span>
+          </div>
+
+          <!-- Términos -->
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                formControlName="acceptTerms"
+                [class.error]="hasError('acceptTerms', 'required')"
+              />
+              <span>
+                Acepto la <a routerLink="/legal/privacy" target="_blank">Política de Privacidad</a>
+                y los <a routerLink="/legal/terms" target="_blank">Términos de Uso</a>
+                <span class="required">*</span>
+              </span>
+            </label>
+            <span class="error-message" *ngIf="hasError('acceptTerms', 'required')">
+              Debes aceptar los términos para continuar
+            </span>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="btn btn-primary btn-submit"
+            [disabled]="loading"
+            [class.loading]="loading"
+          >
+            <mat-icon *ngIf="!loading">send</mat-icon>
+            <mat-icon *ngIf="loading" class="spinner">autorenew</mat-icon>
+            <span>{{ loading ? 'Enviando...' : 'Enviar Mensaje' }}</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Contact Information -->
+      <aside class="contact-info-section">
+        <div class="info-card">
+          <h2>Información de Contacto</h2>
+          <p>También puedes contactarnos directamente a través de estos medios:</p>
+
+          <div class="info-list">
+            <div *ngFor="let info of contactInfo" class="info-item">
+              <mat-icon>{{ info.icon }}</mat-icon>
+              <div class="info-content">
+                <h3>{{ info.title }}</h3>
+                <a *ngIf="info.link" [href]="info.link" target="_blank" [innerHTML]="info.value"></a>
+                <p *ngIf="!info.link" [innerHTML]="info.value"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Link -->
+        <div class="help-card">
+          <mat-icon>help_center</mat-icon>
+          <h3>¿Necesitas ayuda rápida?</h3>
+          <p>Consulta nuestro Centro de Ayuda con preguntas frecuentes</p>
+          <a routerLink="/help" class="btn btn-secondary">
+            <mat-icon>arrow_forward</mat-icon>
+            Ver Preguntas Frecuentes
+          </a>
+        </div>
+
+        <!-- Response Time -->
+        <div class="response-time-card">
+          <mat-icon>schedule</mat-icon>
+          <h3>Tiempo de Respuesta</h3>
+          <p>Respondemos en menos de <strong>24 horas</strong></p>
+          <p class="note">En horario laboral, usualmente en 2-4 horas</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Additional Help -->
+    <section class="additional-help">
+      <h2>Otras Formas de Obtener Ayuda</h2>
+      <div class="help-options">
+        <div class="help-option">
+          <mat-icon>help</mat-icon>
+          <h3>Centro de Ayuda</h3>
+          <p>Encuentra respuestas a preguntas frecuentes</p>
+          <a routerLink="/help" class="link-arrow">
+            Ir al Centro de Ayuda <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </div>
+        <div class="help-option">
+          <mat-icon>chat</mat-icon>
+          <h3>WhatsApp</h3>
+          <p>Chatea con nuestro equipo de soporte</p>
+          <a href="https://wa.me/573001234567" target="_blank" class="link-arrow">
+            Abrir WhatsApp <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </div>
+        <div class="help-option">
+          <mat-icon>groups</mat-icon>
+          <h3>Comunidad</h3>
+          <p>Únete a nuestra comunidad en redes sociales</p>
+          <a href="https://facebook.com/mslhogar" target="_blank" class="link-arrow">
+            Ver Comunidad <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
