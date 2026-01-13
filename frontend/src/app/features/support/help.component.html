@@ -10,8 +10,51 @@
 
   <!-- Main Content -->
   <div class="support-content">
+    <!-- Search Bar -->
+    <section class="search-section">
+      <div class="search-container">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Busca tu pregunta aquí... (ej: pago, servicio, cuenta)"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange(searchQuery)"
+          aria-label="Buscar preguntas frecuentes"
+        />
+        <button
+          *ngIf="searchQuery.length > 0"
+          class="clear-search-btn"
+          (click)="clearSearch()"
+          aria-label="Limpiar búsqueda"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+        <div class="search-spinner" *ngIf="isSearching">
+          <mat-icon class="spinner-icon">autorenew</mat-icon>
+        </div>
+      </div>
+      
+      <!-- Search Info -->
+      <div class="search-info" *ngIf="searchQuery.length > 0 && searchQuery.length < 3">
+        <mat-icon class="info-icon">info</mat-icon>
+        <p>Escribe al menos 3 caracteres para buscar</p>
+      </div>
+      
+      <!-- Search Results Info -->
+      <div class="search-results-info" *ngIf="isInSearchMode && !isSearching">
+        <mat-icon class="results-icon">{{ searchResults.length > 0 ? 'check_circle' : 'search_off' }}</mat-icon>
+        <p *ngIf="searchResults.length > 0">
+          Se encontraron <strong>{{ searchResults.length }}</strong> resultado(s) para "<strong>{{ searchQuery }}</strong>"
+        </p>
+        <p *ngIf="searchResults.length === 0">
+          No se encontraron resultados para "<strong>{{ searchQuery }}</strong>"
+        </p>
+      </div>
+    </section>
+
     <!-- Categories Grid -->
-    <section class="categories-section">
+    <section class="categories-section" *ngIf="!isInSearchMode">
       <h2>Explora por Categoría</h2>
       <div class="categories-grid">
         <div 
@@ -60,19 +103,30 @@
     <section class="faqs-section" *ngIf="!loading && !error">
       <div class="section-header">
         <h2>
-          Preguntas Frecuentes
-          <span class="category-badge" *ngIf="selectedCategory !== 'all'">
+          <span *ngIf="!isInSearchMode">Preguntas Frecuentes</span>
+          <span *ngIf="isInSearchMode">Resultados de Búsqueda</span>
+          <span class="category-badge" *ngIf="selectedCategory !== 'all' && !isInSearchMode">
             {{ selectedCategory }}
           </span>
         </h2>
-        <p class="results-count">{{ filteredFaqs.length }} preguntas encontradas</p>
+        <p class="results-count">{{ filteredFaqs.length }} pregunta(s) encontrada(s)</p>
       </div>
 
       <!-- Empty State -->
       <div class="empty-state" *ngIf="filteredFaqs.length === 0">
         <mat-icon>search_off</mat-icon>
-        <h3>No se encontraron preguntas frecuentes</h3>
-        <p>Intenta seleccionar otra categoría o contacta con soporte.</p>
+        <h3 *ngIf="!isInSearchMode">No se encontraron preguntas frecuentes</h3>
+        <h3 *ngIf="isInSearchMode">No se encontraron resultados para "{{ searchQuery }}"</h3>
+        <p *ngIf="!isInSearchMode">Intenta seleccionar otra categoría o contacta con soporte.</p>
+        <p *ngIf="isInSearchMode">Intenta con otros términos de búsqueda o contacta con soporte.</p>
+        <button 
+          *ngIf="isInSearchMode" 
+          class="btn btn-secondary" 
+          (click)="clearSearch()"
+        >
+          <mat-icon>arrow_back</mat-icon>
+          Ver todas las FAQs
+        </button>
       </div>
 
       <div class="faqs-list" *ngIf="filteredFaqs.length > 0">

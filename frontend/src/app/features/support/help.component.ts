@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { AnalyticsService } from '../../core/services/analytics.service';
 import { FaqService, Faq, FaqCategory } from '../../core/services/faq.service';
 
@@ -17,7 +20,7 @@ interface HelpCategory {
 @Component({
   selector: 'app-help',
   standalone: true,
-  imports: [CommonModule, MatIconModule, RouterModule],
+  imports: [CommonModule, FormsModule, MatIconModule, RouterModule],
   templateUrl: './help.component.html',
   styleUrls: ['./support.component.scss'],
   animations: [
@@ -39,6 +42,12 @@ export class HelpComponent implements OnInit {
   loading = true;
   error: string | null = null;
   
+  // Búsqueda
+  searchQuery: string = '';
+  isSearching = false;
+  searchResults: Faq[] = [];
+  private searchSubject = new Subject<string>();
+  
   // Control de votos para evitar spam
   private votedFaqs: Set<string> = new Set();
   private readonly VOTED_FAQS_KEY = 'msl_faq_voted';
@@ -49,6 +58,9 @@ export class HelpComponent implements OnInit {
   ) {
     // Cargar FAQs votadas desde localStorage
     this.loadVotedFaqs();
+    
+    // Configurar búsqueda con debounce
+    this.setupSearch();
   }
 
   ngOnInit(): void {
@@ -57,6 +69,66 @@ export class HelpComponent implements OnInit {
     
     // Cargar FAQs desde el backend
     this.loadFaqs();
+  }
+
+  /**
+   * Configurar búsqueda con debounce
+   */
+  private setupSearch(): void {
+    this.searchSubject.pipe(
+      debounceTime(400), // Esperar 400ms después del último keystroke
+      distinctUntilChanged(), // Solo buscar si el término cambió
+      switchMap(query => {
+        if (!query || query.trim().length < 3) {
+          this.isSearching = false;
+          this.searchResults = [];
+          return [];
+        }
+        
+        this.isSearching = true;
+        return this.faqService.searchFaqs(query.trim());
+      })
+    ).subscribe({
+      next: (results) => {
+        this.searchResults = results;
+        this.isSearching = false;
+        
+        // Track búsqueda
+        if (this.searchQuery.trim().length >= 3) {
+          this.analytics.trackEvent('FAQ', 'Search', this.searchQuery);
+        }
+      },
+      error: (error) => {
+        console.error('Error al buscar FAQs:', error);
+        this.isSearching = false;
+        this.searchResults = [];
+      }
+    });
+  }
+
+  /**
+   * Manejar cambio en el input de búsqueda
+   */
+  onSearchChange(query: string): void {
+    this.searchQuery = query;
+    this.searchSubject.next(query);
+  }
+
+  /**
+   * Limpiar búsqueda
+   */
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchResults = [];
+    this.isSearching = false;
+    this.searchSubject.next('');
+  }
+
+  /**
+   * Verificar si está en modo búsqueda
+   */
+  get isInSearchMode(): boolean {
+    return this.searchQuery.trim().length >= 3;
   }
 
   /**
@@ -259,6 +331,12 @@ export class HelpComponent implements OnInit {
   ];
 
   get filteredFaqs(): Faq[] {
+    // Si está buscando, mostrar resultados de búsqueda
+    if (this.isInSearchMode) {
+      return this.searchResults;
+    }
+    
+    // Si no, filtrar por categoría
     if (this.selectedCategory === 'all') {
       return this.faqs;
     }
@@ -287,6 +365,9 @@ export class HelpComponent implements OnInit {
   selectCategory(category: string): void {
     this.selectedCategory = category;
     this.expandedIndex = null;
+    
+    // Limpiar búsqueda al cambiar categoría
+    this.clearSearch();
     
     // Si selecciona una categoría específica, cargar FAQs de esa categoría
     if (category !== 'all') {
