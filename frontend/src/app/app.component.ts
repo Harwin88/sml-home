@@ -5,16 +5,18 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { SearchService } from './core/services/search.service';
 import { FirstVisitService } from './core/services/first-visit.service';
+import { AnalyticsService } from './core/services/analytics.service';
 import { WelcomeModalComponent } from './shared/components/welcome-modal/welcome-modal.component';
 import { WorkWithUsModalComponent } from './shared/components/work-with-us-modal/work-with-us-modal.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
+import { CookieConsentComponent } from './shared/components/cookie-consent/cookie-consent.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, MatIconModule, WelcomeModalComponent, WorkWithUsModalComponent, FooterComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, MatIconModule, WelcomeModalComponent, WorkWithUsModalComponent, FooterComponent, CookieConsentComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -29,8 +31,10 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private searchService: SearchService,
     private router: Router,
-    private firstVisitService: FirstVisitService
+    private firstVisitService: FirstVisitService,
+    private analyticsService: AnalyticsService
   ) {}
+
 
   ngOnInit(): void {
     // Verificar si es la primera visita y mostrar el modal

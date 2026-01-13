@@ -91,9 +91,10 @@
             rel="noopener noreferrer"
             class="social-link"
             [attr.aria-label]="social.name"
+            [attr.data-social]="social.name.toLowerCase()"
             [style.--social-color]="social.color"
           >
-            <mat-icon>{{ social.icon }}</mat-icon>
+            <span class="social-icon-text">{{ getSocialIcon(social.name) }}</span>
             <span class="social-name">{{ social.name }}</span>
           </a>
         </div>

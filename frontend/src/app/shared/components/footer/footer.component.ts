@@ -75,31 +75,31 @@ export class FooterComponent {
   socialLinks: SocialLink[] = [
     {
       name: 'Facebook',
-      icon: 'facebook',
+      icon: 'thumb_up',
       url: 'https://facebook.com/mslhogar',
       color: '#1877F2'
     },
     {
       name: 'Instagram',
-      icon: 'instagram',
+      icon: 'photo_camera',
       url: 'https://instagram.com/mslhogar',
       color: '#E4405F'
     },
     {
       name: 'Twitter',
-      icon: 'twitter',
+      icon: 'chat_bubble',
       url: 'https://twitter.com/mslhogar',
       color: '#1DA1F2'
     },
     {
       name: 'LinkedIn',
-      icon: 'linkedin',
+      icon: 'business_center',
       url: 'https://linkedin.com/company/mslhogar',
       color: '#0A66C2'
     },
     {
       name: 'WhatsApp',
-      icon: 'whatsapp',
+      icon: 'message',
       url: 'https://wa.me/573001234567',
       color: '#25D366'
     }
@@ -131,6 +131,20 @@ export class FooterComponent {
    */
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /**
+   * Obtener ícono/letra para redes sociales
+   */
+  getSocialIcon(name: string): string {
+    const icons: { [key: string]: string } = {
+      'Facebook': 'f',
+      'Instagram': '📷',
+      'Twitter': '𝕏',
+      'LinkedIn': 'in',
+      'WhatsApp': '💬'
+    };
+    return icons[name] || name.charAt(0);
   }
 }
 

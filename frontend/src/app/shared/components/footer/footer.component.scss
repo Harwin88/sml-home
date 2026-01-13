@@ -307,13 +307,29 @@
           transition: opacity 0.3s;
         }
 
-        mat-icon {
+        .social-icon-text {
           font-size: 1.5rem;
-          width: 1.5rem;
-          height: 1.5rem;
-          line-height: 1.5rem;
+          font-weight: 700;
           position: relative;
           z-index: 1;
+          line-height: 1;
+          font-family: 'Arial', sans-serif;
+        }
+
+        // Estilos específicos por red social
+        &[data-social="facebook"] .social-icon-text {
+          font-family: 'Georgia', serif;
+          font-style: italic;
+        }
+
+        &[data-social="linkedin"] .social-icon-text {
+          font-size: 1.25rem;
+          font-family: 'Arial', sans-serif;
+          font-weight: 900;
+        }
+
+        &[data-social="twitter"] .social-icon-text {
+          font-size: 1.375rem;
         }
 
         .social-name {

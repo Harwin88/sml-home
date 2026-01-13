@@ -1,0 +1,186 @@
+<div class="cookie-consent" *ngIf="showBanner" [@slideIn]>
+  <!-- Banner Principal -->
+  <div class="cookie-banner" *ngIf="!showSettings">
+    <div class="banner-content">
+      <div class="banner-icon">
+        <mat-icon>cookie</mat-icon>
+      </div>
+      
+      <div class="banner-text">
+        <h3>🍪 Usamos Cookies</h3>
+        <p>
+          Utilizamos cookies para mejorar tu experiencia, analizar el tráfico y personalizar el contenido. 
+          Al hacer clic en "Aceptar todas", aceptas el uso de todas las cookies. 
+          Puedes personalizar tus preferencias en "Configurar".
+        </p>
+        <a href="/legal/cookies" target="_blank" class="privacy-link">
+          Política de Cookies
+          <mat-icon>open_in_new</mat-icon>
+        </a>
+      </div>
+
+      <div class="banner-actions">
+        <button class="btn-accept-all" (click)="acceptAll()" aria-label="Aceptar todas las cookies">
+          Aceptar Todas
+        </button>
+        <button class="btn-reject" (click)="rejectOptional()" aria-label="Rechazar cookies opcionales">
+          Solo Necesarias
+        </button>
+        <button class="btn-settings" (click)="showCustomSettings()" aria-label="Configurar cookies">
+          <mat-icon>settings</mat-icon>
+          Configurar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de Configuración -->
+  <div class="cookie-settings" *ngIf="showSettings">
+    <div class="settings-header">
+      <h3>Configuración de Cookies</h3>
+      <button class="btn-close" (click)="closeSettings()" aria-label="Cerrar configuración">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="settings-content">
+      <p class="settings-intro">
+        Controla qué cookies deseas permitir. Ten en cuenta que algunas funcionalidades pueden no estar disponibles si deshabilitas ciertos tipos de cookies.
+      </p>
+
+      <!-- Cookie Necesarias -->
+      <div class="cookie-category">
+        <div class="category-header">
+          <div class="category-info">
+            <mat-icon class="category-icon">check_circle</mat-icon>
+            <div>
+              <h4>Cookies Necesarias</h4>
+              <p>Esenciales para el funcionamiento del sitio</p>
+            </div>
+          </div>
+          <div class="category-toggle">
+            <input 
+              type="checkbox" 
+              id="necessary" 
+              [checked]="consent.necessary" 
+              disabled 
+              class="toggle-input"
+            />
+            <label for="necessary" class="toggle-label">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="always-active">Siempre activas</span>
+          </div>
+        </div>
+        <div class="category-description">
+          Estas cookies son fundamentales para que el sitio web funcione correctamente. Sin ellas, no podrías navegar o usar las funciones básicas.
+        </div>
+      </div>
+
+      <!-- Cookies de Analytics -->
+      <div class="cookie-category">
+        <div class="category-header">
+          <div class="category-info">
+            <mat-icon class="category-icon">analytics</mat-icon>
+            <div>
+              <h4>Cookies de Análisis</h4>
+              <p>Nos ayudan a entender cómo usas el sitio</p>
+            </div>
+          </div>
+          <div class="category-toggle">
+            <input 
+              type="checkbox" 
+              id="analytics" 
+              [checked]="consent.analytics"
+              (change)="toggleCookie('analytics')"
+              class="toggle-input"
+            />
+            <label for="analytics" class="toggle-label">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="category-description">
+          Estas cookies nos permiten contar visitas y fuentes de tráfico para medir y mejorar el rendimiento de nuestro sitio. (Google Analytics, tracking interno)
+        </div>
+      </div>
+
+      <!-- Cookies de Marketing -->
+      <div class="cookie-category">
+        <div class="category-header">
+          <div class="category-info">
+            <mat-icon class="category-icon">campaign</mat-icon>
+            <div>
+              <h4>Cookies de Marketing</h4>
+              <p>Para mostrarte contenido relevante</p>
+            </div>
+          </div>
+          <div class="category-toggle">
+            <input 
+              type="checkbox" 
+              id="marketing" 
+              [checked]="consent.marketing"
+              (change)="toggleCookie('marketing')"
+              class="toggle-input"
+            />
+            <label for="marketing" class="toggle-label">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="category-description">
+          Estas cookies pueden ser establecidas por nuestros socios publicitarios para crear un perfil de tus intereses y mostrarte anuncios relevantes.
+        </div>
+      </div>
+
+      <!-- Cookies de Preferencias -->
+      <div class="cookie-category">
+        <div class="category-header">
+          <div class="category-info">
+            <mat-icon class="category-icon">tune</mat-icon>
+            <div>
+              <h4>Cookies de Preferencias</h4>
+              <p>Recordamos tus configuraciones</p>
+            </div>
+          </div>
+          <div class="category-toggle">
+            <input 
+              type="checkbox" 
+              id="preferences" 
+              [checked]="consent.preferences"
+              (change)="toggleCookie('preferences')"
+              class="toggle-input"
+            />
+            <label for="preferences" class="toggle-label">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="category-description">
+          Estas cookies permiten que el sitio web recuerde tus elecciones (como idioma o región) y proporcione características mejoradas y más personalizadas.
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-footer">
+      <button class="btn-save" (click)="saveCustomSettings()" aria-label="Guardar configuración">
+        Guardar Configuración
+      </button>
+      <button class="btn-accept-all-settings" (click)="acceptAll()" aria-label="Aceptar todas">
+        Aceptar Todas
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Botón flotante para reabrir configuración (cuando ya se dio consentimiento) -->
+<button 
+  class="cookie-settings-btn" 
+  *ngIf="!showBanner && cookieService.hasConsent()"
+  (click)="reopenBanner()"
+  aria-label="Configuración de cookies"
+  title="Configuración de cookies"
+>
+  <mat-icon>cookie</mat-icon>
+</button>
+
