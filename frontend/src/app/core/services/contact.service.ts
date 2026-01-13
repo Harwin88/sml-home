@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { delay, map, catchError } from 'rxjs/operators';
+import { StrapiBaseService } from './strapi-base.service';
+import { ConfigService } from './config.service';
 
 export interface ContactFormData {
   name: string;
@@ -19,40 +21,52 @@ export interface ContactResponse {
   ticketId?: string;
 }
 
+interface StrapiContactResponse {
+  success: boolean;
+  message: string;
+  ticketId: string;
+  data: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-export class ContactService {
-  private apiUrl = '/api/contact'; // URL del backend (ajustar según configuración)
+export class ContactService extends StrapiBaseService {
 
-  constructor(private http: HttpClient) {}
-
-  /**
-   * Envía un formulario de contacto
-   */
-  submitContactForm(formData: ContactFormData): Observable<ContactResponse> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-
-    // TODO: Implementar llamada real al backend
-    // return this.http.post<ContactResponse>(this.apiUrl, formData, { headers });
-
-    // Por ahora, simulamos una respuesta del servidor
-    return this.simulateSubmit(formData);
+  constructor(
+    protected override http: HttpClient,
+    protected override configService: ConfigService
+  ) {
+    super(http, configService);
   }
 
   /**
-   * Simula el envío del formulario (para desarrollo)
-   * Eliminar cuando se implemente el backend real
+   * Envía un formulario de contacto al backend
    */
-  private simulateSubmit(formData: ContactFormData): Observable<ContactResponse> {
-    // Simular llamada al servidor con delay
-    return of({
-      success: true,
-      message: 'Tu mensaje ha sido enviado exitosamente. Te responderemos pronto.',
-      ticketId: this.generateTicketId()
-    }).pipe(delay(1500)); // Simular latencia de red
+  submitContactForm(formData: ContactFormData): Observable<ContactResponse> {
+    // Filtrar acceptTerms ya que es solo para validación del cliente
+    const { acceptTerms, ...dataToSend } = formData;
+    
+    // Enviar al endpoint de Strapi
+    // getApiUrl() ya incluye '/api', solo agregar el endpoint
+    return this.http.post<StrapiContactResponse>(
+      `${this.getApiUrl()}/contact-forms`,
+      { data: dataToSend },
+      { headers: this.getHeaders() }
+    ).pipe(
+      map(response => ({
+        success: response.success,
+        message: response.message,
+        ticketId: response.ticketId
+      })),
+      catchError(error => {
+        console.error('Error al enviar formulario de contacto:', error);
+        const errorMessage = error.error?.message || 
+                           error.error?.error?.message || 
+                           'Error al enviar el formulario. Por favor, intenta nuevamente.';
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
 
   /**

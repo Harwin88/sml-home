@@ -26,8 +26,8 @@
         <div 
           *ngFor="let category of categories"
           class="category-card"
-          [class.active]="selectedCategory === category.name"
-          (click)="selectCategory(category.name)"
+          [class.active]="selectedCategory === category.value"
+          (click)="selectCategory(category.value)"
         >
           <mat-icon>{{ category.icon }}</mat-icon>
           <h3>{{ category.name }}</h3>
@@ -36,8 +36,28 @@
       </div>
     </section>
 
+    <!-- Loading State -->
+    <section class="faqs-section" *ngIf="loading">
+      <div class="loading-container">
+        <mat-icon class="loading-spinner">autorenew</mat-icon>
+        <p>Cargando preguntas frecuentes...</p>
+      </div>
+    </section>
+
+    <!-- Error State -->
+    <section class="faqs-section" *ngIf="error && !loading">
+      <div class="error-container">
+        <mat-icon>error_outline</mat-icon>
+        <h3>{{ error }}</h3>
+        <button class="btn btn-primary" (click)="loadFaqs()">
+          <mat-icon>refresh</mat-icon>
+          Reintentar
+        </button>
+      </div>
+    </section>
+
     <!-- FAQs Section -->
-    <section class="faqs-section">
+    <section class="faqs-section" *ngIf="!loading && !error">
       <div class="section-header">
         <h2>
           Preguntas Frecuentes
@@ -48,15 +68,22 @@
         <p class="results-count">{{ filteredFaqs.length }} preguntas encontradas</p>
       </div>
 
-      <div class="faqs-list">
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredFaqs.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <h3>No se encontraron preguntas frecuentes</h3>
+        <p>Intenta seleccionar otra categoría o contacta con soporte.</p>
+      </div>
+
+      <div class="faqs-list" *ngIf="filteredFaqs.length > 0">
         <div 
           *ngFor="let faq of filteredFaqs; let i = index"
           class="faq-item"
           [class.expanded]="expandedIndex === i"
         >
-          <div class="faq-question" (click)="toggleFaq(i)">
+          <div class="faq-question" (click)="toggleFaq(i, faq)">
             <div class="question-content">
-              <mat-icon class="question-icon">{{ faq.icon }}</mat-icon>
+              <mat-icon class="question-icon">{{ faq.icon || 'help' }}</mat-icon>
               <h3>{{ faq.question }}</h3>
             </div>
             <mat-icon class="expand-icon">
@@ -65,6 +92,31 @@
           </div>
           <div class="faq-answer" [@slideDown] *ngIf="expandedIndex === i">
             <p>{{ faq.answer }}</p>
+            
+            <!-- Feedback Buttons -->
+            <div class="faq-feedback">
+              <p class="feedback-question">¿Te resultó útil esta respuesta?</p>
+              <div class="feedback-buttons">
+                <button 
+                  class="feedback-btn"
+                  (click)="markAsHelpful(faq, true, $event)"
+                  [disabled]="!faq.id"
+                >
+                  <mat-icon>thumb_up</mat-icon>
+                  Sí
+                  <span *ngIf="faq.helpfulCount">({{ faq.helpfulCount }})</span>
+                </button>
+                <button 
+                  class="feedback-btn"
+                  (click)="markAsHelpful(faq, false, $event)"
+                  [disabled]="!faq.id"
+                >
+                  <mat-icon>thumb_down</mat-icon>
+                  No
+                  <span *ngIf="faq.notHelpfulCount">({{ faq.notHelpfulCount }})</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

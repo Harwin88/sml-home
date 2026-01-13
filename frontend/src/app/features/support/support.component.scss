@@ -85,7 +85,7 @@
   padding: 1.5rem;
   margin-bottom: 2rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   animation: slideDown 0.4s ease-out;
   box-shadow: var(--shadow-lg);
@@ -95,6 +95,7 @@
     font-size: 3rem;
     width: 3rem;
     height: 3rem;
+    flex-shrink: 0;
   }
 
   .message-content {
@@ -108,9 +109,145 @@
 
     p {
       color: #155724;
+      margin: 0 0 0.5rem;
+      opacity: 0.9;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &.ticket-id {
+        background: rgba(21, 87, 36, 0.1);
+        padding: 0.75rem;
+        border-radius: var(--border-radius-md);
+        margin-top: 0.75rem;
+        font-family: 'Courier New', monospace;
+        
+        strong {
+          display: block;
+          margin-bottom: 0.25rem;
+          font-family: inherit;
+        }
+      }
+
+      &.info-text {
+        font-size: 0.85rem;
+        opacity: 0.7;
+        margin-top: 0.5rem;
+      }
+    }
+  }
+}
+
+// ============================================
+// Error Message
+// ============================================
+.error-message {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 2px solid #dc3545;
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  animation: slideDown 0.4s ease-out;
+  box-shadow: var(--shadow-lg);
+
+  mat-icon {
+    color: #dc3545;
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    flex-shrink: 0;
+  }
+
+  .message-content {
+    flex: 1;
+
+    h3 {
+      color: #721c24;
+      margin: 0 0 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    p {
+      color: #721c24;
       margin: 0;
       opacity: 0.9;
     }
+  }
+}
+
+// ============================================
+// Loading State
+// ============================================
+.loading-container {
+  text-align: center;
+  padding: 4rem 2rem;
+
+  .loading-spinner {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    color: var(--color-primary);
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+  }
+}
+
+// ============================================
+// Error State
+// ============================================
+.error-container {
+  text-align: center;
+  padding: 4rem 2rem;
+
+  mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    color: #dc3545;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    margin-top: 1rem;
+  }
+}
+
+// ============================================
+// Empty State
+// ============================================
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+
+  mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    color: var(--color-text-tertiary);
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--color-text-secondary);
   }
 }
 
@@ -310,11 +447,64 @@
     border-top: 1px solid #e9ecef;
     animation: slideDown 0.3s ease-out;
 
-    p {
-      margin: 0;
+    > p {
+      margin: 0 0 1.5rem;
       color: var(--color-text-secondary);
       line-height: 1.8;
       font-size: 0.95rem;
+    }
+
+    .faq-feedback {
+      border-top: 1px solid #e9ecef;
+      padding-top: 1rem;
+      margin-top: 1rem;
+
+      .feedback-question {
+        color: var(--color-text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .feedback-buttons {
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .feedback-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border: 2px solid #e9ecef;
+        background: white;
+        color: var(--color-text-secondary);
+        border-radius: var(--border-radius-md);
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+
+        mat-icon {
+          font-size: 1.25rem;
+          width: 1.25rem;
+          height: 1.25rem;
+        }
+
+        &:hover:not(:disabled) {
+          border-color: var(--color-primary);
+          color: var(--color-primary);
+          background: rgba(16, 185, 129, 0.05);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        span {
+          font-size: 0.85rem;
+          opacity: 0.7;
+        }
+      }
     }
   }
 }

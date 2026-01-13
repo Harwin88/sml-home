@@ -15,7 +15,20 @@
       <mat-icon>check_circle</mat-icon>
       <div class="message-content">
         <h3>¡Mensaje enviado exitosamente!</h3>
-        <p>Gracias por contactarnos. Nuestro equipo revisará tu mensaje y te responderá en un plazo máximo de 24 horas.</p>
+        <p>{{ successMessage || 'Gracias por contactarnos. Nuestro equipo revisará tu mensaje y te responderá en un plazo máximo de 24 horas.' }}</p>
+        <p *ngIf="ticketId" class="ticket-id">
+          <strong>Número de Ticket:</strong> {{ ticketId }}
+        </p>
+        <p class="info-text">Guarda este número para consultar el estado de tu solicitud.</p>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage && !loading">
+      <mat-icon>error_outline</mat-icon>
+      <div class="message-content">
+        <h3>Error al enviar el mensaje</h3>
+        <p>{{ errorMessage }}</p>
       </div>
     </div>
 

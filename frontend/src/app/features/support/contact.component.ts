@@ -25,6 +25,8 @@ export class ContactComponent implements OnInit, OnDestroy {
   submitted = false;
   loading = false;
   showSuccessMessage = false;
+  successMessage = '';
+  ticketId = '';
   errorMessage = '';
 
   contactTypes = [
@@ -128,7 +130,7 @@ export class ContactComponent implements OnInit, OnDestroy {
     // Enviar formulario usando el servicio
     this.contactService.submitContactForm(this.contactForm.value).subscribe({
       next: (response) => {
-        console.log('Respuesta del servidor:', response);
+        console.log('✅ Respuesta del servidor:', response);
         
         // Track evento de envío exitoso
         this.analytics.trackFormSubmit('contact', true);
@@ -136,6 +138,8 @@ export class ContactComponent implements OnInit, OnDestroy {
 
         this.loading = false;
         this.showSuccessMessage = true;
+        this.successMessage = response.message;
+        this.ticketId = response.ticketId || '';
         
         // Limpiar borrador
         this.contactService.clearDraft();
@@ -147,20 +151,27 @@ export class ContactComponent implements OnInit, OnDestroy {
         });
         this.submitted = false;
 
-        // Ocultar mensaje de éxito después de 5 segundos
+        // Ocultar mensaje de éxito después de 8 segundos
         setTimeout(() => {
           this.showSuccessMessage = false;
-        }, 5000);
+          this.successMessage = '';
+          this.ticketId = '';
+        }, 8000);
       },
       error: (error) => {
-        console.error('Error al enviar formulario:', error);
+        console.error('❌ Error al enviar formulario:', error);
         
         // Track evento de error
         this.analytics.trackFormSubmit('contact', false);
         this.analytics.trackEvent('Contact Form', 'Error', error.message || 'Unknown error');
 
         this.loading = false;
-        this.errorMessage = 'Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente o contáctanos directamente.';
+        this.errorMessage = error.message || 'Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente o contáctanos directamente.';
+        
+        // Ocultar mensaje de error después de 10 segundos
+        setTimeout(() => {
+          this.errorMessage = '';
+        }, 10000);
       }
     });
   }

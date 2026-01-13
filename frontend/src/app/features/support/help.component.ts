@@ -4,16 +4,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { AnalyticsService } from '../../core/services/analytics.service';
-
-interface FAQ {
-  question: string;
-  answer: string;
-  category: string;
-  icon: string;
-}
+import { FaqService, Faq, FaqCategory } from '../../core/services/faq.service';
 
 interface HelpCategory {
   name: string;
+  value: FaqCategory | 'all';
   icon: string;
   description: string;
   route?: string;
@@ -40,64 +35,112 @@ interface HelpCategory {
 export class HelpComponent implements OnInit {
   expandedIndex: number | null = null;
   selectedCategory: string = 'all';
+  faqs: Faq[] = [];
+  loading = true;
+  error: string | null = null;
 
-  constructor(private analytics: AnalyticsService) {}
+  constructor(
+    private analytics: AnalyticsService,
+    private faqService: FaqService
+  ) {}
 
   ngOnInit(): void {
     // Track page view
     this.analytics.trackPageView('/help', 'Centro de Ayuda');
+    
+    // Cargar FAQs desde el backend
+    this.loadFaqs();
+  }
+
+  /**
+   * Cargar FAQs desde el backend
+   */
+  loadFaqs(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.faqService.getAllFaqs({
+      sort: ['order:asc', 'createdAt:desc'],
+      populate: ['relatedFaqs']
+    }).subscribe({
+      next: (faqs) => {
+        this.faqs = faqs;
+        this.loading = false;
+        console.log(`✅ ${faqs.length} FAQs cargadas desde el backend`);
+      },
+      error: (error) => {
+        console.error('Error al cargar FAQs:', error);
+        this.error = 'Error al cargar las preguntas frecuentes. Intenta recargar la página.';
+        this.loading = false;
+        // Cargar FAQs de respaldo (hardcoded)
+        this.loadFallbackFaqs();
+      }
+    });
+  }
+
+  /**
+   * FAQs de respaldo si el backend no está disponible
+   */
+  loadFallbackFaqs(): void {
+    this.faqs = this.fallbackFaqs;
   }
 
   categories: HelpCategory[] = [
     {
       name: 'General',
+      value: 'general',
       icon: 'info',
       description: 'Información general sobre MSL Hogar'
     },
     {
       name: 'Búsqueda',
+      value: 'search',
       icon: 'search',
       description: 'Cómo buscar y encontrar profesionales'
     },
     {
       name: 'Pagos',
+      value: 'payments',
       icon: 'payment',
       description: 'Métodos de pago y facturación'
     },
     {
       name: 'Seguridad',
+      value: 'security',
       icon: 'security',
       description: 'Verificación y confianza'
     },
     {
       name: 'Cuenta',
+      value: 'account',
       icon: 'account_circle',
       description: 'Gestión de tu cuenta'
     }
   ];
 
-  faqs: FAQ[] = [
+  // FAQs de respaldo (fallback) si el backend no está disponible
+  fallbackFaqs: Faq[] = [
     // General
     {
-      category: 'General',
+      category: 'general',
       icon: 'help',
       question: '¿Qué es MSL Hogar?',
       answer: 'MSL Hogar es una plataforma digital que conecta familias colombianas con profesionales verificados para servicios del hogar. Facilitamos el encuentro entre usuarios que necesitan servicios de limpieza, plomería, electricidad, jardinería y más, con proveedores calificados y de confianza.'
     },
     {
-      category: 'General',
+      category: 'general',
       icon: 'location_on',
       question: '¿En qué ciudades están disponibles?',
       answer: 'Actualmente operamos en las principales ciudades de Colombia: Bogotá, Medellín, Cali, Barranquilla, Cartagena, Bucaramanga, Pereira y Armenia. Estamos expandiéndonos continuamente a nuevas ciudades.'
     },
     {
-      category: 'General',
+      category: 'general',
       icon: 'schedule',
       question: '¿Cuál es el horario de atención?',
       answer: 'Nuestra plataforma está disponible 24/7 para buscar y contactar profesionales. Nuestro equipo de soporte está disponible de lunes a viernes de 8:00 AM a 6:00 PM (hora de Colombia). Para emergencias fuera de horario, contamos con un sistema de respuesta automática.'
     },
     {
-      category: 'General',
+      category: 'general',
       icon: 'monetization_on',
       question: '¿Cuánto cuesta usar la plataforma?',
       answer: 'Buscar y contactar profesionales es completamente gratis para los usuarios. Solo pagas directamente al profesional por el servicio contratado. No cobramos comisiones ocultas ni tarifas de intermediación.'
@@ -105,25 +148,25 @@ export class HelpComponent implements OnInit {
 
     // Búsqueda
     {
-      category: 'Búsqueda',
+      category: 'search',
       icon: 'search',
       question: '¿Cómo busco un profesional?',
       answer: 'Usa nuestra barra de búsqueda en la página principal. Puedes buscar por tipo de servicio (ej: "plomero", "electricista") o por descripción del problema. Luego filtra por ubicación, precio, disponibilidad y calificaciones para encontrar el profesional ideal.'
     },
     {
-      category: 'Búsqueda',
+      category: 'search',
       icon: 'filter_alt',
       question: '¿Cómo funcionan los filtros de búsqueda?',
       answer: 'Puedes filtrar por: ubicación (ciudad o barrio), rango de precios, disponibilidad (inmediata, hoy, esta semana), calificación mínima (1-5 estrellas), tipo de servicio, experiencia del profesional y si ha sido verificado por MSL Hogar.'
     },
     {
-      category: 'Búsqueda',
+      category: 'search',
       icon: 'star',
       question: '¿Qué significan las calificaciones?',
       answer: 'Las calificaciones (1-5 estrellas) son opiniones reales de usuarios que han contratado los servicios. Solo usuarios que han completado un servicio pueden dejar una calificación. Verificamos que todas las reseñas sean auténticas.'
     },
     {
-      category: 'Búsqueda',
+      category: 'search',
       icon: 'verified',
       question: '¿Qué significa "Proveedor Verificado"?',
       answer: 'Los proveedores verificados han completado nuestro proceso de validación que incluye: verificación de identidad, antecedentes penales, certificaciones profesionales (cuando aplica), referencias comprobables y una entrevista con nuestro equipo.'
@@ -131,25 +174,25 @@ export class HelpComponent implements OnInit {
 
     // Pagos
     {
-      category: 'Pagos',
+      category: 'payments',
       icon: 'payment',
       question: '¿Cómo pago por los servicios?',
       answer: 'El pago se realiza directamente al profesional según el método acordado entre ambas partes. Los métodos más comunes son: efectivo al finalizar el servicio, transferencia bancaria, Nequi, Daviplata o tarjeta. Cada profesional indica sus métodos de pago aceptados en su perfil.'
     },
     {
-      category: 'Pagos',
+      category: 'payments',
       icon: 'receipt',
       question: '¿Puedo solicitar factura?',
       answer: 'Sí, puedes solicitar factura directamente al profesional. Los proveedores registrados como persona jurídica o régimen común están obligados a emitir factura electrónica. Verifica en el perfil del profesional si ofrece este servicio.'
     },
     {
-      category: 'Pagos',
+      category: 'payments',
       icon: 'money_off',
       question: '¿Hay costos adicionales o comisiones?',
       answer: 'No. El precio que ves en el perfil del profesional es el precio base del servicio. No cobramos comisiones adicionales. Ten en cuenta que algunos servicios pueden tener costos variables según materiales o complejidad del trabajo, lo cual debe acordarse previamente.'
     },
     {
-      category: 'Pagos',
+      category: 'payments',
       icon: 'local_offer',
       question: '¿Ofrecen descuentos o promociones?',
       answer: 'Sí, frecuentemente tenemos promociones especiales, descuentos para primeros servicios y ofertas en servicios recurrentes. Suscríbete a nuestro newsletter para recibir notificaciones de promociones exclusivas.'
@@ -157,25 +200,25 @@ export class HelpComponent implements OnInit {
 
     // Seguridad
     {
-      category: 'Seguridad',
+      category: 'security',
       icon: 'shield',
       question: '¿Cómo garantizan la seguridad?',
       answer: 'Implementamos múltiples medidas: verificación de antecedentes de todos los profesionales, sistema de calificaciones transparente, soporte 24/7, seguro de responsabilidad civil para incidentes, y un equipo dedicado que monitorea la calidad del servicio.'
     },
     {
-      category: 'Seguridad',
+      category: 'security',
       icon: 'policy',
       question: '¿Qué pasa si tengo un problema con un servicio?',
       answer: 'Contacta inmediatamente a nuestro equipo de soporte. Investigaremos el caso, mediaremos entre ambas partes y, si corresponde, tomaremos acciones como advertencias, suspensión o eliminación del profesional de la plataforma. Tu satisfacción y seguridad son nuestra prioridad.'
     },
     {
-      category: 'Seguridad',
+      category: 'security',
       icon: 'privacy_tip',
       question: '¿Cómo protegen mis datos personales?',
       answer: 'Cumplimos estrictamente con la Ley 1581 de 2012 de Protección de Datos de Colombia. Tu información personal está encriptada, solo se comparte lo mínimo necesario para contactar profesionales, y nunca vendemos tus datos a terceros. Lee nuestra Política de Privacidad para más detalles.'
     },
     {
-      category: 'Seguridad',
+      category: 'security',
       icon: 'gpp_good',
       question: '¿Qué es el Seguro de Garantía?',
       answer: 'Es una cobertura opcional que algunos profesionales ofrecen para proteger contra daños materiales durante el servicio. Verifica en el perfil del profesional si cuenta con este seguro y qué cubre específicamente.'
@@ -183,45 +226,96 @@ export class HelpComponent implements OnInit {
 
     // Cuenta
     {
-      category: 'Cuenta',
+      category: 'account',
       icon: 'person_add',
       question: '¿Necesito crear una cuenta para usar MSL Hogar?',
       answer: 'No es obligatorio para buscar profesionales, pero crear una cuenta te permite: guardar tus búsquedas favoritas, contactar directamente a profesionales, ver tu historial de servicios, recibir notificaciones personalizadas y dejar calificaciones.'
     },
     {
-      category: 'Cuenta',
+      category: 'account',
       icon: 'edit',
       question: '¿Cómo edito mi perfil?',
       answer: 'Inicia sesión, ve a "Mi Cuenta" en el menú superior, y selecciona "Editar Perfil". Puedes actualizar tu información personal, preferencias de contacto, dirección y métodos de pago preferidos.'
     },
     {
-      category: 'Cuenta',
+      category: 'account',
       icon: 'delete',
       question: '¿Puedo eliminar mi cuenta?',
       answer: 'Sí, puedes solicitar la eliminación de tu cuenta en cualquier momento. Ve a Configuración > Privacidad > Eliminar Cuenta. Ten en cuenta que esto eliminará permanentemente tu historial, calificaciones y datos personales según nuestra política de retención de datos.'
     },
     {
-      category: 'Cuenta',
+      category: 'account',
       icon: 'work',
       question: '¿Cómo puedo trabajar como profesional en MSL Hogar?',
       answer: 'Si eres un profesional de servicios del hogar, haz clic en "Trabaja con Nosotros" en el menú principal. Completa el formulario de registro, proporciona tu documentación y certificaciones, y nuestro equipo revisará tu solicitud en 2-3 días hábiles.'
     }
   ];
 
-  get filteredFaqs(): FAQ[] {
+  get filteredFaqs(): Faq[] {
     if (this.selectedCategory === 'all') {
       return this.faqs;
     }
     return this.faqs.filter(faq => faq.category === this.selectedCategory);
   }
 
-  toggleFaq(index: number): void {
+  toggleFaq(index: number, faq: Faq): void {
+    const wasExpanded = this.expandedIndex === index;
     this.expandedIndex = this.expandedIndex === index ? null : index;
+    
+    // Si se expandió (no se colapsó), incrementar vistas
+    if (!wasExpanded && faq.id) {
+      this.faqService.incrementView(faq.id).subscribe({
+        next: (result) => {
+          if (faq.viewCount !== undefined) {
+            faq.viewCount = result.viewCount;
+          }
+        },
+        error: (error) => console.error('Error al incrementar vistas:', error)
+      });
+    }
   }
 
   selectCategory(category: string): void {
     this.selectedCategory = category;
     this.expandedIndex = null;
+    
+    // Si selecciona una categoría específica, cargar FAQs de esa categoría
+    if (category !== 'all') {
+      this.loading = true;
+      this.faqService.getFaqsByCategory(category as FaqCategory).subscribe({
+        next: (faqs) => {
+          this.faqs = faqs;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error al cargar FAQs por categoría:', error);
+          this.loading = false;
+        }
+      });
+    } else {
+      // Recargar todas las FAQs
+      this.loadFaqs();
+    }
+  }
+
+  /**
+   * Marcar FAQ como útil
+   */
+  markAsHelpful(faq: Faq, helpful: boolean, event: Event): void {
+    event.stopPropagation(); // Evitar que se expanda/colapse el accordion
+    
+    if (!faq.id) return;
+
+    this.faqService.markHelpful(faq.id, helpful).subscribe({
+      next: (result) => {
+        faq.helpfulCount = result.helpfulCount;
+        faq.notHelpfulCount = result.notHelpfulCount;
+        
+        // Track evento
+        this.analytics.trackEvent('FAQ', helpful ? 'Helpful' : 'Not Helpful', faq.question);
+      },
+      error: (error) => console.error('Error al marcar FAQ:', error)
+    });
   }
 }
 
