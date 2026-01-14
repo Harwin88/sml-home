@@ -118,7 +118,10 @@
 </main>
 
 <!-- Footer Global -->
-<app-footer></app-footer>
+<app-footer 
+  (openWelcome)="openWelcomeModal()" 
+  (openWorkWithUs)="openWorkWithUsModal()"
+></app-footer>
 
 <!-- Cookie Consent Banner -->
 <app-cookie-consent></app-cookie-consent>

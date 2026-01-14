@@ -194,6 +194,11 @@
           transition: all 0.3s;
           padding: var(--spacing-xs) 0;
           position: relative;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          text-align: left;
+          width: 100%;
 
           &::before {
             content: '';

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +8,7 @@ interface FooterLink {
   route?: string;
   external?: string;
   icon?: string;
+  action?: string; // Para acciones como abrir modales
 }
 
 interface FooterSection {
@@ -30,6 +31,9 @@ interface SocialLink {
   styleUrls: ['./footer.component.scss']
 })
 export class FooterComponent {
+  @Output() openWelcome = new EventEmitter<void>();
+  @Output() openWorkWithUs = new EventEmitter<void>();
+
   currentYear = new Date().getFullYear();
 
   footerSections: FooterSection[] = [
@@ -38,8 +42,8 @@ export class FooterComponent {
       links: [
         { label: 'Inicio', route: '/', icon: 'home' },
         { label: 'Buscar Servicios', route: '/search', icon: 'search' },
-        { label: 'Sobre Nosotros', route: '/', icon: 'info' },
-        { label: 'Trabaja con Nosotros', route: '/', icon: 'work' }
+        { label: 'Sobre Nosotros', action: 'openWelcome', icon: 'info' },
+        { label: 'Trabaja con Nosotros', action: 'openWorkWithUs', icon: 'work' }
       ]
     },
     {
@@ -118,6 +122,20 @@ export class FooterComponent {
     { icon: 'support_agent', text: 'Soporte 24/7' },
     { icon: 'star', text: 'Mejor Calificación' }
   ];
+
+  /**
+   * Manejar acciones de los enlaces
+   */
+  handleLinkAction(action: string): void {
+    switch (action) {
+      case 'openWelcome':
+        this.openWelcome.emit();
+        break;
+      case 'openWorkWithUs':
+        this.openWorkWithUs.emit();
+        break;
+    }
+  }
 
   /**
    * Navegar a una sección externa

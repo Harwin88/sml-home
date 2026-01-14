@@ -1,33 +1,55 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
   <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
     <div class="modal-header">
-      <h2 class="modal-title">
-        <mat-icon>sparkles</mat-icon>
-        Bienvenido a MSL Hogar
-      </h2>
       <button class="modal-close-btn" (click)="closeModal()" aria-label="Cerrar">
         <mat-icon>close</mat-icon>
       </button>
     </div>
     
-    <div class="modal-body">
-      <mat-icon class="modal-icon">verified_user</mat-icon>
-      <p class="modal-text">
-        Todos los proveedores de servicios que forman parte de nuestra plataforma 
-        han sido <strong>verificados mediante un proceso riguroso de validación</strong> que incluye 
-        la revisión de su experiencia profesional, antecedentes disciplinarios y 
-        la validación de los servicios que ofrecen.
-      </p>
-      <p class="modal-text">
-        La seguridad y confianza de nuestros clientes es nuestra máxima prioridad, 
-        y nos comprometemos a mantener los más altos estándares de calidad en 
-        cada detalle de nuestro servicio.
+    <!-- Hero Section -->
+    <div class="modal-hero">
+      <div class="hero-icon">
+        <span class="emoji">🏠</span>
+      </div>
+      <h2 class="hero-title">
+        Bienvenido a <span class="brand">MSL Hogar</span>
+      </h2>
+      <p class="hero-subtitle">
+        Tu plataforma de confianza para encontrar profesionales verificados
       </p>
     </div>
     
+    <!-- Body - Features Grid -->
+    <div class="modal-body">
+      <div class="features-grid">
+        <div 
+          class="feature-card" 
+          *ngFor="let feature of features"
+          [style.--feature-color]="feature.color"
+        >
+          <div class="feature-icon-wrapper">
+            <mat-icon class="feature-icon">{{ feature.icon }}</mat-icon>
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+        </div>
+      </div>
+
+      <!-- Additional Info -->
+      <div class="info-banner">
+        <mat-icon class="info-icon">info</mat-icon>
+        <p class="info-text">
+          Nos comprometemos a mantener los más altos estándares de calidad en cada detalle de nuestro servicio.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Footer -->
     <div class="modal-footer">
       <button class="modal-understand-btn" (click)="closeModal()">
-        Entendido
+        <span>¡Comenzar Ahora!</span>
+        <mat-icon>arrow_forward</mat-icon>
       </button>
     </div>
   </div>
