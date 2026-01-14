@@ -123,16 +123,54 @@
           </div>
         </div>
         <div class="newsletter-form">
-          <input 
-            type="email" 
-            placeholder="Tu correo electrónico" 
-            class="newsletter-input"
-            aria-label="Correo electrónico para newsletter"
-          />
-          <button class="newsletter-button" aria-label="Suscribirse al newsletter">
-            <span>Suscribirse</span>
-            <mat-icon>arrow_forward</mat-icon>
+          <div class="newsletter-input-wrapper">
+            <input 
+              type="email" 
+              [formControl]="newsletterEmail"
+              placeholder="Tu correo electrónico" 
+              class="newsletter-input"
+              [class.newsletter-input-invalid]="newsletterEmail.invalid && newsletterEmail.touched"
+              [class.newsletter-input-valid]="newsletterEmail.valid && newsletterEmail.touched"
+              [class.newsletter-input-loading]="newsletterState === 'loading'"
+              [class.newsletter-input-success]="newsletterState === 'success'"
+              [class.newsletter-input-error]="newsletterState === 'error'"
+              [disabled]="newsletterState === 'loading'"
+              aria-label="Correo electrónico para newsletter"
+              (keyup.enter)="subscribeNewsletter()"
+            />
+            <mat-icon 
+              class="newsletter-status-icon"
+              *ngIf="newsletterState === 'success'"
+            >check_circle</mat-icon>
+            <mat-icon 
+              class="newsletter-status-icon error"
+              *ngIf="newsletterState === 'error'"
+            >error</mat-icon>
+          </div>
+          <button 
+            class="newsletter-button" 
+            [class.newsletter-button-loading]="newsletterState === 'loading'"
+            [class.newsletter-button-success]="newsletterState === 'success'"
+            [class.newsletter-button-error]="newsletterState === 'error'"
+            [disabled]="isSubscribeDisabled()"
+            (click)="subscribeNewsletter()"
+            aria-label="Suscribirse al newsletter"
+          >
+            <span *ngIf="newsletterState === 'idle' || newsletterState === 'error'">Suscribirse</span>
+            <span *ngIf="newsletterState === 'loading'">Suscribiendo...</span>
+            <span *ngIf="newsletterState === 'success'">¡Suscrito!</span>
+            <mat-icon *ngIf="newsletterState === 'idle' || newsletterState === 'error'">arrow_forward</mat-icon>
+            <mat-icon *ngIf="newsletterState === 'loading'" class="spinning">hourglass_empty</mat-icon>
+            <mat-icon *ngIf="newsletterState === 'success'">check</mat-icon>
           </button>
+          <div 
+            class="newsletter-message"
+            *ngIf="newsletterMessage"
+            [class.newsletter-message-success]="newsletterState === 'success'"
+            [class.newsletter-message-error]="newsletterState === 'error'"
+          >
+            {{ newsletterMessage }}
+          </div>
         </div>
       </div>
     </div>

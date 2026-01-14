@@ -1,7 +1,9 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NewsletterService } from '../../../core/services/newsletter.service';
 
 interface FooterLink {
   label: string;
@@ -26,15 +28,24 @@ interface SocialLink {
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [CommonModule, RouterModule, MatIconModule, ReactiveFormsModule],
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss']
 })
-export class FooterComponent {
+export class FooterComponent implements OnInit {
   @Output() openWelcome = new EventEmitter<void>();
   @Output() openWorkWithUs = new EventEmitter<void>();
 
   currentYear = new Date().getFullYear();
+  
+  // Newsletter form
+  newsletterEmail = new FormControl('', [
+    Validators.required,
+    Validators.email
+  ]);
+  
+  newsletterState: 'idle' | 'loading' | 'success' | 'error' = 'idle';
+  newsletterMessage = '';
 
   footerSections: FooterSection[] = [
     {
@@ -123,6 +134,18 @@ export class FooterComponent {
     { icon: 'star', text: 'Mejor Calificación' }
   ];
 
+  constructor(private newsletterService: NewsletterService) {}
+
+  ngOnInit(): void {
+    // Validación en tiempo real del email
+    this.newsletterEmail.valueChanges.subscribe(() => {
+      if (this.newsletterState === 'error') {
+        this.newsletterState = 'idle';
+        this.newsletterMessage = '';
+      }
+    });
+  }
+
   /**
    * Manejar acciones de los enlaces
    */
@@ -163,6 +186,76 @@ export class FooterComponent {
       'WhatsApp': '💬'
     };
     return icons[name] || name.charAt(0);
+  }
+
+  /**
+   * Suscribirse al newsletter
+   */
+  subscribeNewsletter(): void {
+    // Validar email
+    if (this.newsletterEmail.invalid) {
+      this.newsletterEmail.markAsTouched();
+      this.newsletterState = 'error';
+      this.newsletterMessage = 'Por favor, ingresa un email válido.';
+      return;
+    }
+
+    const email = this.newsletterEmail.value?.trim() || '';
+    
+    if (!this.newsletterService.isValidEmail(email)) {
+      this.newsletterState = 'error';
+      this.newsletterMessage = 'El formato del email no es válido.';
+      return;
+    }
+
+    // Cambiar estado a loading
+    this.newsletterState = 'loading';
+    this.newsletterMessage = '';
+
+    // Llamar al servicio
+    this.newsletterService.subscribe(email, 'footer').subscribe({
+      next: (response) => {
+        this.newsletterState = 'success';
+        this.newsletterMessage = response.message || '¡Te has suscrito exitosamente!';
+        
+        // Limpiar el formulario después de 3 segundos
+        setTimeout(() => {
+          this.newsletterEmail.reset();
+          this.newsletterState = 'idle';
+          this.newsletterMessage = '';
+        }, 3000);
+      },
+      error: (error) => {
+        this.newsletterState = 'error';
+        
+        // Manejar diferentes tipos de errores
+        if (error.error === 'DUPLICATE_EMAIL') {
+          this.newsletterMessage = 'Este email ya está suscrito a nuestro newsletter.';
+        } else if (error.error === 'RATE_LIMIT_EXCEEDED') {
+          this.newsletterMessage = 'Has realizado demasiados intentos. Por favor, espera unos minutos.';
+        } else if (error.error === 'INVALID_EMAIL') {
+          this.newsletterMessage = 'El formato del email no es válido.';
+        } else {
+          this.newsletterMessage = error.message || 'Error al suscribirse. Por favor, intenta nuevamente.';
+        }
+      }
+    });
+  }
+
+  /**
+   * Verificar si el email es válido
+   */
+  isEmailValid(): boolean {
+    return this.newsletterEmail.valid && this.newsletterEmail.touched;
+  }
+
+  /**
+   * Verificar si el botón debe estar deshabilitado
+   */
+  isSubscribeDisabled(): boolean {
+    return this.newsletterState === 'loading' || 
+           this.newsletterEmail.invalid || 
+           !this.newsletterEmail.value?.trim();
   }
 }
 
