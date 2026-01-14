@@ -1,31 +1,113 @@
 <header class="app-header">
   <div class="header-content">
-    <div class="logo-section">
-      <a routerLink="/" [routerLinkActive]="'active'" aria-label="Ir al inicio">
-        <h1 class="logo">{{ title }}</h1>
-      </a>
-    </div>
-    <div class="header-actions">
-      <div class="header-buttons">
-        <button class="info-button" (click)="openWorkWithUsModal()" aria-label="Trabaja con nosotros">
-          <mat-icon class="info-icon">work</mat-icon>
-          <span class="info-text">Trabaja con nosotros</span>
+    <div class="header-top">
+      <div class="logo-section">
+        <a routerLink="/" aria-label="Ir al inicio">
+          <h1 class="logo">{{ title }}</h1>
+        </a>
+      </div>
+      
+      <nav class="header-nav">
+      <div class="nav-main">
+        <!-- Botón Inicio -->
+        <button 
+          class="nav-button" 
+          [class.active]="currentRoute === '/'"
+          routerLink="/"
+          aria-label="Ir al inicio"
+        >
+          <mat-icon>home</mat-icon>
+          <span class="nav-text">Inicio</span>
         </button>
-        <button class="info-button" (click)="openWelcomeModal()" aria-label="Información sobre verificación">
-          <mat-icon class="info-icon">info</mat-icon>
-          <span class="info-text">Sobre nosotros</span>
+
+        <!-- Botón Buscar -->
+        <button 
+          class="nav-button" 
+          [class.active]="currentRoute.startsWith('/search')"
+          routerLink="/search"
+          aria-label="Buscar proveedores"
+        >
+          <mat-icon>search</mat-icon>
+          <span class="nav-text">Buscar</span>
+        </button>
+
+        <!-- Menú de Soporte -->
+        <button 
+          class="nav-button menu-trigger" 
+          [matMenuTriggerFor]="supportMenuDropdown"
+          aria-label="Menú de soporte"
+        >
+          <mat-icon>support_agent</mat-icon>
+          <span class="nav-text">Soporte</span>
+          <mat-icon class="dropdown-icon">keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-menu #supportMenuDropdown="matMenu" class="header-menu">
+          <button 
+            mat-menu-item 
+            *ngFor="let item of supportMenu"
+            [routerLink]="item.route"
+            class="menu-item"
+          >
+            <mat-icon>{{ item.icon }}</mat-icon>
+            <span>{{ item.label }}</span>
+          </button>
+        </mat-menu>
+
+        <!-- Menú Legal -->
+        <button 
+          class="nav-button menu-trigger" 
+          [matMenuTriggerFor]="legalMenuDropdown"
+          aria-label="Menú legal"
+        >
+          <mat-icon>gavel</mat-icon>
+          <span class="nav-text">Legal</span>
+          <mat-icon class="dropdown-icon">keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-menu #legalMenuDropdown="matMenu" class="header-menu">
+          <button 
+            mat-menu-item 
+            *ngFor="let item of legalMenu"
+            [routerLink]="item.route"
+            class="menu-item"
+          >
+            <mat-icon>{{ item.icon }}</mat-icon>
+            <span>{{ item.label }}</span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <div class="nav-secondary">
+        <button 
+          class="nav-button secondary" 
+          (click)="openWorkWithUsModal()" 
+          aria-label="Trabaja con nosotros"
+        >
+          <mat-icon>work</mat-icon>
+          <span class="nav-text">Trabaja con nosotros</span>
+        </button>
+        <button 
+          class="nav-button secondary" 
+          (click)="openWelcomeModal()" 
+          aria-label="Información sobre nosotros"
+        >
+          <mat-icon>info</mat-icon>
+          <span class="nav-text">Sobre nosotros</span>
         </button>
       </div>
-      <div class="search-section" *ngIf="showSearch">
-        <div class="header-search-box">
-          <input 
-            type="text" 
-            [formControl]="searchControl" 
-            placeholder="Buscar proveedores de servicios..." 
-            class="header-search-input" 
-          />
-          <mat-icon class="header-search-icon">search</mat-icon>
-        </div>
+    </nav>
+    </div>
+
+    <!-- Input de búsqueda - Solo se muestra en /search -->
+    <div class="search-section" *ngIf="showSearch">
+      <div class="header-search-box">
+        <mat-icon class="header-search-icon">search</mat-icon>
+        <input 
+          type="text" 
+          [formControl]="searchControl" 
+          placeholder="Buscar proveedores de servicios..." 
+          class="header-search-input" 
+          aria-label="Buscar proveedores"
+        />
       </div>
     </div>
   </div>

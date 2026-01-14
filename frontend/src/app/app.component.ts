@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { SearchService } from './core/services/search.service';
 import { FirstVisitService } from './core/services/first-visit.service';
 import { AnalyticsService } from './core/services/analytics.service';
@@ -13,20 +14,43 @@ import { CookieConsentComponent } from './shared/components/cookie-consent/cooki
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subscription, filter } from 'rxjs';
 
+interface MenuLink {
+  label: string;
+  route: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, MatIconModule, WelcomeModalComponent, WorkWithUsModalComponent, FooterComponent, CookieConsentComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, MatIconModule, MatMenuModule, WelcomeModalComponent, WorkWithUsModalComponent, FooterComponent, CookieConsentComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'HOME';
+  title = 'MSL Hogar';
   searchControl = new FormControl('');
-  showSearch = true;
+  showSearch = false; // Solo se muestra en /search
   showWelcomeModal = false;
   showWorkWithUsModal = false;
+  currentRoute = '/';
   private subscriptions: Subscription[] = [];
+
+  // Menú de Soporte
+  supportMenu: MenuLink[] = [
+    { label: 'Centro de Ayuda', route: '/help', icon: 'help' },
+    { label: 'Preguntas Frecuentes', route: '/help', icon: 'quiz' },
+    { label: 'Contacto', route: '/contact', icon: 'contact_mail' },
+    { label: 'Reportar Problema', route: '/contact', icon: 'report_problem' }
+  ];
+
+  // Menú Legal
+  legalMenu: MenuLink[] = [
+    { label: 'Términos y Condiciones', route: '/legal/terms', icon: 'description' },
+    { label: 'Política de Privacidad', route: '/legal/privacy', icon: 'privacy_tip' },
+    { label: 'Política de Cookies', route: '/legal/cookies', icon: 'cookie' },
+    { label: 'Aviso Legal', route: '/legal/notice', icon: 'gavel' }
+  ];
 
   constructor(
     private searchService: SearchService,
@@ -62,17 +86,19 @@ export class AppComponent implements OnInit, OnDestroy {
         this.searchService.setSearchTerm(query || '');
       });
 
-    // Mostrar/ocultar búsqueda según la ruta
+    // Mostrar/ocultar búsqueda según la ruta (solo en /search)
     const routeSub = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        this.showSearch = event.url === '/' || event.urlAfterRedirects === '/';
+        this.currentRoute = event.url;
+        this.showSearch = event.url.startsWith('/search') || event.urlAfterRedirects?.startsWith('/search');
       });
 
     this.subscriptions.push(syncSub, searchSub, routeSub);
     
     // Inicializar showSearch según la ruta actual
-    this.showSearch = this.router.url === '/';
+    this.currentRoute = this.router.url;
+    this.showSearch = this.router.url.startsWith('/search');
   }
 
   onCloseWelcomeModal(): void {

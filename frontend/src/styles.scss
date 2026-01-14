@@ -72,6 +72,7 @@
   --z-fixed: 1030;
   --z-modal-backdrop: 1040;
   --z-modal: 1050;
+  --z-overlay: 1100;
 }
 
 * {
@@ -221,4 +222,19 @@ html {
   @media (max-width: 768px) {
     display: none !important;
   }
+}
+
+// Asegurar que los overlays de Angular Material (menús, tooltips, etc.) tengan z-index alto
+.cdk-overlay-container {
+  z-index: var(--z-overlay) !important;
+}
+
+// Asegurar que el backdrop de los overlays tenga z-index apropiado
+.cdk-overlay-backdrop {
+  z-index: var(--z-overlay) !important;
+}
+
+// Panel de menú específicamente
+.cdk-overlay-pane {
+  z-index: var(--z-overlay) !important;
 }
