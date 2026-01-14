@@ -75,7 +75,7 @@ export class ContactService extends StrapiBaseService {
   private generateTicketId(): string {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 10000);
-    return `MSL-${timestamp}-${random}`;
+    return `KAPI-${timestamp}-${random}`;
   }
 
   /**

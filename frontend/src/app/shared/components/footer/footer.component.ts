@@ -91,25 +91,25 @@ export class FooterComponent implements OnInit {
     {
       name: 'Facebook',
       icon: 'thumb_up',
-      url: 'https://facebook.com/mslhogar',
+      url: 'https://facebook.com/kapi',
       color: '#1877F2'
     },
     {
       name: 'Instagram',
       icon: 'photo_camera',
-      url: 'https://instagram.com/mslhogar',
+      url: 'https://instagram.com/kapi',
       color: '#E4405F'
     },
     {
       name: 'Twitter',
       icon: 'chat_bubble',
-      url: 'https://twitter.com/mslhogar',
+      url: 'https://twitter.com/kapi',
       color: '#1DA1F2'
     },
     {
       name: 'LinkedIn',
       icon: 'business_center',
-      url: 'https://linkedin.com/company/mslhogar',
+      url: 'https://linkedin.com/company/kapi',
       color: '#0A66C2'
     },
     {
@@ -121,7 +121,7 @@ export class FooterComponent implements OnInit {
   ];
 
   contactInfo = {
-    email: 'info@mslhogar.com',
+    email: 'info@kapi.help',
     phone: '+57 300 123 4567',
     address: 'Bogotá, Colombia',
     hours: 'Lun - Vie: 8:00 AM - 6:00 PM'

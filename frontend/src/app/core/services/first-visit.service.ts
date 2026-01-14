@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class FirstVisitService {
-  private readonly STORAGE_KEY = 'msl_hogar_first_visit_completed';
+  private readonly STORAGE_KEY = 'kapi_first_visit_completed';
 
   isFirstVisit(): boolean {
     // Verificar si ya se mostró el modal

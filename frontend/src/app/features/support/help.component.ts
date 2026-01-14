@@ -50,7 +50,7 @@ export class HelpComponent implements OnInit {
   
   // Control de votos para evitar spam
   private votedFaqs: Set<string> = new Set();
-  private readonly VOTED_FAQS_KEY = 'msl_faq_voted';
+  private readonly VOTED_FAQS_KEY = 'kapi_faq_voted';
 
   constructor(
     private analytics: AnalyticsService,
@@ -169,7 +169,7 @@ export class HelpComponent implements OnInit {
       name: 'General',
       value: 'general',
       icon: 'info',
-      description: 'Información general sobre MSL Hogar'
+      description: 'Información general sobre kapi'
     },
     {
       name: 'Búsqueda',
@@ -203,8 +203,8 @@ export class HelpComponent implements OnInit {
     {
       category: 'general',
       icon: 'help',
-      question: '¿Qué es MSL Hogar?',
-      answer: 'MSL Hogar es una plataforma digital que conecta familias colombianas con profesionales verificados para servicios del hogar. Facilitamos el encuentro entre usuarios que necesitan servicios de limpieza, plomería, electricidad, jardinería y más, con proveedores calificados y de confianza.'
+      question: '¿Qué es kapi?',
+      answer: 'kapi es una plataforma digital que conecta familias colombianas con profesionales verificados para servicios del hogar. Facilitamos el encuentro entre usuarios que necesitan servicios de limpieza, plomería, electricidad, jardinería y más, con proveedores calificados y de confianza.'
     },
     {
       category: 'general',
@@ -236,7 +236,7 @@ export class HelpComponent implements OnInit {
       category: 'search',
       icon: 'filter_alt',
       question: '¿Cómo funcionan los filtros de búsqueda?',
-      answer: 'Puedes filtrar por: ubicación (ciudad o barrio), rango de precios, disponibilidad (inmediata, hoy, esta semana), calificación mínima (1-5 estrellas), tipo de servicio, experiencia del profesional y si ha sido verificado por MSL Hogar.'
+      answer: 'Puedes filtrar por: ubicación (ciudad o barrio), rango de precios, disponibilidad (inmediata, hoy, esta semana), calificación mínima (1-5 estrellas), tipo de servicio, experiencia del profesional y si ha sido verificado por kapi.'
     },
     {
       category: 'search',
@@ -307,7 +307,7 @@ export class HelpComponent implements OnInit {
     {
       category: 'account',
       icon: 'person_add',
-      question: '¿Necesito crear una cuenta para usar MSL Hogar?',
+      question: '¿Necesito crear una cuenta para usar kapi?',
       answer: 'No es obligatorio para buscar profesionales, pero crear una cuenta te permite: guardar tus búsquedas favoritas, contactar directamente a profesionales, ver tu historial de servicios, recibir notificaciones personalizadas y dejar calificaciones.'
     },
     {
@@ -325,7 +325,7 @@ export class HelpComponent implements OnInit {
     {
       category: 'account',
       icon: 'work',
-      question: '¿Cómo puedo trabajar como profesional en MSL Hogar?',
+      question: '¿Cómo puedo trabajar como profesional en kapi?',
       answer: 'Si eres un profesional de servicios del hogar, haz clic en "Trabaja con Nosotros" en el menú principal. Completa el formulario de registro, proporciona tu documentación y certificaciones, y nuestro equipo revisará tu solicitud en 2-3 días hábiles.'
     }
   ];

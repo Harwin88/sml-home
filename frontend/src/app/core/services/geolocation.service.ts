@@ -176,7 +176,7 @@ export class GeolocationService {
     
     return this.http.get<any[]>(url, {
       headers: {
-        'User-Agent': 'MSL-Hogar-App' // Requerido por Nominatim
+        'User-Agent': 'kapi-App' // Requerido por Nominatim
       }
     }).pipe(
       timeout(10000),

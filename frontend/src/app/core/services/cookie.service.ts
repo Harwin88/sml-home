@@ -20,7 +20,7 @@ export interface CookieConsent {
   providedIn: 'root'
 })
 export class CookieService {
-  private readonly CONSENT_COOKIE_NAME = 'msl_cookie_consent';
+  private readonly CONSENT_COOKIE_NAME = 'kapi_cookie_consent';
   private readonly CONSENT_EXPIRY_DAYS = 365;
 
   constructor() {}

@@ -43,8 +43,8 @@ export class ContactComponent implements OnInit, OnDestroy {
     {
       icon: 'email',
       title: 'Email',
-      value: 'soporte&#64;mslhogar.com',
-      link: 'mailto:soporte@mslhogar.com'
+      value: 'soporte&#64;kapi.help',
+      link: 'mailto:soporte@kapi.help'
     },
     {
       icon: 'phone',

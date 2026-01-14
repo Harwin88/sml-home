@@ -28,7 +28,7 @@ interface MenuLink {
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'MSL Hogar';
+  title = 'kapi';
   searchControl = new FormControl('');
   showSearch = false; // Solo se muestra en /search
   showWelcomeModal = false;

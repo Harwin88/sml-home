@@ -48,8 +48,8 @@ export class AnalyticsService {
   private pageViews: PageView[] = [];
   private currentPageStartTime: number = Date.now();
   private readonly MAX_EVENTS_IN_MEMORY = 100;
-  private readonly SESSION_STORAGE_KEY = 'msl_analytics_session';
-  private readonly USER_ID_KEY = 'msl_user_id';
+  private readonly SESSION_STORAGE_KEY = 'kapi_analytics_session';
+  private readonly USER_ID_KEY = 'kapi_user_id';
 
   constructor(
     private cookieService: CookieService,
@@ -344,7 +344,7 @@ export class AnalyticsService {
     // this.http.post('/api/analytics/events', data).subscribe();
 
     // Por ahora, solo guardar en localStorage para debugging
-    const existingData = localStorage.getItem('msl_analytics_data');
+    const existingData = localStorage.getItem('kapi_analytics_data');
     const allData = existingData ? JSON.parse(existingData) : [];
     allData.push(data);
     
@@ -353,7 +353,7 @@ export class AnalyticsService {
       allData.shift();
     }
     
-    localStorage.setItem('msl_analytics_data', JSON.stringify(allData));
+    localStorage.setItem('kapi_analytics_data', JSON.stringify(allData));
 
     // Limpiar eventos enviados
     this.events = [];
@@ -433,7 +433,7 @@ export class AnalyticsService {
     this.events = [];
     this.pageViews = [];
     sessionStorage.removeItem(this.SESSION_STORAGE_KEY);
-    localStorage.removeItem('msl_analytics_data');
+    localStorage.removeItem('kapi_analytics_data');
   }
 
   /**
