@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "newsletter_subscriptions",
+  "info": {
+    "singularName": "newsletter-subscription",
+    "pluralName": "newsletter-subscriptions",
+    "displayName": "Suscripción Newsletter",
+    "description": "Suscripciones al newsletter de MSL Hogar"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "active",
+        "unsubscribed",
+        "bounced"
+      ],
+      "default": "active",
+      "required": true
+    },
+    "source": {
+      "type": "string",
+      "default": "footer",
+      "maxLength": 50
+    },
+    "preferences": {
+      "type": "json",
+      "required": false
+    },
+    "subscribedAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "unsubscribedAt": {
+      "type": "datetime",
+      "required": false
+    },
+    "ipAddress": {
+      "type": "string",
+      "required": false,
+      "maxLength": 45
+    },
+    "confirmationToken": {
+      "type": "string",
+      "unique": true,
+      "required": false,
+      "maxLength": 100
+    },
+    "confirmed": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    }
+  }
+}
+

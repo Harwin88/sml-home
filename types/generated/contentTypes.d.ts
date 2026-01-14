@@ -700,6 +700,63 @@ export interface ApiMediasMedias extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiNewsletterSubscriptionNewsletterSubscription
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'newsletter_subscriptions';
+  info: {
+    description: 'Suscripciones al newsletter de MSL Hogar';
+    displayName: 'Suscripci\u00F3n Newsletter';
+    pluralName: 'newsletter-subscriptions';
+    singularName: 'newsletter-subscription';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    confirmationToken: Schema.Attribute.String &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    confirmed: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    ipAddress: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 45;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::newsletter-subscription.newsletter-subscription'
+    > &
+      Schema.Attribute.Private;
+    preferences: Schema.Attribute.JSON;
+    publishedAt: Schema.Attribute.DateTime;
+    source: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }> &
+      Schema.Attribute.DefaultTo<'footer'>;
+    status: Schema.Attribute.Enumeration<
+      ['active', 'unsubscribed', 'bounced']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'active'>;
+    subscribedAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    unsubscribedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiReviewReview extends Struct.CollectionTypeSchema {
   collectionName: 'reviews';
   info: {
@@ -1487,6 +1544,7 @@ declare module '@strapi/strapi' {
       'api::faq.faq': ApiFaqFaq;
       'api::form.form': ApiFormForm;
       'api::medias.medias': ApiMediasMedias;
+      'api::newsletter-subscription.newsletter-subscription': ApiNewsletterSubscriptionNewsletterSubscription;
       'api::review.review': ApiReviewReview;
       'api::service-provider.service-provider': ApiServiceProviderServiceProvider;
       'api::support-ticket.support-ticket': ApiSupportTicketSupportTicket;
