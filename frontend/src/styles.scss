@@ -232,9 +232,19 @@ html {
 // Asegurar que el backdrop de los overlays tenga z-index apropiado
 .cdk-overlay-backdrop {
   z-index: var(--z-overlay) !important;
+  
+  // El backdrop transparente no debe bloquear clics - es transparente y no debería interferir
+  &.cdk-overlay-transparent-backdrop {
+    pointer-events: none !important;
+  }
 }
 
-// Panel de menú específicamente
+// Panel de menú específicamente - debe estar por encima del backdrop
 .cdk-overlay-pane {
   z-index: var(--z-overlay) !important;
+  
+  // Los paneles de menú del header deben estar por encima del backdrop
+  &.mat-mdc-menu-panel {
+    z-index: calc(var(--z-overlay) + 100) !important;
+  }
 }

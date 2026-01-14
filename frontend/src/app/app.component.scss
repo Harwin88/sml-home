@@ -305,8 +305,6 @@
 
 // Estilos para los menús desplegables
 ::ng-deep .header-menu {
-  z-index: var(--z-overlay) !important;
-
   .mat-mdc-menu-content {
     padding: 0.5rem 0;
   }
@@ -341,6 +339,14 @@
     span {
       font-weight: 500;
     }
+  }
+}
+
+// Asegurar que el panel del menú del header esté por encima del backdrop
+::ng-deep .cdk-overlay-pane {
+  // Los paneles de menú deben estar por encima del backdrop transparente
+  &.mat-mdc-menu-panel {
+    z-index: calc(var(--z-overlay) + 100) !important;
   }
 }
 
