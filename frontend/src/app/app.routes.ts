@@ -8,6 +8,9 @@ import { CookiesComponent } from './features/legal/cookies.component';
 import { NoticeComponent } from './features/legal/notice.component';
 import { HelpComponent } from './features/support/help.component';
 import { ContactComponent } from './features/support/contact.component';
+import { UserProfileComponent } from './features/profile/user-profile.component';
+import { FavoritesComponent } from './features/profile/favorites.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -19,5 +22,7 @@ export const routes: Routes = [
   { path: 'legal/privacy', component: PrivacyComponent },
   { path: 'legal/cookies', component: CookiesComponent },
   { path: 'legal/notice', component: NoticeComponent },
+  { path: 'profile', component: UserProfileComponent, canActivate: [authGuard] },
+  { path: 'profile/favorites', component: FavoritesComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

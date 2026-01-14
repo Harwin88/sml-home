@@ -7,6 +7,8 @@ import { ReviewService } from '../../core/services/review.service';
 import { RatingModalComponent } from '../../shared/components/rating-modal/rating-modal.component';
 import { ServiceProvider } from '../../core/models/service-provider.model';
 import { ConfigService } from '../../core/services/config.service';
+import { AuthService } from '../../core/services/auth.service';
+import { FavoritesService } from '../../core/services/favorites.service';
 
 @Component({
     selector: 'app-provider-profile',
@@ -27,7 +29,9 @@ export class ProviderProfileComponent implements OnInit {
         private routerService: Router,
         private providerService: ServiceProviderService,
         private reviewService: ReviewService,
-        private configService: ConfigService
+        private configService: ConfigService,
+        private authService: AuthService,
+        private favoritesService: FavoritesService
     ) { }
 
     ngOnInit(): void {
@@ -283,6 +287,59 @@ export class ProviderProfileComponent implements OnInit {
                 alert('Hubo un error al enviar tu calificación. Por favor intenta de nuevo.');
             }
         });
+    }
+
+    /**
+     * Verificar si el usuario está autenticado
+     */
+    isAuthenticated(): boolean {
+        return this.authService.isAuthenticated();
+    }
+
+    /**
+     * Verificar si el proveedor está en favoritos
+     */
+    isFavorite(): boolean {
+        if (!this.provider || !this.isAuthenticated()) {
+            return false;
+        }
+        return this.favoritesService.isFavorite(this.provider.id);
+    }
+
+    /**
+     * Toggle favorito (agregar o remover)
+     */
+    toggleFavorite(): void {
+        if (!this.provider) return;
+
+        if (!this.isAuthenticated()) {
+            alert('Debes iniciar sesión para agregar favoritos');
+            return;
+        }
+
+        if (this.isFavorite()) {
+            // Remover de favoritos
+            this.favoritesService.removeFavorite(this.provider.id).subscribe({
+                next: () => {
+                    this.authService.refreshUser().subscribe();
+                },
+                error: (error) => {
+                    console.error('Error al remover favorito:', error);
+                    alert('Error al remover de favoritos');
+                }
+            });
+        } else {
+            // Agregar a favoritos
+            this.favoritesService.addFavorite(this.provider.id).subscribe({
+                next: () => {
+                    this.authService.refreshUser().subscribe();
+                },
+                error: (error) => {
+                    console.error('Error al agregar favorito:', error);
+                    alert('Error al agregar a favoritos');
+                }
+            });
+        }
     }
 }
 

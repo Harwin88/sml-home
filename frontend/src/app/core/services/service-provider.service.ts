@@ -205,7 +205,7 @@ export class ServiceProviderService extends StrapiBaseService {
      * Helper: Obtener URL de media
      * Construye la URL completa usando apiUrl + url del media
      */
-    private getMediaUrl(media: any): string {
+    getMediaUrl(media: any): string {
         if (!media?.url) return '';
         
         // Si ya es una URL completa, retornarla

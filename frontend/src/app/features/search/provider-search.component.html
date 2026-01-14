@@ -249,6 +249,16 @@
                 <mat-icon>verified</mat-icon>
                 Verificado
               </span>
+              <!-- Botón de favoritos (solo para usuarios autenticados) -->
+              <button 
+                *ngIf="isAuthenticated()" 
+                class="favorite-btn"
+                [class.favorited]="isFavorite(provider)"
+                (click)="toggleFavorite(provider)"
+                [attr.aria-label]="isFavorite(provider) ? 'Remover de favoritos' : 'Agregar a favoritos'"
+                type="button">
+                <mat-icon>favorite</mat-icon>
+              </button>
             </div>
 
             <!-- Info -->

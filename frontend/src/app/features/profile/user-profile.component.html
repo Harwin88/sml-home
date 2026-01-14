@@ -1,0 +1,87 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>Mi Perfil</h1>
+    <p class="subtitle">Gestiona tu información y preferencias</p>
+  </div>
+
+  <div class="profile-content" *ngIf="!isLoading && user">
+    <!-- Información del Usuario -->
+    <div class="profile-section">
+      <h2>
+        <mat-icon>person</mat-icon>
+        Información Personal
+      </h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Email</label>
+          <p>{{ user.email }}</p>
+        </div>
+        <div class="info-item">
+          <label>Teléfono</label>
+          <p>{{ user.phone }}</p>
+        </div>
+        <div class="info-item">
+          <label>Tipo de Usuario</label>
+          <p>
+            <span class="badge" [class.badge-provider]="user.userType === 'provider'">
+              {{ user.userType === 'provider' ? 'Proveedor' : 'Usuario Regular' }}
+            </span>
+          </p>
+        </div>
+        <div class="info-item" *ngIf="user.latitude && user.longitude">
+          <label>Ubicación</label>
+          <p>{{ user.latitude.toFixed(6) }}, {{ user.longitude.toFixed(6) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="profile-section">
+      <h2>
+        <mat-icon>dashboard</mat-icon>
+        Acciones Rápidas
+      </h2>
+      <div class="actions-grid">
+        <a *ngIf="user.userType === 'regular'" routerLink="/profile/favorites" class="action-card">
+          <mat-icon>favorite</mat-icon>
+          <div>
+            <h3>Mis Favoritos</h3>
+            <p>Ver proveedores guardados</p>
+          </div>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </a>
+        <a *ngIf="user.userType === 'provider'" routerLink="/profile/reservations" class="action-card">
+          <mat-icon>calendar_today</mat-icon>
+          <div>
+            <h3>Mis Reservas</h3>
+            <p>Gestionar reservas de servicios</p>
+          </div>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </a>
+        <a routerLink="/contact" class="action-card">
+          <mat-icon>support_agent</mat-icon>
+          <div>
+            <h3>Contactar Soporte</h3>
+            <p>Obtener ayuda</p>
+          </div>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <mat-icon class="spinning">hourglass_empty</mat-icon>
+    <p>Cargando perfil...</p>
+  </div>
+
+  <!-- No User State -->
+  <div class="no-user-state" *ngIf="!isLoading && !user">
+    <mat-icon>account_circle</mat-icon>
+    <h2>No hay sesión activa</h2>
+    <p>Por favor, inicia sesión para ver tu perfil</p>
+    <a routerLink="/" class="btn-primary">Ir al Inicio</a>
+  </div>
+</div>
+

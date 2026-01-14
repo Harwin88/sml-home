@@ -77,6 +77,65 @@
       </div>
 
       <div class="nav-secondary">
+        <!-- Botón de Usuario/Login -->
+        <button 
+          *ngIf="!isAuthenticated"
+          class="nav-button secondary" 
+          (click)="openAuthModal()" 
+          aria-label="Iniciar sesión"
+        >
+          <mat-icon>account_circle</mat-icon>
+          <span class="nav-text">Iniciar Sesión</span>
+        </button>
+        
+        <!-- Menú de Usuario Autenticado -->
+        <button 
+          *ngIf="isAuthenticated"
+          class="nav-button menu-trigger" 
+          [matMenuTriggerFor]="userMenuDropdown"
+          aria-label="Menú de usuario"
+        >
+          <mat-icon>account_circle</mat-icon>
+          <span class="nav-text">{{ currentUser?.email || 'Mi Cuenta' }}</span>
+          <mat-icon class="dropdown-icon">keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-menu #userMenuDropdown="matMenu" class="header-menu">
+          <button 
+            mat-menu-item 
+            [routerLink]="currentUser?.userType === 'provider' ? '/profile/provider' : '/profile'"
+            class="menu-item"
+          >
+            <mat-icon>person</mat-icon>
+            <span>Mi Perfil</span>
+          </button>
+          <button 
+            *ngIf="currentUser?.userType === 'regular'"
+            mat-menu-item 
+            routerLink="/profile/favorites"
+            class="menu-item"
+          >
+            <mat-icon>favorite</mat-icon>
+            <span>Mis Favoritos</span>
+          </button>
+          <button 
+            *ngIf="currentUser?.userType === 'provider'"
+            mat-menu-item 
+            routerLink="/profile/reservations"
+            class="menu-item"
+          >
+            <mat-icon>calendar_today</mat-icon>
+            <span>Mis Reservas</span>
+          </button>
+          <button 
+            mat-menu-item 
+            (click)="logout()"
+            class="menu-item"
+          >
+            <mat-icon>logout</mat-icon>
+            <span>Cerrar Sesión</span>
+          </button>
+        </mat-menu>
+
         <button 
           class="nav-button secondary" 
           (click)="openWorkWithUsModal()" 
@@ -131,3 +190,6 @@
 
 <!-- Modal Trabaja con nosotros -->
 <app-work-with-us-modal *ngIf="showWorkWithUsModal" (close)="onCloseWorkWithUsModal()"></app-work-with-us-modal>
+
+<!-- Modal de Autenticación -->
+<app-auth-modal *ngIf="showAuthModal" (close)="onCloseAuthModal()" (success)="onAuthSuccess()"></app-auth-modal>

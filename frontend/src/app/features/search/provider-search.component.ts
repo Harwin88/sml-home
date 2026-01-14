@@ -14,6 +14,8 @@ import { RatingModalComponent } from '../../shared/components/rating-modal/ratin
 import { CategoryView } from '../../core/models/category.model';
 import { ServiceProviderCard } from '../../core/models/service-provider.model';
 import { ConfigService } from '../../core/services/config.service';
+import { AuthService } from '../../core/services/auth.service';
+import { FavoritesService } from '../../core/services/favorites.service';
 import { Subscription } from 'rxjs';
 
 interface CategoryFilter {
@@ -89,7 +91,9 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
         private reviewService: ReviewService,
         private geolocationService: GeolocationService,
         private configService: ConfigService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private authService: AuthService,
+        private favoritesService: FavoritesService
     ) { }
 
     ngOnInit(): void {
@@ -104,6 +108,11 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
 
         // Configurar geolocalización
         this.setupGeolocation();
+
+        // Cargar favoritos si el usuario está autenticado
+        if (this.isAuthenticated()) {
+            this.loadUserFavorites();
+        }
     }
 
     ngOnDestroy(): void {
@@ -864,5 +873,100 @@ export class ProviderSearchComponent implements OnInit, OnDestroy {
         // Generar la URL de WhatsApp
         // Formato: https://wa.me/[número]?text=[mensaje]
         return `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+    }
+
+    /**
+     * Verificar si el usuario está autenticado
+     */
+    isAuthenticated(): boolean {
+        return this.authService.isAuthenticated();
+    }
+
+    /**
+     * Cargar favoritos del usuario autenticado
+     */
+    loadUserFavorites(): void {
+        const user = this.authService.getCurrentUserSync();
+        if (!user || !(user as any).documentId) {
+            console.log('ProviderSearchComponent: No hay documentId, intentando refrescar usuario...');
+            this.authService.refreshUser().subscribe({
+                next: (updatedUser) => {
+                    if ((updatedUser as any)?.documentId) {
+                        this.loadFavoritesByDocumentId((updatedUser as any).documentId);
+                    }
+                },
+                error: (error) => {
+                    console.error('ProviderSearchComponent: Error al refrescar usuario:', error);
+                }
+            });
+            return;
+        }
+
+        this.loadFavoritesByDocumentId((user as any).documentId);
+    }
+
+    /**
+     * Cargar favoritos usando documentId
+     */
+    private loadFavoritesByDocumentId(documentId: string): void {
+        this.favoritesService.getFavoritesByDocumentId(documentId).subscribe({
+            next: (favorites) => {
+                console.log('ProviderSearchComponent: Favoritos cargados:', favorites?.length || 0);
+                // El servicio de favoritos ya actualiza su cache interno
+                // Solo necesitamos asegurarnos de que el usuario tenga los favoritos actualizados
+                this.authService.refreshUser().subscribe();
+            },
+            error: (error) => {
+                console.error('ProviderSearchComponent: Error al cargar favoritos:', error);
+            }
+        });
+    }
+
+    /**
+     * Verificar si un proveedor está en favoritos
+     */
+    isFavorite(provider: ServiceProviderCard): boolean {
+        if (!this.isAuthenticated()) {
+            return false;
+        }
+        return this.favoritesService.isFavorite(provider.id);
+    }
+
+    /**
+     * Toggle favorito (agregar o remover)
+     */
+    toggleFavorite(provider: ServiceProviderCard): void {
+        if (!this.isAuthenticated()) {
+            // Si no está autenticado, abrir modal de login
+            // Por ahora solo mostramos un mensaje
+            alert('Debes iniciar sesión para agregar favoritos');
+            return;
+        }
+
+        if (this.isFavorite(provider)) {
+            // Remover de favoritos
+            this.favoritesService.removeFavorite(provider.id).subscribe({
+                next: () => {
+                    // Actualizar estado local si es necesario
+                    this.authService.refreshUser().subscribe();
+                },
+                error: (error) => {
+                    console.error('Error al remover favorito:', error);
+                    alert('Error al remover de favoritos');
+                }
+            });
+        } else {
+            // Agregar a favoritos
+            this.favoritesService.addFavorite(provider.id).subscribe({
+                next: () => {
+                    // Actualizar estado local si es necesario
+                    this.authService.refreshUser().subscribe();
+                },
+                error: (error) => {
+                    console.error('Error al agregar favorito:', error);
+                    alert('Error al agregar a favoritos');
+                }
+            });
+        }
     }
 }

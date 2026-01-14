@@ -1,0 +1,78 @@
+<div class="favorites-container">
+  <div class="favorites-header">
+    <h1>
+      <mat-icon>favorite</mat-icon>
+      Mis Favoritos
+    </h1>
+    <p class="subtitle">Proveedores que has guardado</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <mat-icon class="spinning">hourglass_empty</mat-icon>
+    <p>Cargando favoritos...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!isLoading && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="loadFavorites()">
+      <mat-icon>refresh</mat-icon>
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !error && favorites.length === 0">
+    <mat-icon>favorite_border</mat-icon>
+    <h2>No tienes favoritos aún</h2>
+    <p>Explora proveedores y guarda tus favoritos para acceder rápidamente a ellos</p>
+    <a routerLink="/search" class="btn-primary">
+      <mat-icon>search</mat-icon>
+      Buscar Proveedores
+    </a>
+  </div>
+
+  <!-- Favorites Grid -->
+  <div class="favorites-grid" *ngIf="!isLoading && !error && favorites.length > 0">
+    <div class="favorite-card" *ngFor="let provider of favorites; trackBy: trackByProviderId">
+      <div class="card-image">
+        <img [src]="getPhotoUrl(provider)" [alt]="provider.name" (error)="onImageError($event)" />
+        <button class="btn-remove-favorite" (click)="removeFavorite(provider.id)" aria-label="Remover de favoritos">
+          <mat-icon>favorite</mat-icon>
+        </button>
+      </div>
+      <div class="card-content">
+        <h3>
+          <a [routerLink]="['/provider', provider.documentId || provider.id]">{{ provider.name }}</a>
+        </h3>
+        <div class="card-meta">
+          <div class="rating" *ngIf="provider.rating">
+            <mat-icon>star</mat-icon>
+            <span>{{ provider.rating.toFixed(1) }}</span>
+            <span class="reviews">({{ provider.totalReviews || 0 }})</span>
+          </div>
+          <div class="verified" *ngIf="provider.isVerified">
+            <mat-icon>verified</mat-icon>
+            <span>Verificado</span>
+          </div>
+        </div>
+        <p class="description" *ngIf="provider.description">
+          {{ provider.description.length > 100 ? (provider.description.substring(0, 100) + '...') : provider.description }}
+        </p>
+        <div class="card-footer">
+          <div class="price" *ngIf="provider.hourlyRate">
+            <span class="label">Desde</span>
+            <span class="amount">${{ provider.hourlyRate | number:'1.0-0' }}/hora</span>
+          </div>
+          <a [routerLink]="['/provider', provider.documentId || provider.id]" class="btn-view">
+            Ver Perfil
+            <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

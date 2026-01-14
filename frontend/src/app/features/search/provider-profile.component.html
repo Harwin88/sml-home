@@ -38,7 +38,19 @@
       </div>
 
       <div class="profile-header-info">
-        <h1 class="provider-name">{{ provider.name }}</h1>
+        <div class="name-favorite-row">
+          <h1 class="provider-name">{{ provider.name }}</h1>
+          <!-- Botón de favoritos (solo para usuarios autenticados) -->
+          <button 
+            *ngIf="isAuthenticated()" 
+            class="favorite-btn"
+            [class.favorited]="isFavorite()"
+            (click)="toggleFavorite()"
+            [attr.aria-label]="isFavorite() ? 'Remover de favoritos' : 'Agregar a favoritos'"
+            type="button">
+            <mat-icon>favorite</mat-icon>
+          </button>
+        </div>
         
         <!-- Rating -->
         <div class="rating-section">

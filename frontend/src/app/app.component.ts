@@ -11,6 +11,8 @@ import { WelcomeModalComponent } from './shared/components/welcome-modal/welcome
 import { WorkWithUsModalComponent } from './shared/components/work-with-us-modal/work-with-us-modal.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { CookieConsentComponent } from './shared/components/cookie-consent/cookie-consent.component';
+import { AuthModalComponent } from './shared/components/auth-modal/auth-modal.component';
+import { AuthService } from './core/services/auth.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subscription, filter } from 'rxjs';
 
@@ -23,7 +25,7 @@ interface MenuLink {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, MatIconModule, MatMenuModule, WelcomeModalComponent, WorkWithUsModalComponent, FooterComponent, CookieConsentComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, MatIconModule, MatMenuModule, WelcomeModalComponent, WorkWithUsModalComponent, FooterComponent, CookieConsentComponent, AuthModalComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -33,7 +35,10 @@ export class AppComponent implements OnInit, OnDestroy {
   showSearch = false; // Solo se muestra en /search
   showWelcomeModal = false;
   showWorkWithUsModal = false;
+  showAuthModal = false;
   currentRoute = '/';
+  isAuthenticated = false;
+  currentUser: any = null;
   private subscriptions: Subscription[] = [];
 
   // Menú de Soporte
@@ -56,11 +61,39 @@ export class AppComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     private router: Router,
     private firstVisitService: FirstVisitService,
-    private analyticsService: AnalyticsService
+    private analyticsService: AnalyticsService,
+    private authService: AuthService
   ) {}
 
 
   ngOnInit(): void {
+    // Verificar si hay query param para abrir modal de autenticación
+    const checkAuthParam = (url: string) => {
+      try {
+        const urlObj = new URL(url, window.location.origin);
+        if (urlObj.searchParams.get('auth') === 'login') {
+          this.showAuthModal = true;
+        }
+      } catch (e) {
+        // Si no se puede parsear la URL, verificar directamente
+        if (url.includes('auth=login')) {
+          this.showAuthModal = true;
+        }
+      }
+    };
+
+    // Verificar en la ruta actual
+    checkAuthParam(this.router.url);
+
+    // Suscribirse a cambios de ruta
+    const authParamSub = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        checkAuthParam(event.url);
+      });
+    
+    this.subscriptions.push(authParamSub);
+
     // Verificar si es la primera visita y mostrar el modal
     if (this.firstVisitService.isFirstVisit()) {
       // Pequeño delay para que la página cargue primero
@@ -99,6 +132,13 @@ export class AppComponent implements OnInit, OnDestroy {
     // Inicializar showSearch según la ruta actual
     this.currentRoute = this.router.url;
     this.showSearch = this.router.url.startsWith('/search');
+
+    // Suscribirse al estado de autenticación
+    const authSub = this.authService.getCurrentUser().subscribe(user => {
+      this.isAuthenticated = !!user;
+      this.currentUser = user;
+    });
+    this.subscriptions.push(authSub);
   }
 
   onCloseWelcomeModal(): void {
@@ -119,6 +159,31 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onCloseWorkWithUsModal(): void {
     this.showWorkWithUsModal = false;
+  }
+
+  openAuthModal(): void {
+    this.showAuthModal = true;
+  }
+
+  onCloseAuthModal(): void {
+    this.showAuthModal = false;
+  }
+
+  onAuthSuccess(): void {
+    // Usuario autenticado exitosamente
+    this.showAuthModal = false;
+    
+    // Verificar si hay una ruta de retorno en los query params
+    const url = new URL(window.location.href);
+    const returnUrl = url.searchParams.get('returnUrl');
+    if (returnUrl) {
+      // Remover query params y redirigir
+      this.router.navigateByUrl(returnUrl);
+    }
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   ngOnDestroy(): void {
