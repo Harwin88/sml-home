@@ -5,7 +5,7 @@
     "singularName": "newsletter-subscription",
     "pluralName": "newsletter-subscriptions",
     "displayName": "Suscripción Newsletter",
-    "description": "Suscripciones al newsletter de MSL Hogar"
+    "description": "Suscripciones al newsletter de kapi"
   },
   "options": {
     "draftAndPublish": false

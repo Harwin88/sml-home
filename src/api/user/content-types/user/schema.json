@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "users",
+  "info": {
+    "singularName": "user",
+    "pluralName": "users",
+    "displayName": "Usuario",
+    "description": "Usuarios de la plataforma kapi"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "phone": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "password": {
+      "type": "string",
+      "required": true,
+      "private": true,
+      "minLength": 6
+    },
+    "latitude": {
+      "type": "decimal",
+      "required": false
+    },
+    "longitude": {
+      "type": "decimal",
+      "required": false
+    },
+    "userType": {
+      "type": "enumeration",
+      "enum": [
+        "regular",
+        "provider"
+      ],
+      "default": "regular",
+      "required": true
+    },
+    "favorites": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::service-provider.service-provider",
+      "mappedBy": "favoritedBy"
+    },
+    "providerProfile": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::service-provider.service-provider",
+      "mappedBy": "user"
+    },
+    "reservations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::reservation.reservation",
+      "mappedBy": "user"
+    },
+    "providerReservations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::reservation.reservation",
+      "mappedBy": "provider"
+    }
+  }
+}
+

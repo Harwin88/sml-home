@@ -27,7 +27,7 @@ export default {
       // TODO: Implementar con plugin de email de Strapi
       // await strapi.plugins['email'].services.email.send({
       //   to: options.to,
-      //   from: options.from || 'soporte@mslhogar.com',
+      //   from: options.from || 'soporte@kapi.help',
       //   subject: options.subject,
       //   text: options.text,
       //   html: options.html,
@@ -36,7 +36,7 @@ export default {
       console.log('📧 Email a enviar:');
       console.log('  To:', options.to);
       console.log('  Subject:', options.subject);
-      console.log('  From:', options.from || 'soporte@mslhogar.com');
+      console.log('  From:', options.from || 'soporte@kapi.help');
       
       return { success: true };
     } catch (error) {
@@ -67,7 +67,7 @@ export default {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🏠 MSL Hogar</h1>
+            <h1>🏠 kapi</h1>
             <p>Confirmación de Mensaje Recibido</p>
           </div>
           <div class="content">
@@ -92,11 +92,11 @@ export default {
               <li>💬 WhatsApp: +57 300 123 4567</li>
             </ul>
             
-            <a href="https://mslhogar.com/help" class="btn">Centro de Ayuda</a>
+            <a href="https://kapi.help/help" class="btn">Centro de Ayuda</a>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} MSL Hogar. Todos los derechos reservados.</p>
-            <p>Bogotá, Colombia | soporte@mslhogar.com</p>
+            <p>© ${new Date().getFullYear()} kapi. Todos los derechos reservados.</p>
+            <p>Bogotá, Colombia | soporte@kapi.help</p>
           </div>
         </div>
       </body>
@@ -105,7 +105,7 @@ export default {
 
     return this.send({
       to: contactForm.email,
-      subject: `Confirmación - Ticket ${contactForm.ticketId} - MSL Hogar`,
+      subject: `Confirmación - Ticket ${contactForm.ticketId} - kapi`,
       html,
     });
   },
@@ -193,7 +193,7 @@ export default {
     `;
 
     return this.send({
-      to: process.env.SUPPORT_EMAIL || 'soporte@mslhogar.com',
+      to: process.env.SUPPORT_EMAIL || 'soporte@kapi.help',
       subject: `🚨 Nuevo Contacto - ${contactForm.contactType.toUpperCase()} - ${contactForm.ticketId}`,
       html,
       replyTo: contactForm.email,
@@ -239,7 +239,7 @@ export default {
             
             <p>Si tienes preguntas adicionales, responde a este email o accede a tu ticket:</p>
             
-            <a href="https://mslhogar.com/support/ticket/${ticket.ticketNumber}" class="btn">
+            <a href="https://kapi.help/support/ticket/${ticket.ticketNumber}" class="btn">
               Ver Ticket Completo
             </a>
           </div>
@@ -250,7 +250,7 @@ export default {
 
     return this.send({
       to: ticket.requesterEmail,
-      subject: `Nueva respuesta - Ticket ${ticket.ticketNumber} - MSL Hogar`,
+      subject: `Nueva respuesta - Ticket ${ticket.ticketNumber} - kapi`,
       html,
     });
   },
@@ -298,17 +298,17 @@ export default {
             <div class="rating">
               <p><strong>¿Cómo fue tu experiencia?</strong></p>
               <div>
-                <a href="https://mslhogar.com/rate-ticket/${ticket.ticketNumber}/5" class="star">⭐</a>
-                <a href="https://mslhogar.com/rate-ticket/${ticket.ticketNumber}/4" class="star">⭐</a>
-                <a href="https://mslhogar.com/rate-ticket/${ticket.ticketNumber}/3" class="star">⭐</a>
-                <a href="https://mslhogar.com/rate-ticket/${ticket.ticketNumber}/2" class="star">⭐</a>
-                <a href="https://mslhogar.com/rate-ticket/${ticket.ticketNumber}/1" class="star">⭐</a>
+                <a href="https://kapi.help/rate-ticket/${ticket.ticketNumber}/5" class="star">⭐</a>
+                <a href="https://kapi.help/rate-ticket/${ticket.ticketNumber}/4" class="star">⭐</a>
+                <a href="https://kapi.help/rate-ticket/${ticket.ticketNumber}/3" class="star">⭐</a>
+                <a href="https://kapi.help/rate-ticket/${ticket.ticketNumber}/2" class="star">⭐</a>
+                <a href="https://kapi.help/rate-ticket/${ticket.ticketNumber}/1" class="star">⭐</a>
               </div>
             </div>
             
             <div style="text-align: center;">
-              <a href="https://mslhogar.com" class="btn">Volver al Sitio</a>
-              <a href="https://mslhogar.com/help" class="btn">Centro de Ayuda</a>
+              <a href="https://kapi.help" class="btn">Volver al Sitio</a>
+              <a href="https://kapi.help/help" class="btn">Centro de Ayuda</a>
             </div>
           </div>
         </div>
@@ -318,7 +318,7 @@ export default {
 
     return this.send({
       to: ticket.requesterEmail,
-      subject: `✅ Ticket Resuelto - ${ticket.ticketNumber} - MSL Hogar`,
+      subject: `✅ Ticket Resuelto - ${ticket.ticketNumber} - kapi`,
       html,
     });
   },

@@ -704,7 +704,7 @@ export interface ApiNewsletterSubscriptionNewsletterSubscription
   extends Struct.CollectionTypeSchema {
   collectionName: 'newsletter_subscriptions';
   info: {
-    description: 'Suscripciones al newsletter de MSL Hogar';
+    description: 'Suscripciones al newsletter de kapi';
     displayName: 'Suscripci\u00F3n Newsletter';
     pluralName: 'newsletter-subscriptions';
     singularName: 'newsletter-subscription';
@@ -754,6 +754,53 @@ export interface ApiNewsletterSubscriptionNewsletterSubscription
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiReservationReservation extends Struct.CollectionTypeSchema {
+  collectionName: 'reservations';
+  info: {
+    description: 'Reservas de servicios realizadas por usuarios';
+    displayName: 'Reserva';
+    pluralName: 'reservations';
+    singularName: 'reservation';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    contactEmail: Schema.Attribute.Email;
+    contactPhone: Schema.Attribute.String & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    hours: Schema.Attribute.Decimal;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::reservation.reservation'
+    > &
+      Schema.Attribute.Private;
+    notes: Schema.Attribute.Text;
+    provider: Schema.Attribute.Relation<'manyToOne', 'api::user.user'>;
+    publishedAt: Schema.Attribute.DateTime;
+    serviceAddress: Schema.Attribute.Text & Schema.Attribute.Required;
+    serviceDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    serviceDescription: Schema.Attribute.Text;
+    serviceProvider: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::service-provider.service-provider'
+    >;
+    status: Schema.Attribute.Enumeration<
+      ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'pending'>;
+    totalPrice: Schema.Attribute.Decimal;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<'manyToOne', 'api::user.user'>;
   };
 }
 
@@ -834,6 +881,7 @@ export interface ApiServiceProviderServiceProvider
     description_normalized: Schema.Attribute.Text;
     email: Schema.Attribute.Email;
     experienceYears: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    favoritedBy: Schema.Attribute.Relation<'manyToMany', 'api::user.user'>;
     hourlyRate: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
@@ -877,6 +925,7 @@ export interface ApiServiceProviderServiceProvider
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<'oneToOne', 'api::user.user'>;
     whatsapp: Schema.Attribute.String;
   };
 }
@@ -1026,6 +1075,64 @@ export interface ApiTagTag extends Struct.CollectionTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     value: Schema.Attribute.String;
+  };
+}
+
+export interface ApiUserUser extends Struct.CollectionTypeSchema {
+  collectionName: 'users';
+  info: {
+    description: 'Usuarios de la plataforma kapi';
+    displayName: 'Usuario';
+    pluralName: 'users';
+    singularName: 'user';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    favorites: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::service-provider.service-provider'
+    >;
+    latitude: Schema.Attribute.Decimal;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::user.user'> &
+      Schema.Attribute.Private;
+    longitude: Schema.Attribute.Decimal;
+    password: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 6;
+      }>;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    providerProfile: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::service-provider.service-provider'
+    >;
+    providerReservations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::reservation.reservation'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    reservations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::reservation.reservation'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userType: Schema.Attribute.Enumeration<['regular', 'provider']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'regular'>;
   };
 }
 
@@ -1545,10 +1652,12 @@ declare module '@strapi/strapi' {
       'api::form.form': ApiFormForm;
       'api::medias.medias': ApiMediasMedias;
       'api::newsletter-subscription.newsletter-subscription': ApiNewsletterSubscriptionNewsletterSubscription;
+      'api::reservation.reservation': ApiReservationReservation;
       'api::review.review': ApiReviewReview;
       'api::service-provider.service-provider': ApiServiceProviderServiceProvider;
       'api::support-ticket.support-ticket': ApiSupportTicketSupportTicket;
       'api::tag.tag': ApiTagTag;
+      'api::user.user': ApiUserUser;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

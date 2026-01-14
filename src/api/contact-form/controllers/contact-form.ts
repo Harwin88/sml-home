@@ -17,7 +17,7 @@ export default factories.createCoreController('api::contact-form.contact-form', 
       const userAgent = ctx.request.headers['user-agent'] || 'unknown';
       
       // Generar ticket ID único
-      const ticketId = `MSL-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      const ticketId = `KAPI-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
       
       // Crear el formulario de contacto
       const contactForm = await strapi.entityService.create('api::contact-form.contact-form', {

@@ -113,6 +113,18 @@
       "relation": "oneToMany",
       "target": "api::review.review",
       "mappedBy": "serviceProvider"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user.user",
+      "inversedBy": "providerProfile"
+    },
+    "favoritedBy": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::user.user",
+      "inversedBy": "favorites"
     }
   }
 }

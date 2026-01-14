@@ -1,0 +1,76 @@
+{
+  "kind": "collectionType",
+  "collectionName": "reservations",
+  "info": {
+    "singularName": "reservation",
+    "pluralName": "reservations",
+    "displayName": "Reserva",
+    "description": "Reservas de servicios realizadas por usuarios"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::user.user",
+      "inversedBy": "reservations"
+    },
+    "provider": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::user.user",
+      "inversedBy": "providerReservations"
+    },
+    "serviceProvider": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::service-provider.service-provider"
+    },
+    "serviceDate": {
+      "type": "datetime",
+      "required": true
+    },
+    "serviceAddress": {
+      "type": "text",
+      "required": true
+    },
+    "serviceDescription": {
+      "type": "text"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "confirmed",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "required": true
+    },
+    "totalPrice": {
+      "type": "decimal",
+      "required": false
+    },
+    "hours": {
+      "type": "decimal",
+      "required": false
+    },
+    "contactPhone": {
+      "type": "string",
+      "required": true
+    },
+    "contactEmail": {
+      "type": "email",
+      "required": false
+    },
+    "notes": {
+      "type": "text"
+    }
+  }
+}
+

@@ -11,8 +11,8 @@ module.exports = async ({ strapi }) => {
     const faqsData = [
         // GENERAL (7 FAQs)
         {
-            question: '¿Qué es MSL Hogar?',
-            answer: 'MSL Hogar es una plataforma digital que conecta familias colombianas con profesionales verificados para servicios del hogar. Facilitamos el encuentro entre usuarios que necesitan servicios de limpieza, plomería, electricidad, jardinería y más, con proveedores calificados y de confianza.',
+            question: '¿Qué es kapi?',
+            answer: 'kapi es una plataforma digital que conecta familias colombianas con profesionales verificados para servicios del hogar. Facilitamos el encuentro entre usuarios que necesitan servicios de limpieza, plomería, electricidad, jardinería y más, con proveedores calificados y de confianza.',
             category: 'general',
             icon: 'help',
             order: 1,
@@ -102,7 +102,7 @@ module.exports = async ({ strapi }) => {
         },
         {
             question: '¿Cómo funcionan los filtros de búsqueda?',
-            answer: 'Puedes filtrar por: ubicación (ciudad o barrio), rango de precios, disponibilidad (inmediata, hoy, esta semana), calificación mínima (1-5 estrellas), tipo de servicio, experiencia del profesional y si ha sido verificado por MSL Hogar.',
+            answer: 'Puedes filtrar por: ubicación (ciudad o barrio), rango de precios, disponibilidad (inmediata, hoy, esta semana), calificación mínima (1-5 estrellas), tipo de servicio, experiencia del profesional y si ha sido verificado por kapi.',
             category: 'search',
             icon: 'filter_alt',
             order: 2,
@@ -227,7 +227,7 @@ module.exports = async ({ strapi }) => {
         },
         {
             question: '¿Tienen seguro de responsabilidad civil?',
-            answer: 'MSL Hogar cuenta con seguro de responsabilidad civil que cubre incidentes durante la prestación del servicio. Adicionalmente, muchos profesionales tienen su propio seguro. Verifica en el perfil del profesional si cuenta con este seguro y qué cubre específicamente.',
+            answer: 'kapi cuenta con seguro de responsabilidad civil que cubre incidentes durante la prestación del servicio. Adicionalmente, muchos profesionales tienen su propio seguro. Verifica en el perfil del profesional si cuenta con este seguro y qué cubre específicamente.',
             category: 'security',
             icon: 'security',
             order: 4,
@@ -239,7 +239,7 @@ module.exports = async ({ strapi }) => {
 
         // ACCOUNT (4 FAQs)
         {
-            question: '¿Necesito crear una cuenta para usar MSL Hogar?',
+            question: '¿Necesito crear una cuenta para usar kapi?',
             answer: 'No es obligatorio para buscar profesionales, pero crear una cuenta te permite: guardar tus búsquedas favoritas, contactar directamente a profesionales, ver tu historial de servicios, recibir notificaciones personalizadas y dejar calificaciones.',
             category: 'account',
             icon: 'person_add',
@@ -261,7 +261,7 @@ module.exports = async ({ strapi }) => {
             notHelpfulCount: 0
         },
         {
-            question: '¿Cómo puedo trabajar como profesional en MSL Hogar?',
+            question: '¿Cómo puedo trabajar como profesional en kapi?',
             answer: 'Si eres un profesional de servicios del hogar, haz clic en "Trabaja con Nosotros" en el menú principal. Completa el formulario de registro, proporciona tu documentación y certificaciones, y nuestro equipo revisará tu solicitud en 2-3 días hábiles.',
             category: 'account',
             icon: 'work',
@@ -343,7 +343,7 @@ module.exports = async ({ strapi }) => {
         // TECHNICAL (3 FAQs)
         {
             question: '¿Qué hago si la plataforma no carga correctamente?',
-            answer: 'Intenta estos pasos: 1) Refresca la página (Ctrl+F5), 2) Limpia el caché del navegador, 3) Prueba en modo incógnito, 4) Usa otro navegador, 5) Verifica tu conexión a internet. Si el problema persiste, contáctanos en soporte@mslhogar.com.',
+            answer: 'Intenta estos pasos: 1) Refresca la página (Ctrl+F5), 2) Limpia el caché del navegador, 3) Prueba en modo incógnito, 4) Usa otro navegador, 5) Verifica tu conexión a internet. Si el problema persiste, contáctanos en soporte@kapi.help.',
             category: 'technical',
             icon: 'build_circle',
             order: 1,
@@ -364,7 +364,7 @@ module.exports = async ({ strapi }) => {
             notHelpfulCount: 0
         },
         {
-            question: '¿Puedo usar MSL Hogar desde mi celular?',
+            question: '¿Puedo usar kapi desde mi celular?',
             answer: 'Sí, nuestra plataforma está completamente optimizada para funcionar en smartphones y tablets de cualquier sistema operativo. Próximamente lanzaremos aplicaciones nativas para iOS y Android con funcionalidades adicionales.',
             category: 'technical',
             icon: 'phone_android',
