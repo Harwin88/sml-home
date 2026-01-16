@@ -88,8 +88,8 @@ export default {
             
             <p>Si tu consulta es urgente, también puedes contactarnos por:</p>
             <ul>
-              <li>📞 Teléfono: +57 300 123 4567</li>
-              <li>💬 WhatsApp: +57 300 123 4567</li>
+              <li>📞 Teléfono: +57 3126701425</li>
+              <li>💬 WhatsApp: +57 3126701425</li>
             </ul>
             
             <a href="https://kapi.help/help" class="btn">Centro de Ayuda</a>

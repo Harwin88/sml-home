@@ -231,9 +231,17 @@ Asegúrate de tener en `backend/.env`:
 
 ```env
 # Admin Panel
-ADMIN_JWT_SECRET=tu-secret-generado
-API_TOKEN_SALT=tu-salt-generado
+# Genera uno nuevo con: node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
+ADMIN_JWT_SECRET=bueygGu0wk3EOUnOmsQIkGSwvm4JvHpv3QIE6MHIGAQz2H0XimscU2PDRKIEK+yFlLUalpKjp7SBLploRNLtTQ==
+# Genera uno nuevo con: node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
+API_TOKEN_SALT=DVgAV0Oe42xsJX2SnPIzo3FaKsfy3LnlqEejQXloxOwDblDLqMKrVaMDyuojA90iNGHy+lfNwesx6vnr3vSkeQ==
+# Genera uno nuevo con: node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
+TRANSFER_TOKEN_SALT=UWsjKXk6FdcsfZhxnIFJN1tDwuvfA7UHFQBIGBa+R50bZ9vU5dB2MTvdr48dc+TinVmpyDBgwfCHH4rfIklTpA==
 APP_KEYS=key1,key2,key3,key4
+
+# JWT Secret para Users-Permissions Plugin (autenticación de usuarios)
+# Genera uno nuevo con: node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
+JWT_SECRET=RVf05vXjFCQVYDQOUC0JkSfn/rUJlQi3h5ZaOR7J6p2TNKro6n8cpo7AVXL/Zhdkt9a9Cwr6kV5cR19bmRkTBQ==
 
 # Database (ya debería estar configurado)
 DATABASE_CLIENT=postgres

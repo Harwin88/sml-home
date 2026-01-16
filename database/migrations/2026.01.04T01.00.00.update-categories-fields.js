@@ -45,11 +45,19 @@ module.exports = {
     async up() {
         console.log('🔄 Iniciando migración: actualización de campos de categorías...');
 
-        await strapi.db.transaction(async () => {
-            // Obtener todas las categorías
-            const categories = await strapi.entityService.findMany('api::category.category', {
-                filters: {}
-            });
+        try {
+            // Verificar si la tabla existe
+            const tableExists = await strapi.db.connection.schema.hasTable('categories');
+            if (!tableExists) {
+                console.log('⚠️  La tabla "categories" no existe todavía. La migración se omitirá y se ejecutará cuando el schema esté sincronizado.');
+                return;
+            }
+
+            await strapi.db.transaction(async () => {
+                // Obtener todas las categorías
+                const categories = await strapi.entityService.findMany('api::category.category', {
+                    filters: {}
+                });
 
             console.log(`📋 Encontradas ${categories.length} categorías para actualizar`);
 
@@ -106,10 +114,15 @@ module.exports = {
                 }
             }
 
-            console.log(`\n🎉 Migración completada!`);
-            console.log(`   ✅ Categorías actualizadas: ${updated}`);
-            console.log(`   ⏭️  Categorías omitidas: ${skipped}`);
-        });
+                console.log(`\n🎉 Migración completada!`);
+                console.log(`   ✅ Categorías actualizadas: ${updated}`);
+                console.log(`   ⏭️  Categorías omitidas: ${skipped}`);
+            });
+        } catch (error) {
+            console.error('⚠️  Error en la migración de actualización de categorías:', error.message);
+            console.log('ℹ️  La aplicación continuará iniciando. El seed se puede ejecutar manualmente más tarde.');
+            // No hacer throw para que la migración no falle el inicio de la app
+        }
     },
 
     async down() {
