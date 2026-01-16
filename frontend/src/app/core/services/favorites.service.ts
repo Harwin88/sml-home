@@ -117,7 +117,6 @@ export class FavoritesService {
    */
   removeFavorite(providerId: number): Observable<any> {
     const apiUrl = getApiUrl(this.configService);
-    const url = `${apiUrl}/users/favorites/${providerId}`;
 
     const user = this.authService.getCurrentUserSync();
     if (!user) {
@@ -125,11 +124,12 @@ export class FavoritesService {
       return throwError(() => new Error('No hay usuario autenticado'));
     }
 
-    const body: any = {};
+    // Construir query params para DELETE (ya que el body puede no parsearse)
+    let url = `${apiUrl}/users/favorites/${providerId}?`;
     if ((user as any).documentId) {
-      body.userDocumentId = (user as any).documentId;
+      url += `userDocumentId=${encodeURIComponent((user as any).documentId)}`;
     } else if (user.id) {
-      body.userId = user.id;
+      url += `userId=${encodeURIComponent(user.id)}`;
     } else {
       console.error('FavoritesService.removeFavorite: Usuario sin id/documentId');
       return throwError(() => new Error('Usuario sin identificador válido'));
@@ -137,17 +137,19 @@ export class FavoritesService {
 
     console.log('FavoritesService.removeFavorite: URL:', url);
     console.log('FavoritesService.removeFavorite: providerId:', providerId);
-    console.log('FavoritesService.removeFavorite: body:', body);
     
-    return this.http.request('DELETE', url, { body }).pipe(
+    return this.http.delete(url).pipe(
       tap(() => {
+        console.log('FavoritesService.removeFavorite: Éxito al remover favorito');
         // Actualizar cache local inmediatamente
         this.favoriteIds.delete(providerId);
         // Actualizar usuario después de remover favorito
         this.authService.refreshUser().subscribe();
       }),
       catchError(error => {
-        console.error('Error al remover favorito:', error);
+        console.error('FavoritesService.removeFavorite: Error al remover favorito:', error);
+        console.error('FavoritesService.removeFavorite: Status:', error.status);
+        console.error('FavoritesService.removeFavorite: Error completo:', error);
         return throwError(() => error);
       })
     );
