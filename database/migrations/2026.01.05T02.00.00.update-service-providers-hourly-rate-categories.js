@@ -30,8 +30,18 @@ module.exports = {
         console.log('   - Agregando hourlyRate aleatorios');
         console.log('   - Asignando categorías a proveedores sin categorías\n');
 
-        // Obtener todos los proveedores de servicio
-        const providers = await strapi.entityService.findMany('api::service-provider.service-provider', {
+        try {
+            // Verificar si las tablas existen
+            const providersTableExists = await strapi.db.connection.schema.hasTable('service_providers');
+            const categoriesTableExists = await strapi.db.connection.schema.hasTable('categories');
+            
+            if (!providersTableExists || !categoriesTableExists) {
+                console.log('⚠️  Las tablas necesarias no existen todavía. La migración se omitirá y se ejecutará cuando el schema esté sincronizado.');
+                return;
+            }
+
+            // Obtener todos los proveedores de servicio
+            const providers = await strapi.entityService.findMany('api::service-provider.service-provider', {
             populate: ['categories'],
             filters: {}
         });
@@ -154,12 +164,17 @@ module.exports = {
             }
         }
 
-        console.log(`\n🎉 Migración completada!`);
-        console.log(`   💰 Proveedores con hourlyRate actualizado: ${updatedRate}`);
-        console.log(`   🏷️  Proveedores con categorías asignadas: ${updatedCategories}`);
-        console.log(`   ⏭️  Proveedores sin cambios: ${skipped}`);
-        if (errors > 0) {
-            console.log(`   ⚠️  Errores encontrados: ${errors}`);
+            console.log(`\n🎉 Migración completada!`);
+            console.log(`   💰 Proveedores con hourlyRate actualizado: ${updatedRate}`);
+            console.log(`   🏷️  Proveedores con categorías asignadas: ${updatedCategories}`);
+            console.log(`   ⏭️  Proveedores sin cambios: ${skipped}`);
+            if (errors > 0) {
+                console.log(`   ⚠️  Errores encontrados: ${errors}`);
+            }
+        } catch (error) {
+            console.error('⚠️  Error en la migración de proveedores:', error.message);
+            console.log('ℹ️  La aplicación continuará iniciando. El seed se puede ejecutar manualmente más tarde.');
+            // No hacer throw para que la migración no falle el inicio de la app
         }
     },
 

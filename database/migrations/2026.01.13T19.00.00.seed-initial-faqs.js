@@ -53,7 +53,25 @@ module.exports = {
         console.log('🌱 Iniciando migración: seed de FAQs iniciales...');
         console.log(`📝 Total de FAQs a crear: ${faqsData.length}\n`);
 
-        await strapi.db.transaction(async () => {
+        try {
+            // Verificar si la tabla existe
+            const tableExists = await strapi.db.connection.schema.hasTable('faqs');
+            if (!tableExists) {
+                console.log('⚠️  La tabla "faqs" no existe todavía. La migración se omitirá y se ejecutará cuando el schema esté sincronizado.');
+                return;
+            }
+
+            // Verificar si ya hay FAQs
+            const existingFaqs = await strapi.entityService.findMany('api::faq.faq', {
+                limit: 1
+            });
+
+            if (existingFaqs && existingFaqs.length > 0) {
+                console.log('ℹ️  Ya existen FAQs en la base de datos. La migración se omitirá.');
+                return;
+            }
+
+            await strapi.db.transaction(async () => {
             let created = 0;
             
             for (const faqData of faqsData) {
@@ -74,10 +92,15 @@ module.exports = {
                 }
             }
             
-            console.log(`\n📊 Total creadas: ${created}/${faqsData.length}`);
-        });
+                console.log(`\n📊 Total creadas: ${created}/${faqsData.length}`);
+            });
 
-        console.log('\n🎉 Migración completada: Todas las FAQs fueron creadas exitosamente!');
+            console.log('\n🎉 Migración completada: Todas las FAQs fueron creadas exitosamente!');
+        } catch (error) {
+            console.error('⚠️  Error en la migración de FAQs:', error.message);
+            console.log('ℹ️  La aplicación continuará iniciando. El seed se puede ejecutar manualmente más tarde.');
+            // No hacer throw para que la migración no falle el inicio de la app
+        }
     }
 };
 
