@@ -10,24 +10,24 @@ if (!fs.existsSync(assetsDir)) {
 }
 
 // Obtener variables de entorno desde .env.local
-const apiUrl = process.env['API-URL'] || process.env.API_URL || '';
-const strapiKey = process.env['STRAPI-KEY'] || process.env.STRAPI_KEY || '';
+const apiUrl = process.env['API_URL'] || process.env.API_URL || '';
+const strapiKey = process.env['STRAPI_KEY'] || process.env.STRAPI_KEY || '';
 
 // Validar que existan las variables requeridas
 const envLocalPath = path.resolve(__dirname, '../.env.local');
 if (!fs.existsSync(envLocalPath)) {
   console.error('❌ Error: El archivo .env.local no existe.');
   console.error('   Por favor, crea el archivo .env.local con las siguientes variables:');
-  console.error('   API-URL=tu-url-aqui');
-  console.error('   STRAPI-KEY=tu-key-aqui');
+  console.error('   API_URL=tu-url-aqui');
+  console.error('   STRAPI_KEY=tu-key-aqui');
   process.exit(1);
 }
 
 if (!apiUrl) {
-  console.warn('⚠️  Advertencia: API-URL no está definida en .env.local');
+  console.warn('⚠️  Advertencia: API_URL no está definida en .env.local');
 }
 if (!strapiKey) {
-  console.warn('⚠️  Advertencia: STRAPI-KEY no está definida en .env.local');
+  console.warn('⚠️  Advertencia: STRAPI_KEY no está definida en .env.local');
 }
 
 // Generar config.json
