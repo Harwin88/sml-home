@@ -144,7 +144,7 @@ export class ContactService extends StrapiBaseService {
    * Valida un número de teléfono colombiano
    */
   isValidColombianPhone(phone: string): boolean {
-    // Acepta formatos: 3001234567, 300-123-4567, +57 300 123 4567, etc.
+    // Acepta formatos: 3001234567, 300-123-4567, +57 3126701425, etc.
     const cleanPhone = phone.replace(/\D/g, '');
     // Números de celular en Colombia: 10 dígitos comenzando con 3
     // O 12 dígitos comenzando con 57 (código de país)

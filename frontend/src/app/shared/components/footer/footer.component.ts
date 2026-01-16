@@ -122,7 +122,7 @@ export class FooterComponent implements OnInit {
 
   contactInfo = {
     email: 'info@kapi.help',
-    phone: '+57 300 123 4567',
+    phone: '+57 3126701425',
     address: 'Bogotá, Colombia',
     hours: 'Lun - Vie: 8:00 AM - 6:00 PM'
   };

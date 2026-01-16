@@ -49,13 +49,13 @@ export class ContactComponent implements OnInit, OnDestroy {
     {
       icon: 'phone',
       title: 'Teléfono',
-      value: '+57 300 123 4567',
+      value: '+57 3126701425',
       link: 'tel:+573001234567'
     },
     {
       icon: 'message',
       title: 'WhatsApp',
-      value: '+57 300 123 4567',
+      value: '+57 3126701425',
       link: 'https://wa.me/573001234567'
     },
     {
