@@ -1,0 +1,242 @@
+<div class="support-page-container">
+  <!-- Header -->
+  <div class="support-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">help_center</mat-icon>
+      <h1>Centro de Ayuda</h1>
+      <p class="subtitle">Encuentra respuestas a las preguntas más frecuentes</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="support-content">
+    <!-- Search Bar -->
+    <section class="search-section">
+      <div class="search-container">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Busca tu pregunta aquí... (ej: pago, servicio, cuenta)"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange(searchQuery)"
+          aria-label="Buscar preguntas frecuentes"
+        />
+        <button
+          *ngIf="searchQuery.length > 0"
+          class="clear-search-btn"
+          (click)="clearSearch()"
+          aria-label="Limpiar búsqueda"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+        <div class="search-spinner" *ngIf="isSearching">
+          <mat-icon class="spinner-icon">autorenew</mat-icon>
+        </div>
+      </div>
+      
+      <!-- Search Info -->
+      <div class="search-info" *ngIf="searchQuery.length > 0 && searchQuery.length < 3">
+        <mat-icon class="info-icon">info</mat-icon>
+        <p>Escribe al menos 3 caracteres para buscar</p>
+      </div>
+      
+      <!-- Search Results Info -->
+      <div class="search-results-info" *ngIf="isInSearchMode && !isSearching">
+        <mat-icon class="results-icon">{{ searchResults.length > 0 ? 'check_circle' : 'search_off' }}</mat-icon>
+        <p *ngIf="searchResults.length > 0">
+          Se encontraron <strong>{{ searchResults.length }}</strong> resultado(s) para "<strong>{{ searchQuery }}</strong>"
+        </p>
+        <p *ngIf="searchResults.length === 0">
+          No se encontraron resultados para "<strong>{{ searchQuery }}</strong>"
+        </p>
+      </div>
+    </section>
+
+    <!-- Categories Grid -->
+    <section class="categories-section" *ngIf="!isInSearchMode">
+      <h2>Explora por Categoría</h2>
+      <div class="categories-grid">
+        <div 
+          class="category-card"
+          [class.active]="selectedCategory === 'all'"
+          (click)="selectCategory('all')"
+        >
+          <mat-icon>apps</mat-icon>
+          <h3>Todas</h3>
+          <p>{{ faqs.length }} preguntas</p>
+        </div>
+        <div 
+          *ngFor="let category of categories"
+          class="category-card"
+          [class.active]="selectedCategory === category.value"
+          (click)="selectCategory(category.value)"
+        >
+          <mat-icon>{{ category.icon }}</mat-icon>
+          <h3>{{ category.name }}</h3>
+          <p>{{ category.description }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    <section class="faqs-section" *ngIf="loading">
+      <div class="loading-container">
+        <mat-icon class="loading-spinner">autorenew</mat-icon>
+        <p>Cargando preguntas frecuentes...</p>
+      </div>
+    </section>
+
+    <!-- Error State -->
+    <section class="faqs-section" *ngIf="error && !loading">
+      <div class="error-container">
+        <mat-icon>error_outline</mat-icon>
+        <h3>{{ error }}</h3>
+        <button class="btn btn-primary" (click)="loadFaqs()">
+          <mat-icon>refresh</mat-icon>
+          Reintentar
+        </button>
+      </div>
+    </section>
+
+    <!-- FAQs Section -->
+    <section class="faqs-section" *ngIf="!loading && !error">
+      <div class="section-header">
+        <h2>
+          <span *ngIf="!isInSearchMode">Preguntas Frecuentes</span>
+          <span *ngIf="isInSearchMode">Resultados de Búsqueda</span>
+          <span class="category-badge" *ngIf="selectedCategory !== 'all' && !isInSearchMode">
+            {{ selectedCategory }}
+          </span>
+        </h2>
+        <p class="results-count">{{ filteredFaqs.length }} pregunta(s) encontrada(s)</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredFaqs.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <h3 *ngIf="!isInSearchMode">No se encontraron preguntas frecuentes</h3>
+        <h3 *ngIf="isInSearchMode">No se encontraron resultados para "{{ searchQuery }}"</h3>
+        <p *ngIf="!isInSearchMode">Intenta seleccionar otra categoría o contacta con soporte.</p>
+        <p *ngIf="isInSearchMode">Intenta con otros términos de búsqueda o contacta con soporte.</p>
+        <button 
+          *ngIf="isInSearchMode" 
+          class="btn btn-secondary" 
+          (click)="clearSearch()"
+        >
+          <mat-icon>arrow_back</mat-icon>
+          Ver todas las FAQs
+        </button>
+      </div>
+
+      <div class="faqs-list" *ngIf="filteredFaqs.length > 0">
+        <div 
+          *ngFor="let faq of filteredFaqs; let i = index"
+          class="faq-item"
+          [class.expanded]="expandedIndex === i"
+        >
+          <div class="faq-question" (click)="toggleFaq(i, faq)">
+            <div class="question-content">
+              <mat-icon class="question-icon">{{ faq.icon || 'help' }}</mat-icon>
+              <h3>{{ faq.question }}</h3>
+            </div>
+            <mat-icon class="expand-icon">
+              {{ expandedIndex === i ? 'expand_less' : 'expand_more' }}
+            </mat-icon>
+          </div>
+          <div class="faq-answer" [@slideDown] *ngIf="expandedIndex === i">
+            <p>{{ faq.answer }}</p>
+            
+            <!-- Feedback Buttons -->
+            <div class="faq-feedback">
+              <p class="feedback-question">¿Te resultó útil esta respuesta?</p>
+              
+              <!-- Botones de votación -->
+              <div class="feedback-buttons" *ngIf="!hasVoted(faq)">
+                <button 
+                  class="feedback-btn"
+                  (click)="markAsHelpful(faq, true, $event)"
+                  [disabled]="!faq.documentId && !faq.id"
+                >
+                  <mat-icon>thumb_up</mat-icon>
+                  Sí
+                  <span *ngIf="faq.helpfulCount && faq.helpfulCount > 0">({{ faq.helpfulCount }})</span>
+                </button>
+                <button 
+                  class="feedback-btn"
+                  (click)="markAsHelpful(faq, false, $event)"
+                  [disabled]="!faq.documentId && !faq.id"
+                >
+                  <mat-icon>thumb_down</mat-icon>
+                  No
+                  <span *ngIf="faq.notHelpfulCount && faq.notHelpfulCount > 0">({{ faq.notHelpfulCount }})</span>
+                </button>
+              </div>
+              
+              <!-- Mensaje si ya votó -->
+              <div class="feedback-voted" *ngIf="hasVoted(faq)">
+                <mat-icon class="voted-icon">check_circle</mat-icon>
+                <p class="voted-message">Gracias por tu opinión</p>
+                <div class="feedback-stats">
+                  <span *ngIf="faq.helpfulCount && faq.helpfulCount > 0">
+                    <mat-icon>thumb_up</mat-icon> {{ faq.helpfulCount }}
+                  </span>
+                  <span *ngIf="faq.notHelpfulCount && faq.notHelpfulCount > 0">
+                    <mat-icon>thumb_down</mat-icon> {{ faq.notHelpfulCount }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="contact-cta">
+      <div class="cta-content">
+        <mat-icon>contact_support</mat-icon>
+        <h2>¿No encontraste lo que buscabas?</h2>
+        <p>Nuestro equipo de soporte está listo para ayudarte</p>
+        <div class="cta-buttons">
+          <a routerLink="/contact" class="btn btn-primary">
+            <mat-icon>mail</mat-icon>
+            Contáctanos
+          </a>
+          <a href="https://wa.me/573001234567" target="_blank" class="btn btn-secondary">
+            <mat-icon>message</mat-icon>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Links -->
+    <section class="quick-links">
+      <h2>Enlaces Útiles</h2>
+      <div class="links-grid">
+        <a routerLink="/contact" class="quick-link-card">
+          <mat-icon>contact_mail</mat-icon>
+          <h3>Contacto</h3>
+          <p>Envíanos un mensaje</p>
+        </a>
+        <a routerLink="/legal/terms" class="quick-link-card">
+          <mat-icon>description</mat-icon>
+          <h3>Términos y Condiciones</h3>
+          <p>Lee nuestros términos</p>
+        </a>
+        <a routerLink="/legal/privacy" class="quick-link-card">
+          <mat-icon>privacy_tip</mat-icon>
+          <h3>Privacidad</h3>
+          <p>Política de privacidad</p>
+        </a>
+        <a routerLink="/" class="quick-link-card">
+          <mat-icon>work</mat-icon>
+          <h3>Trabaja con Nosotros</h3>
+          <p>Únete a nuestro equipo</p>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>
+

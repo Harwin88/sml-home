@@ -1,0 +1,208 @@
+<div class="profile-container">
+  <!-- Botón de regreso -->
+  <div class="back-button">
+    <button class="btn-back" (click)="router.navigate(['/'])">
+      <mat-icon>arrow_back</mat-icon>
+      Volver a búsqueda
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando perfil...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error">
+    <h3>
+      <mat-icon>warning</mat-icon>
+      Error
+    </h3>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="router.navigate(['/'])">Volver a búsqueda</button>
+  </div>
+
+  <!-- Perfil del proveedor -->
+  <div *ngIf="provider && !loading" class="profile-content">
+    
+    <!-- Header del perfil -->
+    <div class="profile-header">
+      <div class="profile-image-section">
+        <img [src]="getPhotoUrl()" [alt]="provider.name" class="profile-image"
+          (error)="onImageError($event)" />
+        <span *ngIf="provider.isVerified" class="verified-badge-large">
+          <mat-icon>verified</mat-icon>
+          Verificado
+        </span>
+      </div>
+
+      <div class="profile-header-info">
+        <div class="name-favorite-row">
+          <h1 class="provider-name">{{ provider.name }}</h1>
+          <!-- Botón de favoritos (solo para usuarios autenticados) -->
+          <button 
+            *ngIf="isAuthenticated()" 
+            class="favorite-btn"
+            [class.favorited]="isFavorite()"
+            (click)="toggleFavorite()"
+            [attr.aria-label]="isFavorite() ? 'Remover de favoritos' : 'Agregar a favoritos'"
+            type="button">
+            <mat-icon>favorite</mat-icon>
+          </button>
+        </div>
+        
+        <!-- Rating -->
+        <div class="rating-section">
+          <div class="stars-display">
+            <mat-icon *ngFor="let filled of getStars()" class="star" [class.filled]="filled">star</mat-icon>
+            <span class="rating-value">{{ provider.rating.toFixed(1) }}/5</span>
+          </div>
+          <span class="reviews-count">({{ provider.totalReviews }} reseña{{ provider.totalReviews !== 1 ? 's' : '' }})</span>
+        </div>
+
+        <!-- Experiencia -->
+        <div class="experience-badge">
+          <mat-icon class="icon">work</mat-icon>
+          <span>{{ provider.experienceYears }} años de experiencia</span>
+        </div>
+
+        <!-- Rango de precio -->
+        <div class="price-range-badge" [ngClass]="provider.priceRange">
+          <mat-icon class="icon">attach_money</mat-icon>
+          <span>{{ getPriceRangeText() }}</span>
+        </div>
+
+        <!-- Tarifa por hora -->
+        <div *ngIf="provider.hourlyRate" class="hourly-rate-badge">
+          <mat-icon class="icon">payments</mat-icon>
+          <span>${{ formatPrice(provider.hourlyRate) }} / hora</span>
+        </div>
+
+        <!-- Botones de acción principales -->
+        <div class="action-buttons">
+          <button class="btn btn-rate" (click)="openRatingModal()">
+            <mat-icon class="icon">star</mat-icon>
+            Calificar Servicio
+          </button>
+          <button class="btn btn-whatsapp" (click)="openWhatsApp()">
+            <mat-icon class="icon">chat</mat-icon>
+            Contactar por WhatsApp
+          </button>
+          <button class="btn btn-call" (click)="callProvider()">
+            <mat-icon class="icon">phone</mat-icon>
+            Llamar
+          </button>
+          <button *ngIf="provider.email" class="btn btn-email" (click)="sendEmail()">
+            <mat-icon class="icon">email</mat-icon>
+            Email
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información detallada -->
+    <div class="profile-details">
+      
+      <!-- Descripción -->
+      <section class="detail-section" *ngIf="provider.description">
+        <h2>
+          <mat-icon>description</mat-icon>
+          Sobre el servicio
+        </h2>
+        <p class="description-text">{{ provider.description }}</p>
+      </section>
+
+      <!-- Información de contacto -->
+      <section class="detail-section">
+        <h2>
+          <mat-icon>phone</mat-icon>
+          Información de contacto
+        </h2>
+        <div class="contact-info">
+          <div class="contact-item" *ngIf="provider.phone">
+            <span class="contact-label">Teléfono:</span>
+            <a [href]="'tel:' + provider.phone" class="contact-value">{{ provider.phone }}</a>
+          </div>
+          <div class="contact-item" *ngIf="provider.whatsapp">
+            <span class="contact-label">WhatsApp:</span>
+            <a [href]="getWhatsAppUrl()" target="_blank" class="contact-value">{{ provider.whatsapp }}</a>
+          </div>
+          <div class="contact-item" *ngIf="provider.email">
+            <span class="contact-label">Email:</span>
+            <a [href]="'mailto:' + provider.email" class="contact-value">{{ provider.email }}</a>
+          </div>
+          <div class="contact-item" *ngIf="provider.address">
+            <span class="contact-label">Dirección:</span>
+            <span class="contact-value">{{ provider.address }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categorías de servicio -->
+      <section class="detail-section" *ngIf="getCategories().length > 0">
+        <h2>
+          <mat-icon>build</mat-icon>
+          Servicios ofrecidos
+        </h2>
+        <div class="categories-list">
+          <span *ngFor="let category of getCategories()" class="category-tag-large">
+            {{ category.name }}
+          </span>
+        </div>
+      </section>
+
+      <!-- Área de servicio -->
+      <section class="detail-section" *ngIf="provider.serviceArea">
+        <h2>
+          <mat-icon>location_on</mat-icon>
+          Área de servicio
+        </h2>
+        <p class="service-area">{{ provider.serviceArea }}</p>
+      </section>
+
+      <!-- Certificaciones -->
+      <section class="detail-section" *ngIf="getCertifications().length > 0">
+        <h2>
+          <mat-icon>emoji_events</mat-icon>
+          Certificaciones
+        </h2>
+        <ul class="certifications-list">
+          <li *ngFor="let cert of getCertifications()" class="certification-item">
+            <div class="certification-content">
+              <span class="certification-name">{{ cert.name }}</span>
+              <span class="certification-issuer" *ngIf="cert.issuer">- {{ cert.issuer }}</span>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Horario de disponibilidad -->
+      <section class="detail-section" *ngIf="hasAvailabilitySchedule()">
+        <h2>
+          <mat-icon>schedule</mat-icon>
+          Disponibilidad
+        </h2>
+        <div class="schedule-info">
+          <div class="schedule-list">
+            <div *ngFor="let item of getAvailabilitySchedule()" class="schedule-item">
+              <span class="schedule-day">{{ item.day }}</span>
+              <span class="schedule-hours">{{ item.hours }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal de calificación -->
+<app-rating-modal 
+  *ngIf="showRatingModal && provider"
+  [providerName]="provider.name"
+  [providerId]="provider.documentId"
+  (close)="closeRatingModal()"
+  (submit)="onSubmitRating($event)">
+</app-rating-modal>
+

@@ -1,0 +1,350 @@
+<div class="search-container">
+
+  <!-- Filtros activos -->
+  <div class="active-filters-bar" *ngIf="activeFiltersCount > 0">
+    <span class="filter-count">{{ activeFiltersCount }} filtro(s) activo(s)</span>
+    <button class="btn-clear" (click)="clearFilters()">Limpiar todo</button>
+  </div>
+
+  <div class="content-wrapper">
+
+    <!-- Sidebar con filtros -->
+    <aside class="filters-sidebar">
+
+      <!-- Filtro por Categorías (Solo Nodos Hoja) -->
+      <div class="filter-section">
+        <h3>
+          <mat-icon>list</mat-icon>
+          Categorías de Servicio
+        </h3>
+        <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 15px;">
+          Selecciona una categoría
+        </p>
+
+        <!-- Buscador de categorías (para filtrar la lista de categorías) -->
+        <div class="category-search-box">
+          <input type="text" 
+                 [formControl]="categorySearchControl" 
+                 placeholder="Buscar categoría..."
+                 class="category-search-input" />
+          <mat-icon class="category-search-icon">search</mat-icon>
+        </div>
+
+        <div *ngIf="loadingCategories" class="loading-small">
+          Cargando categorías...
+        </div>
+
+        <!-- Mostrar solo categorías nodo hoja como filtros seleccionables (filtradas por búsqueda) -->
+        <div *ngIf="!loadingCategories && subcategoryFilters.length > 0" class="leaf-categories-list">
+          <label *ngFor="let category of filteredSubcategoryFilters" class="checkbox-label"
+            [class.selected]="category.selected">
+            <input type="checkbox" [checked]="category.selected" (change)="toggleSubcategory(category)" />
+            <span class="subcategory-icon" *ngIf="category.icon">{{ category.icon }}</span>
+            <span class="subcategory-name">{{ category.name }}</span>
+            <span class="parent-badge" *ngIf="category.parentName">{{ category.parentName }}</span>
+          </label>
+        </div>
+
+        <!-- Mensaje cuando no hay categorías que coincidan con la búsqueda -->
+        <div *ngIf="!loadingCategories && subcategoryFilters.length > 0 && filteredSubcategoryFilters.length === 0" class="no-categories">
+          <p>No se encontraron categorías con ese término</p>
+        </div>
+
+        <!-- Mensaje cuando no hay categorías disponibles -->
+        <div *ngIf="!loadingCategories && subcategoryFilters.length === 0" class="no-categories">
+          <p>No hay categorías disponibles</p>
+        </div>
+      </div>
+
+      <!-- Filtro por Rating -->
+      <div class="filter-section">
+        <h3>
+          <mat-icon>star</mat-icon>
+          Calificación Mínima
+        </h3>
+        <div class="rating-filter">
+          <input type="range" min="0" max="5" step="0.5" [(ngModel)]="minRating" (ngModelChange)="applyFilters()"
+            class="rating-slider" />
+          <div class="rating-value">
+            <span *ngIf="minRating > 0">
+              <mat-icon>star</mat-icon>
+              {{ minRating }} o más
+            </span>
+            <span *ngIf="minRating === 0">Cualquier calificación</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtro por Verificación -->
+      <div class="filter-section">
+        <h3>
+          <mat-icon>check_circle</mat-icon>
+          Estado
+        </h3>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="showOnlyVerified" (ngModelChange)="applyFilters()" />
+          <span>Solo proveedores verificados</span>
+        </label>
+      </div>
+
+      <!-- Filtro por Ubicación -->
+      <div class="filter-section">
+        <h3>
+          <mat-icon>location_on</mat-icon>
+          Mi Ubicación
+        </h3>
+        <div class="location-filter">
+          <div *ngIf="!userLocation && !isGettingLocation && !isGeocoding && !locationError && !showManualLocation" class="location-action">
+            <button class="btn-location" (click)="getUserLocation()" type="button">
+              <mat-icon class="location-icon">my_location</mat-icon>
+              <span>Obtener mi ubicación</span>
+            </button>
+            <button class="btn-location-secondary" (click)="toggleManualLocation()" type="button">
+              <mat-icon class="location-icon">edit_location</mat-icon>
+              <span>Ingresar dirección</span>
+            </button>
+          </div>
+
+          <!-- Opción de dirección manual -->
+          <div *ngIf="showManualLocation" class="location-manual">
+            <div class="manual-location-input">
+              <input 
+                type="text" 
+                [(ngModel)]="manualAddress"
+                placeholder="Ej: Calle 123, Bogotá, Colombia"
+                class="location-input"
+                (keyup.enter)="searchManualLocation()"
+              />
+              <button class="btn-location-search" (click)="searchManualLocation()" [disabled]="isGeocoding" type="button">
+                <mat-icon *ngIf="!isGeocoding">search</mat-icon>
+                <div *ngIf="isGeocoding" class="mini-spinner"></div>
+              </button>
+            </div>
+            <button class="btn-location-cancel" (click)="toggleManualLocation()" type="button">
+              Cancelar
+            </button>
+          </div>
+
+          <div *ngIf="isGettingLocation || isGeocoding" class="location-loading">
+            <div class="location-spinner"></div>
+            <p class="location-message">
+              {{ isGettingLocation ? 'Obteniendo ubicación...' : 'Buscando dirección...' }}
+            </p>
+          </div>
+
+          <div *ngIf="locationError && !showManualLocation" class="location-error">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <p class="location-message error-text">{{ locationError }}</p>
+            <div class="location-error-actions">
+              <button class="btn-location-small" (click)="getUserLocation()" type="button">
+                <mat-icon>refresh</mat-icon>
+                Intentar de nuevo
+              </button>
+              <button class="btn-location-small" (click)="toggleManualLocation()" type="button">
+                <mat-icon>edit_location</mat-icon>
+                Ingresar dirección
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="userLocation && !isGettingLocation && !isGeocoding" class="location-success">
+            <div class="location-info">
+              <p class="location-message success-text">
+                <mat-icon class="location-icon" [class.gps-icon]="userLocation.source === 'gps'" 
+                          [class.ip-icon]="userLocation.source === 'ip'"
+                          [class.manual-icon]="userLocation.source === 'manual'">
+                  {{ userLocation.source === 'gps' ? 'my_location' : userLocation.source === 'ip' ? 'public' : 'place' }}
+                </mat-icon>
+                <span>
+                  {{ userLocation.source === 'gps' ? 'Ubicación GPS' : userLocation.source === 'ip' ? 'Ubicación aproximada' : 'Ubicación manual' }}
+                </span>
+              </p>
+              <p class="location-address" *ngIf="userLocation.address">
+                {{ userLocation.address }}
+              </p>
+              <p class="location-coords">
+                {{ userLocation.latitude.toFixed(6) }}, {{ userLocation.longitude.toFixed(6) }}
+              </p>
+              <p class="location-accuracy" *ngIf="userLocation.accuracy">
+                <mat-icon>gps_fixed</mat-icon>
+                Precisión: {{ userLocation.accuracy < 1000 ? (userLocation.accuracy.toFixed(0) + ' m') : ((userLocation.accuracy / 1000).toFixed(1) + ' km') }}
+              </p>
+            </div>
+            <div class="location-actions">
+              <button class="btn-location-update" (click)="getUserLocation()" type="button">
+                <mat-icon>refresh</mat-icon>
+                Actualizar
+              </button>
+              <button class="btn-location-clear" (click)="clearLocation()" type="button">
+                <mat-icon>clear</mat-icon>
+                Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtro por Rango de Precio -->
+      <div class="filter-section">
+        <h3>
+          <mat-icon>attach_money</mat-icon>
+          Rango de Precio
+        </h3>
+        <div class="price-filters">
+          <label *ngFor="let range of priceRanges" class="radio-label" [class.selected]="selectedPriceRange === range">
+            <input type="radio" name="priceRange" [value]="range" [(ngModel)]="selectedPriceRange"
+              (ngModelChange)="applyFilters()" />
+            <span class="price-badge" [ngClass]="range">{{ range }}</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="priceRange" value="" [(ngModel)]="selectedPriceRange" (ngModelChange)="applyFilters()" />
+            <span>Todos</span>
+          </label>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Resultados -->
+    <main class="results-section">
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Buscando proveedores...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="error && !loading" class="error">
+        {{ error }}
+      </div>
+
+      <!-- Sin resultados -->
+      <div *ngIf="!loading && !error && filteredProviders.length === 0" class="no-results">
+        <h3>
+          <mat-icon>sentiment_dissatisfied</mat-icon>
+          No se encontraron proveedores
+        </h3>
+        <p>Intenta ajustar los filtros o realiza una nueva búsqueda</p>
+        <button class="btn-primary" (click)="clearFilters()">Limpiar filtros</button>
+      </div>
+
+      <!-- Resultados -->
+      <div *ngIf="!loading && filteredProviders.length > 0">
+
+        <!-- Contador de resultados -->
+        <div class="results-header">
+          <h2>{{ filteredProviders.length }} proveedor(es) encontrado(s)</h2>
+        </div>
+
+        <!-- Grid de proveedores -->
+        <div class="providers-grid">
+          <div *ngFor="let provider of filteredProviders" class="provider-card">
+
+            <!-- Imagen -->
+            <div class="provider-image">
+              <img [src]="provider.photoUrl || 'assets/default-avatar.png'" [alt]="provider.name"
+                (error)="onImageError($event)" />
+              <span *ngIf="provider.isVerified" class="verified-badge">
+                <mat-icon>verified</mat-icon>
+                Verificado
+              </span>
+              <!-- Botón de favoritos (solo para usuarios autenticados) -->
+              <button 
+                *ngIf="isAuthenticated()" 
+                class="favorite-btn"
+                [class.favorited]="isFavorite(provider)"
+                (click)="toggleFavorite(provider)"
+                [attr.aria-label]="isFavorite(provider) ? 'Remover de favoritos' : 'Agregar a favoritos'"
+                type="button">
+                <mat-icon>favorite</mat-icon>
+              </button>
+            </div>
+
+            <!-- Info -->
+            <div class="provider-info">
+              <h3 class="provider-name">{{ provider.name }}</h3>
+
+              <!-- Rating -->
+              <div class="rating">
+                <span class="stars">
+                  <mat-icon>star</mat-icon>
+                  {{ provider.rating.toFixed(1) }}/5
+                </span>
+                <span class="reviews">({{ provider.totalReviews }} reseñas)</span>
+              </div>
+
+              <!-- Experiencia -->
+              <p class="experience">
+                <mat-icon class="icon">work</mat-icon>
+                {{ provider.experienceYears }} años de experiencia
+              </p>
+
+              <!-- Categorías -->
+              <div class="provider-categories">
+                <span *ngFor="let category of provider.categories" class="category-tag"
+                  [class.highlighted]="isCategoryHighlighted(category)">
+                  {{ category }}
+                </span>
+              </div>
+
+              <!-- Precio -->
+              <div class="price-info">
+                <span class="price-badge" [ngClass]="provider.priceRange">
+                  {{ provider.priceRange }}
+                </span>
+                <span *ngIf="provider.hourlyRate" class="hourly-rate">
+                  <mat-icon>payments</mat-icon>
+                  ${{ formatPrice(provider.hourlyRate) }}/hora
+                </span>
+              </div>
+
+              <!-- Acciones -->
+              <div class="provider-actions">
+                <a [href]="getWhatsAppUrl(provider)" target="_blank" rel="noopener noreferrer" class="btn btn-call">
+                  <mat-icon>chat</mat-icon>
+                  <span>Chatear por WhatsApp</span>
+                </a>
+                <a [routerLink]="['/provider', provider.documentId]" class="btn btn-details">
+                  <mat-icon>person</mat-icon>
+                  <span>Ver Perfil</span>
+                </a>
+                <button (click)="openRatingModal(provider)" class="btn btn-rate">
+                  <mat-icon>star</mat-icon>
+                  Calificar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button class="btn-page" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+            <mat-icon>arrow_back</mat-icon>
+            Anterior
+          </button>
+
+          <span class="page-info">
+            Página {{ currentPage }} de {{ totalPages }}
+          </span>
+
+          <button class="btn-page" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+            Siguiente
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal de calificación -->
+<app-rating-modal 
+  *ngIf="showRatingModal && selectedProviderForRating"
+  [providerName]="selectedProviderForRating.name"
+  [providerId]="selectedProviderForRating.documentId"
+  (close)="closeRatingModal()"
+  (submit)="onSubmitRating($event)">
+</app-rating-modal>
