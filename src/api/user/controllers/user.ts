@@ -312,10 +312,12 @@ export default factories.createCoreController('api::user.user', ({ strapi }) => 
     try {
       console.log('removeFavorite (sin JWT): Inicio');
       console.log('removeFavorite: Params:', ctx.params);
+      console.log('removeFavorite: Query:', ctx.query);
       console.log('removeFavorite: Body:', ctx.request.body);
 
       const { providerId } = ctx.params;
-      const { userId, userDocumentId } = ctx.request.body || {};
+      // Leer de query params en lugar de body (DELETE no siempre parsea body)
+      const { userId, userDocumentId } = ctx.query || ctx.request.body || {};
 
       if (!providerId) {
         return ctx.badRequest('providerId es requerido');
