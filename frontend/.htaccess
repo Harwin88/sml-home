@@ -1,0 +1,13 @@
+# Angular SPA - Minimal configuration for Hostinger
+# This ensures all routes redirect to index.html for Angular Router
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  
+  # Don't rewrite files or directories that exist
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Rewrite everything else to index.html
+  RewriteRule ^ index.html [L]
+</IfModule>
