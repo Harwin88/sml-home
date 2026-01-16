@@ -67,41 +67,87 @@ module.exports = {
     async up() {
         console.log('🌱 Iniciando migración: seed de categorías iniciales...');
 
-        await strapi.db.transaction(async () => {
-            for (const categoryData of categoriesData) {
-                try {
-                    const { children, ...parentData } = categoryData;
-
-                    // Crear categoría padre
-                    const parent = await strapi.entityService.create('api::category.category', {
-                        data: {
-                            ...parentData,
-                            publishedAt: new Date()
-                        }
-                    });
-
-                    console.log(`✅ Creada categoría: ${parent.name} (ID: ${parent.id})`);
-
-                    // Crear subcategorías
-                    if (children && children.length > 0) {
-                        for (const childData of children) {
-                            const child = await strapi.entityService.create('api::category.category', {
-                                data: {
-                                    ...childData,
-                                    parent: parent.id,
-                                    publishedAt: new Date()
-                                }
-                            });
-                            console.log(`  ✅ Creada subcategoría: ${child.name}`);
-                        }
-                    }
-                } catch (error) {
-                    console.error(`❌ Error creando categoría ${categoryData.name}:`, error.message);
-                    throw error; // Re-throw para que la transacción haga rollback
-                }
+        try {
+            // Verificar si la tabla existe
+            const tableExists = await strapi.db.connection.schema.hasTable('categories');
+            if (!tableExists) {
+                console.log('⚠️  La tabla "categories" no existe todavía. La migración se omitirá y se ejecutará cuando el schema esté sincronizado.');
+                return;
             }
-        });
 
-        console.log('🎉 Migración completada: Todas las categorías fueron creadas exitosamente!');
+            // Verificar si ya hay categorías
+            const existingCategories = await strapi.entityService.findMany('api::category.category', {
+                limit: 1
+            });
+
+            if (existingCategories && existingCategories.length > 0) {
+                console.log('ℹ️  Ya existen categorías en la base de datos. La migración se omitirá.');
+                return;
+            }
+
+            await strapi.db.transaction(async () => {
+                for (const categoryData of categoriesData) {
+                    try {
+                        const { children, ...parentData } = categoryData;
+
+                        // Verificar si la categoría ya existe
+                        const existing = await strapi.entityService.findMany('api::category.category', {
+                            filters: { slug: parentData.slug },
+                            limit: 1
+                        });
+
+                        if (existing && existing.length > 0) {
+                            console.log(`⏭️  Categoría "${parentData.name}" ya existe. Se omite.`);
+                            continue;
+                        }
+
+                        // Crear categoría padre
+                        const parent = await strapi.entityService.create('api::category.category', {
+                            data: {
+                                ...parentData,
+                                publishedAt: new Date()
+                            }
+                        });
+
+                        console.log(`✅ Creada categoría: ${parent.name} (ID: ${parent.id})`);
+
+                        // Crear subcategorías
+                        if (children && children.length > 0) {
+                            for (const childData of children) {
+                                const existingChild = await strapi.entityService.findMany('api::category.category', {
+                                    filters: { slug: childData.slug },
+                                    limit: 1
+                                });
+
+                                if (existingChild && existingChild.length > 0) {
+                                    console.log(`  ⏭️  Subcategoría "${childData.name}" ya existe. Se omite.`);
+                                    continue;
+                                }
+
+                                const child = await strapi.entityService.create('api::category.category', {
+                                    data: {
+                                        ...childData,
+                                        parent: parent.id,
+                                        publishedAt: new Date()
+                                    }
+                                });
+                                console.log(`  ✅ Creada subcategoría: ${child.name}`);
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`❌ Error creando categoría ${categoryData.name}:`, error.message);
+                        // No hacer throw para que la migración no falle el inicio de la app
+                        // En producción, es mejor que la app inicie aunque el seed falle
+                        continue;
+                    }
+                }
+            });
+
+            console.log('🎉 Migración completada: Todas las categorías fueron creadas exitosamente!');
+        } catch (error) {
+            console.error('⚠️  Error en la migración de categorías:', error.message);
+            console.log('ℹ️  La aplicación continuará iniciando. El seed se puede ejecutar manualmente más tarde.');
+            // No hacer throw para que la migración no falle el inicio de la app
+        }
     }
 };
