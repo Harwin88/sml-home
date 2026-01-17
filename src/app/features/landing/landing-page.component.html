@@ -41,21 +41,75 @@
         </div>
       </div>
       <div class="hero-image">
-        <div class="hero-illustration">
-          <mat-icon class="illustration-icon">home</mat-icon>
-          <div class="illustration-badge verified pulse">
-            <mat-icon>verified</mat-icon>
-            Verificado
+        <!-- Proveedor destacado si existe -->
+        <ng-container *ngIf="featuredProvider && featuredProvider.provider; else noFeaturedProvider">
+          <a 
+            [routerLink]="['/provider', featuredProvider.provider.documentId]"
+            class="hero-illustration featured-provider-link"
+            [attr.aria-label]="'Ver perfil de ' + featuredProvider.provider.name"
+          >
+            <!-- Header con texto destacado y foto miniatura -->
+            <div class="featured-provider-header">
+              <!-- Texto destacado si existe -->
+              <div class="featured-text-badge" *ngIf="featuredProvider.featuredText">
+                {{ featuredProvider.featuredText }}
+              </div>
+              
+              <!-- Foto en miniatura -->
+              <div class="featured-provider-avatar">
+                <img 
+                  [src]="getFeaturedProviderPhotoUrl()" 
+                  [alt]="featuredProvider.provider.name"
+                  class="featured-provider-thumbnail"
+                  onerror="this.src='assets/default-avatar.png'"
+                />
+                <!-- Badge de verificado en la foto -->
+                <div class="verified-badge" *ngIf="featuredProvider.provider.isVerified">
+                  <mat-icon>verified</mat-icon>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Contenido principal -->
+            <div class="featured-provider-content">
+              <!-- Nombre -->
+              <h3 class="featured-provider-name">{{ featuredProvider.provider.name }}</h3>
+              
+              <!-- Calificación destacada -->
+              <div class="featured-rating-section">
+                <div class="rating-stars">
+                  <mat-icon *ngFor="let star of getRatingStars(featuredProvider.provider.rating || 0)">{{ star }}</mat-icon>
+                </div>
+                <span class="rating-value">{{ formatRating(featuredProvider.provider.rating || 0) }}</span>
+                <span class="rating-reviews">({{ formatNumber(featuredProvider.provider.totalReviews || 0) }} reseñas)</span>
+              </div>
+              
+              <!-- Descripción -->
+              <p class="featured-provider-description" *ngIf="featuredProvider.provider.description">
+                {{ getTruncatedDescription(featuredProvider.provider.description, 120) }}
+              </p>
+            </div>
+          </a>
+        </ng-container>
+        
+        <!-- Fallback si no hay proveedor destacado -->
+        <ng-template #noFeaturedProvider>
+          <div class="hero-illustration">
+            <mat-icon class="illustration-icon">home</mat-icon>
+            <div class="illustration-badge verified pulse">
+              <mat-icon>verified</mat-icon>
+              Verificado
+            </div>
+            <div class="illustration-badge rating">
+              <mat-icon>star</mat-icon>
+              {{ formatRating(averageRating) }}
+            </div>
+            <div class="illustration-badge providers">
+              <mat-icon>people</mat-icon>
+              {{ formatNumber(totalProviders) }}+
+            </div>
           </div>
-          <div class="illustration-badge rating">
-            <mat-icon>star</mat-icon>
-            {{ formatRating(averageRating) }}
-          </div>
-          <div class="illustration-badge providers">
-            <mat-icon>people</mat-icon>
-            {{ formatNumber(totalProviders) }}+
-          </div>
-        </div>
+        </ng-template>
       </div>
     </div>
     <div class="hero-wave">

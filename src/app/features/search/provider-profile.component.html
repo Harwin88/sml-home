@@ -1,9 +1,8 @@
 <div class="profile-container">
   <!-- Botón de regreso -->
   <div class="back-button">
-    <button class="btn-back" (click)="router.navigate(['/'])">
+    <button class="btn-back" (click)="router.navigate(['/search'])" aria-label="Volver a búsqueda">
       <mat-icon>arrow_back</mat-icon>
-      Volver a búsqueda
     </button>
   </div>
 
@@ -20,7 +19,7 @@
       Error
     </h3>
     <p>{{ error }}</p>
-    <button class="btn-primary" (click)="router.navigate(['/'])">Volver a búsqueda</button>
+    <button class="btn-primary" (click)="router.navigate(['/search'])">Volver a búsqueda</button>
   </div>
 
   <!-- Perfil del proveedor -->
@@ -89,10 +88,7 @@
             <mat-icon class="icon">chat</mat-icon>
             Contactar por WhatsApp
           </button>
-          <button class="btn btn-call" (click)="callProvider()">
-            <mat-icon class="icon">phone</mat-icon>
-            Llamar
-          </button>
+         
           <button *ngIf="provider.email" class="btn btn-email" (click)="sendEmail()">
             <mat-icon class="icon">email</mat-icon>
             Email
@@ -120,10 +116,7 @@
           Información de contacto
         </h2>
         <div class="contact-info">
-          <div class="contact-item" *ngIf="provider.phone">
-            <span class="contact-label">Teléfono:</span>
-            <a [href]="'tel:' + provider.phone" class="contact-value">{{ provider.phone }}</a>
-          </div>
+        
           <div class="contact-item" *ngIf="provider.whatsapp">
             <span class="contact-label">WhatsApp:</span>
             <a [href]="getWhatsAppUrl()" target="_blank" class="contact-value">{{ provider.whatsapp }}</a>

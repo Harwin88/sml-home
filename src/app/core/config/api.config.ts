@@ -4,7 +4,8 @@ export const API_CONFIG = {
     apiPath: '/api',
     endpoints: {
         categories: '/categories',
-        serviceProviders: '/service-providers'
+        serviceProviders: '/service-providers',
+        featuredProviders: '/featured-providers'
     }
 };
 
