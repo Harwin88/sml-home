@@ -615,6 +615,45 @@ export interface ApiFaqFaq extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiFeaturedProviderFeaturedProvider
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'featured_providers';
+  info: {
+    description: 'Proveedores destacados que aparecen en el banner del home';
+    displayName: 'Proveedor Destacado';
+    pluralName: 'featured-providers';
+    singularName: 'featured-provider';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    endDate: Schema.Attribute.Date;
+    featuredText: Schema.Attribute.Text;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::featured-provider.featured-provider'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    provider: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::service-provider.service-provider'
+    > &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    startDate: Schema.Attribute.Date;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiFormForm extends Struct.CollectionTypeSchema {
   collectionName: 'forms';
   info: {
@@ -1649,6 +1688,7 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::contact-form.contact-form': ApiContactFormContactForm;
       'api::faq.faq': ApiFaqFaq;
+      'api::featured-provider.featured-provider': ApiFeaturedProviderFeaturedProvider;
       'api::form.form': ApiFormForm;
       'api::medias.medias': ApiMediasMedias;
       'api::newsletter-subscription.newsletter-subscription': ApiNewsletterSubscriptionNewsletterSubscription;

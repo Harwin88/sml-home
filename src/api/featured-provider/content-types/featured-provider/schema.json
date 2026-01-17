@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "featured_providers",
+  "info": {
+    "singularName": "featured-provider",
+    "pluralName": "featured-providers",
+    "displayName": "Proveedor Destacado",
+    "description": "Proveedores destacados que aparecen en el banner del home"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "provider": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::service-provider.service-provider",
+      "required": true
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "featuredText": {
+      "type": "text",
+      "required": false
+    },
+    "startDate": {
+      "type": "date"
+    },
+    "endDate": {
+      "type": "date"
+    }
+  }
+}
+
