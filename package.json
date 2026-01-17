@@ -13,7 +13,8 @@
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
-    "seed:faqs:console": "strapi console"
+    "seed:faqs:console": "strapi console",
+    "seed:faqs": "node src/scripts/run-seed-faqs.js"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.33.1",
