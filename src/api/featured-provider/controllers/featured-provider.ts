@@ -20,7 +20,7 @@ export default factories.createCoreController('api::featured-provider.featured-p
             isActive: { $eq: true }
           },
           // No hacer populate del provider, solo devolver el ID
-          fields: ['id', 'documentId', 'order', 'isActive', 'featuredText', 'startDate', 'endDate'],
+          fields: ['id', 'order', 'isActive', 'featuredText', 'startDate', 'endDate'],
           sort: { order: 'asc' },
           limit: 1 // Solo necesitamos uno
         }
@@ -40,9 +40,7 @@ export default factories.createCoreController('api::featured-provider.featured-p
         featured.id,
         {
           populate: {
-            provider: {
-              fields: ['documentId'] // Solo obtener el documentId
-            }
+            provider: true // Populate completo - documentId está disponible automáticamente
           }
         }
       );

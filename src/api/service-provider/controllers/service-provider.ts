@@ -4,8 +4,6 @@
 
 import { factories } from '@strapi/strapi'
 
-const defaultController = factories.createCoreController('api::service-provider.service-provider');
-
 export default factories.createCoreController('api::service-provider.service-provider', ({ strapi }) => ({
   /**
    * Sobrescribir findOne para buscar por documentId si el parámetro no es numérico
@@ -54,7 +52,24 @@ export default factories.createCoreController('api::service-provider.service-pro
       }
     }
 
-    // Si es numérico, usar el comportamiento por defecto
-    return defaultController.findOne(ctx);
+    // Si es numérico, usar el comportamiento por defecto usando entityService
+    try {
+      const { id: numericId } = ctx.params;
+      const entity = await strapi.entityService.findOne('api::service-provider.service-provider', numericId, {
+        populate: {
+          photo: true,
+          categories: true,
+          portfolio: true
+        }
+      });
+
+      if (!entity) {
+        return ctx.notFound();
+      }
+
+      return ctx.send({ data: entity });
+    } catch (error: any) {
+      return ctx.internalServerError(error.message || 'Error al buscar proveedor');
+    }
   }
 }));
